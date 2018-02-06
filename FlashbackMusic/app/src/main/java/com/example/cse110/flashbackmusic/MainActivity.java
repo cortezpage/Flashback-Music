@@ -80,13 +80,24 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
+        // Link the "previous" button with the playPreviousSong() method from the music player
+        Button previousButton = (Button) findViewById(R.id.button_previous);
+        previousButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        musicPlayer.goToPreviousSong();
+                    }
+                }
+        );
+
         // Link the "next" button with the playNextSong() method from the music player
         Button nextButton = (Button) findViewById(R.id.button_next);
         nextButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        musicPlayer.playNextSong();
+                        musicPlayer.goToNextSong();
                     }
                 }
         );

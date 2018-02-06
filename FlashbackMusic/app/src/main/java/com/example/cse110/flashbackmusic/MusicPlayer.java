@@ -37,20 +37,26 @@ public class MusicPlayer {
         loadSong(songs[play_index].getMediaID());
     }
 
-    public void playNextSong() {
+    public void goToPreviousSong() {
+        play_index--;
+        if (play_index < 0) {
+            play_index = songs.length - 1;
+        }
+        this.reset();
+    }
+
+    public void goToNextSong() {
         play_index++;
         if (play_index >= songs.length) {
             play_index = 0;
         }
         this.reset();
-        this.player.start();
     }
 
     // Use this method when you implement the ability to click and choose a song!
     public void selectSong() {
         // update the play index
         // this.reset();
-        // this.player.start();
     }
 
     // Calls loadSong() on each song to be loaded
