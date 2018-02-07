@@ -72,7 +72,6 @@ public class MusicPlayer {
     // Calls loadSong() on each song to be loaded
     // Loads songs based on previously-saved data in string format
     public void loadSongs(String [] song_data) {
-        // Load songs: here is where we will place the songs in an array
         this.songs = new Song[song_data.length];
         String songName = "Song #";
         for (int index = 0; index < song_data.length; index++) {
