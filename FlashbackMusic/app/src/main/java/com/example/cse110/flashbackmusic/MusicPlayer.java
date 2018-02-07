@@ -18,9 +18,7 @@ public class MusicPlayer {
         this.play_index = 0;
     }
 
-    public void destroy() {
-        this.player.release();
-    }
+    public void destroy() { this.player.release(); }
 
     public void play() {
         this.player.start();
@@ -53,6 +51,18 @@ public class MusicPlayer {
         this.reset();
     }
 
+    public void changeCurrentLikeStatus() {
+        this.songs[play_index].incrementLikeStatus();
+    }
+
+    public int getCurrentLikeStatus() {
+        return this.songs[play_index].getLikeStatus();
+    }
+
+    public int getCurrentMediaID() { return this.songs[play_index].getMediaID(); }
+
+    public String getCurrentString() { return this.songs[play_index].toString(); }
+
     // Use this method when you implement the ability to click and choose a song!
     public void selectSong() {
         // update the play index
@@ -60,14 +70,15 @@ public class MusicPlayer {
     }
 
     // Calls loadSong() on each song to be loaded
-    public void loadSongs(int [] songIDs) {
+    // Loads songs based on previously-saved data in string format
+    public void loadSongs(String [] song_data) {
         // Load songs: here is where we will place the songs in an array
-        this.songs = new Song[songIDs.length];
+        this.songs = new Song[song_data.length];
         String songName = "Song #";
-        for (int index = 0; index < songIDs.length; index++) {
-            songs[index] = new Song(songName + index, "Artist", "Album", songIDs[index]);
+        for (int index = 0; index < song_data.length; index++) {
+            songs[index] = new Song(song_data[index]);
         }
-        loadSong(songIDs[0]); // load the first song to be played
+        loadSong(songs[0].getMediaID()); // load the first song to be played
     }
 
     /* loadSong is based on the loadMedia method from Lab 4.
