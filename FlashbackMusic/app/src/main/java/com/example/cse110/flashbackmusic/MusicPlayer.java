@@ -77,6 +77,8 @@ public class MusicPlayer {
 
     public String getCurrentString() { return this.songs[play_index].toString(); }
 
+    public String getCurrentWriteString() { return this.songs[play_index].toWriteString(); }
+
     public String getCurrentSongName() { return this.songs[play_index].getSongName(); }
 
     public String getCurrentSongArtist() { return this.songs[play_index].getArtistName(); }
@@ -87,7 +89,6 @@ public class MusicPlayer {
     // Loads songs based on previously-saved data in string format
     public void loadSongs(String [] song_data, int selected_id) {
         this.songs = new Song[song_data.length];
-        String songName = "Song #";
         for (int index = 0; index < song_data.length; index++) {
             songs[index] = new Song(song_data[index]);
             if (songs[index].getMediaID() == selected_id) {

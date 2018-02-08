@@ -30,16 +30,8 @@ public class SongSelection extends AppCompatActivity {
         sharedEditor = sharedPref.edit();
 
         sharedPrefHelper = new SharedPrefHelper(sharedPref, sharedEditor);
-        sharedPrefHelper.validateData();
-
-        Map<String, ?> allEntries = sharedPref.getAll();
-        song_data = new String[allEntries.size()];
-        int index = 0;
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            Log.i("Read song data:", entry.getKey() + ": " + entry.getValue().toString());
-            song_data[index] = entry.getValue().toString();
-            index++;
-        }
+        sharedPrefHelper.validateSongData();
+        song_data = sharedPrefHelper.getAllSongEntries();
 
         song_buttons = new Button [song_data.length];
         String [] curr_data;
@@ -51,13 +43,13 @@ public class SongSelection extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
             curr_data = song_data[buttonIndex].split("; ");
-            final int curr_id = Integer.parseInt(curr_data[5]);
+            final int curr_id = Integer.parseInt(curr_data[6]);
             new_button = new Button(this);
-            new_button.setText(curr_data[0]);
+            new_button.setText(curr_data[1]);
             new_button.setId(curr_id);
             song_buttons[buttonIndex] = new_button;
             layout.addView(new_button, params);
-            new_button = ((Button) findViewById(Integer.parseInt(curr_data[5])));
+            new_button = ((Button) findViewById(curr_id));
             new_button.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     launchMusicPlay("" + curr_id);
