@@ -2,11 +2,14 @@ package com.example.cse110.flashbackmusic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import java.util.Map;
 
@@ -125,12 +128,19 @@ public class MusicPlay extends AppCompatActivity {
                 }
         );
 
-        Button likeButton = (Button) findViewById(R.id.button_like);
+        final ImageButton likeButton = (ImageButton) findViewById(R.id.button_like);
         likeButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         musicPlayer.changeCurrentLikeStatus();
+                        if (musicPlayer.getCurrentLikeStatus() == 1) {
+                            likeButton.setBackgroundResource(R.drawable.check_mark);
+                        } else if (musicPlayer.getCurrentLikeStatus() == 0) {
+                            likeButton.setBackgroundResource(R.drawable.plus);
+                        } else if (musicPlayer.getCurrentLikeStatus() == 2) {
+                            likeButton.setBackgroundResource(R.drawable.cross);
+                        }
                         int currID = musicPlayer.getCurrentMediaID();
                         String currSong = musicPlayer.getCurrentString();
                         sharedPrefHelper.writeSongData(currID, currSong);
