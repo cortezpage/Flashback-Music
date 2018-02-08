@@ -121,6 +121,13 @@ public class MusicPlay extends AppCompatActivity {
         );
 
         final ImageButton likeButton = (ImageButton) findViewById(R.id.button_like);
+        if (musicPlayer.getCurrentLikeStatus() == 1) {
+            likeButton.setBackgroundResource(R.drawable.check_mark);
+        } else if (musicPlayer.getCurrentLikeStatus() == 0) {
+            likeButton.setBackgroundResource(R.drawable.plus);
+        } else if (musicPlayer.getCurrentLikeStatus() == 2) {
+            likeButton.setBackgroundResource(R.drawable.cross);
+        }
         likeButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
