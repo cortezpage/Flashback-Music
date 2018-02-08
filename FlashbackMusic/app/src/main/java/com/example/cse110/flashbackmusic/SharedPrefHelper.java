@@ -10,12 +10,12 @@ public class SharedPrefHelper {
     private SharedPreferences.Editor sharedEditor;
 
     private String [] all_songs = {
-            "123 Go; Keaton Simons; New & Best of Keaton Simons; 209; 0",
+            //"123 Go; Keaton Simons; New & Best of Keaton Simons; 209; 0",
             "After the Storm; Terry Oldfield; Origins - The Best of Terry Oldfield; 318; 0",
             "All About Ronnie; Rebecca Sayre; This is Always; 269; 0",
             "America Religious; Caroline Rose; I Will Not Be Afraid; 253; 0",
             "At Midnight; Caroline Rose; I Will Not Be Afraid; 198; 0",
-            "Back East; Caroline Rose; I Will Not Be Afraid; 190; 0",
+            /*"Back East; Caroline Rose; I Will Not Be Afraid; 190; 0",
             "Beautiful Pain; Keaton Simons; New & Best of Keaton Simons; 277; 0",
             "Blood On Your Bootheels; Caroline Rose; I Will Not Be Afraid; 195; 0",
             "Can't Find Love; Stacy Jones; Love Is Everywhere; 208; 0",
@@ -67,7 +67,7 @@ public class SharedPrefHelper {
             "When You Go; Caroline Rose; I Will Not Be Afraid; 224; 0",
             "Who Cares?; Rebecca Sayre; This is Always; 196; 0",
             "Wilderness; Terry Oldfield; Origins - The Best of Terry Oldfield; 362; 0",
-            "Windows are the Eyes to the House; Forum; Take Yourself Too Seriously; 246; 0"
+            "Windows are the Eyes to the House; Forum; Take Yourself Too Seriously; 246; 0"*/
     };
 
     private int [] all_IDs;
@@ -78,13 +78,13 @@ public class SharedPrefHelper {
         this.sharedEditor = editor;
 
         this.all_IDs = new int [] {
-                R.raw.one_two_three_go,
+                //R.raw.one_two_three_go,
                 R.raw.after_the_storm,
                 R.raw.all_about_ronnie,
                 R.raw.america_religious,
                 R.raw.at_midnight,
                 R.raw.back_east,
-                R.raw.beautiful_pain,
+                /*R.raw.beautiful_pain,
                 R.raw.blood_on_your_bootheels,
                 R.raw.cant_find_love,
                 R.raw.cant_you_be_mine,
@@ -135,7 +135,7 @@ public class SharedPrefHelper {
                 R.raw.when_you_go,
                 R.raw.who_cares_,
                 R.raw.wilderness,
-                R.raw.windows_are_the_eyes_to_the_house
+                R.raw.windows_are_the_eyes_to_the_house*/
         };
 
         this.all_data = new String[this.all_songs.length];
