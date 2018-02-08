@@ -33,12 +33,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void launchSongSelection () {
-        Intent intent = new Intent(this, SongSelection.class);
+        Intent intent = new Intent(this, SongSelectionActivity.class);
         startActivity(intent);
     }
 
     public void launchAlbumSelection () {
-        Intent intent = new Intent(this, AlbumSelection.class);
+        Intent intent = new Intent(this, AlbumSelectionActivity.class);
         startActivity(intent);
     }
 }
