@@ -13,18 +13,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button switchButton = (Button) findViewById(R.id.button_play_music);
+        Button toSongSelection = (Button) findViewById(R.id.button_to_song_selection);
 
-        switchButton.setOnClickListener(new View.OnClickListener() {
+        toSongSelection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchMusicPlay();
+                launchSongSelection();
+            }
+        });
+
+        Button toAlbumSelection = (Button) findViewById(R.id.button_to_album_selection);
+
+        toAlbumSelection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchAlbumSelection();
             }
         });
     }
 
-    public void launchMusicPlay () {
-        Intent intent = new Intent(this, MusicPlay.class);
+    public void launchSongSelection () {
+        Intent intent = new Intent(this, SongSelection.class);
+        startActivity(intent);
+    }
+
+    public void launchAlbumSelection () {
+        Intent intent = new Intent(this, AlbumSelection.class);
         startActivity(intent);
     }
 }

@@ -1,13 +1,13 @@
 package com.example.cse110.flashbackmusic;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import java.util.Map;
 
 public class MusicPlay extends AppCompatActivity {
@@ -47,11 +47,22 @@ public class MusicPlay extends AppCompatActivity {
             index++;
         }
 
-        musicPlayer = new MusicPlayer(this.getResources());
-        musicPlayer.loadSongs(song_data);
+        String mode = getIntent().getStringExtra("MODE");
+        musicPlayer = new MusicPlayer(this.getResources(), mode);
+        int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
+        musicPlayer.loadSongs(song_data, selected_id);
 
+        TextView songNameDisplay = (TextView) findViewById(R.id.song_name_music_play);
+        songNameDisplay.setText(musicPlayer.getCurrentSongName());
+
+        TextView songArtistDisplay = (TextView) findViewById(R.id.artist_name_music_play);
+        songArtistDisplay.setText(musicPlayer.getCurrentSongArtist());
+
+        TextView albumNameDisplay = (TextView) findViewById(R.id.album_name_music_play);
+        albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
+
+        // Link the "back" button to go back to the song selection activity
         Button back = (Button) findViewById(R.id.button_exit_music_play);
-
         back.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -127,10 +138,5 @@ public class MusicPlay extends AppCompatActivity {
                     }
                 }
         );
-    }
-
-    public void launchActivity () {
-        Intent intent = new Intent(this, MusicSelection.class);
-        startActivity(intent);
     }
 }

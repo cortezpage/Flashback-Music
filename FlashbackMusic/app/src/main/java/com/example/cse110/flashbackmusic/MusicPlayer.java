@@ -3,6 +3,9 @@ package com.example.cse110.flashbackmusic;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
+import android.util.Log;
+
+/* TO-DO: SAVE THE PLAY MODE IN SHARED PREFERENCES */
 
 public class MusicPlayer {
     private Resources song_resources;
@@ -10,17 +13,20 @@ public class MusicPlayer {
     private Song [] songs;
     // private Album [] albums ?
     private int play_index;
+    private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
-    public MusicPlayer(Resources resources) {
+    public MusicPlayer(Resources resources, String mode) {
         this.song_resources = resources;
         this.player = new MediaPlayer();
         this.songs = new Song[3];
         this.play_index = 0;
+        this.play_mode = 0; // assume song selection
     }
 
     public void destroy() { this.player.release(); }
 
     public void play() {
+        Log.i("Now playing:", this.getCurrentString());
         this.player.start();
     }
 
@@ -36,19 +42,27 @@ public class MusicPlayer {
     }
 
     public void goToPreviousSong() {
-        play_index--;
-        if (play_index < 0) {
-            play_index = songs.length - 1;
+        if (play_mode != 0) {
+            play_index--;
+            if (play_index < 0) {
+                play_index = songs.length - 1;
+            }
+            this.reset();
+        } else {
+            Log.i("MusicPlayer.goToPreviousSong()", "Cannot go to previous song in single song selection mode!");
         }
-        this.reset();
     }
 
     public void goToNextSong() {
-        play_index++;
-        if (play_index >= songs.length) {
-            play_index = 0;
+        if (play_mode != 0) {
+            play_index++;
+            if (play_index >= songs.length) {
+                play_index = 0;
+            }
+            this.reset();
+        } else {
+            Log.i("MusicPlayer.goToNextSong()", "Cannot go to next song in single song selection mode!");
         }
-        this.reset();
     }
 
     public void changeCurrentLikeStatus() {
@@ -63,21 +77,24 @@ public class MusicPlayer {
 
     public String getCurrentString() { return this.songs[play_index].toString(); }
 
-    // Use this method when you implement the ability to click and choose a song!
-    public void selectSong() {
-        // update the play index
-        // this.reset();
-    }
+    public String getCurrentSongName() { return this.songs[play_index].getSongName(); }
+
+    public String getCurrentSongArtist() { return this.songs[play_index].getArtistName(); }
+
+    public String getCurrentSongAlbum() { return this.songs[play_index].getAlbumName(); }
 
     // Calls loadSong() on each song to be loaded
     // Loads songs based on previously-saved data in string format
-    public void loadSongs(String [] song_data) {
+    public void loadSongs(String [] song_data, int selected_id) {
         this.songs = new Song[song_data.length];
         String songName = "Song #";
         for (int index = 0; index < song_data.length; index++) {
             songs[index] = new Song(song_data[index]);
+            if (songs[index].getMediaID() == selected_id) {
+                play_index = index;
+            }
         }
-        loadSong(songs[0].getMediaID()); // load the first song to be played
+        loadSong(songs[play_index].getMediaID()); // load the first song to be played
     }
 
     /* loadSong is based on the loadMedia method from Lab 4.

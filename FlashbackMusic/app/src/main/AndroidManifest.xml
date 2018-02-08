@@ -17,10 +17,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MusicSelection"
+            android:name=".SongSelection"
             android:label="@string/title_activity_music_selection"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".MusicPlay"></activity>
+        <activity android:name=".MusicPlay" />
+        <activity android:name=".AlbumSelection"></activity>
     </application>
 
 </manifest>
