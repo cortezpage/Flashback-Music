@@ -3,11 +3,23 @@ package com.example.cse110.flashbackmusic;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import java.util.Map;
+
 
 public class SharedPrefHelper {
 
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedEditor;
+
+    private String [] all_albums = {
+            "I Will Not Be Afraid",
+            "Love Is Everywhere",
+            "New & Best of Keaton Simons",
+            "Origins - The Best of Terry Oldfield",
+            "Take Yourself Too Seriously",
+            "This is Always",
+            "YouTube Audio Library"
+    };
 
     private String [] all_songs = {
             "123 Go; Keaton Simons; New & Best of Keaton Simons; 209; 0",
@@ -140,22 +152,38 @@ public class SharedPrefHelper {
 
         this.all_data = new String[this.all_songs.length];
         for (int index = 0; index < this.all_data.length; index++) {
-            this.all_data[index] = this.all_songs[index] + "; " + this.all_IDs[index];
+            this.all_data[index] = "SONG; " + this.all_songs[index] + "; " + this.all_IDs[index];
         }
     }
 
-    public void validateData() {
+    public void validateSongData() {
         String currSong;
         int write_count = 0;
-        for (int index = 0; index < all_data.length; index++) {
+        for (int index = 0; index < all_data.length && index < all_IDs.length; index++) {
             currSong = this.sharedPref.getString("" + all_IDs[index], "NOTHING FOUND");
             if (currSong == "NOTHING FOUND") {
                 writeSongData(all_IDs[index], all_data[index]);
                 write_count++;
-                Log.i("new data written: ", all_data[index]);
+                Log.i("New data written", all_data[index]);
             }
         }
         if (write_count > 0) { this.applyChanges(); }
+    }
+
+    public String [] getAllSongEntries() {
+        Map<String, ?> allEntries = sharedPref.getAll();
+        String [] song_data = new String[allEntries.size()];
+        String curr_data;
+        int index = 0;
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            curr_data = entry.getValue().toString();
+            Log.i("Read data", entry.getKey() + ": " + curr_data);
+            if (curr_data.split("; ")[0].equals("SONG")) {
+                song_data[index] = curr_data;
+                index++;
+            }
+        }
+        return song_data;
     }
 
     public void writeSongData(int ID, String data) {

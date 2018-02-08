@@ -36,16 +36,8 @@ public class MusicPlay extends AppCompatActivity {
         dataEditor = sharedPref.edit();
 
         sharedPrefHelper = new SharedPrefHelper(sharedPref, dataEditor);
-        sharedPrefHelper.validateData();
-
-        Map<String, ?> allEntries = sharedPref.getAll();
-        song_data = new String[allEntries.size()];
-        int index = 0;
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            Log.i("Read song data:", entry.getKey() + ": " + entry.getValue().toString());
-            song_data[index] = entry.getValue().toString();
-            index++;
-        }
+        sharedPrefHelper.validateSongData();
+        song_data = sharedPrefHelper.getAllSongEntries();
 
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer = new MusicPlayer(this.getResources(), mode);
@@ -132,7 +124,7 @@ public class MusicPlay extends AppCompatActivity {
                     public void onClick(View view) {
                         musicPlayer.changeCurrentLikeStatus();
                         int currID = musicPlayer.getCurrentMediaID();
-                        String currSong = musicPlayer.getCurrentString();
+                        String currSong = musicPlayer.getCurrentWriteString();
                         sharedPrefHelper.writeSongData(currID, currSong);
                         sharedPrefHelper.applyChanges();
                     }

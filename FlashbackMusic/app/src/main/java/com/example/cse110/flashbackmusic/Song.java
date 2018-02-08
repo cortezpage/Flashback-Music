@@ -28,8 +28,9 @@ public class Song {
     // This constructor builds a song from a string filled with data about the song.
     public Song(String data) {
         String [] substrings = data.split("; ");
-        if (substrings.length < 6) {
-            Log.e("Song Constructor: ", "The song data is invalid!");
+        if (substrings.length < 7 || !(substrings[0].equals("SONG"))) {
+            Log.e("Song Constructor", "The song data is invalid!");
+            Log.e("Data", data);
             // Set Jazz in Paris as the default media
             this.song_name = "Jazz in Paris";
             this.artist_name = "Media Right Productions";
@@ -41,12 +42,12 @@ public class Song {
             this.times_of_day = new boolean[6];
             this.days_of_the_week = new boolean[7];
         } else {
-            this.song_name = substrings[0];
-            this.artist_name = substrings[1];
-            this.album_name = substrings[2];
-            this.duration = Integer.parseInt(substrings[3]);
-            this.like_status = Integer.parseInt(substrings[4]);
-            this.media_id = Integer.parseInt(substrings[5]);
+            this.song_name = substrings[1];
+            this.artist_name = substrings[2];
+            this.album_name = substrings[3];
+            this.duration = Integer.parseInt(substrings[4]);
+            this.like_status = Integer.parseInt(substrings[5]);
+            this.media_id = Integer.parseInt(substrings[6]);
             this.locations = new Location[0];
             this.times_of_day = new boolean[6];
             this.days_of_the_week = new boolean[7];
@@ -101,6 +102,10 @@ public class Song {
         String toReturn = this.song_name + "; " + this.artist_name + "; " + this.album_name;
         toReturn = toReturn + "; "+ this.duration + "; " + this.like_status + "; " + this.media_id;
         return toReturn;
+    }
+
+    public String toWriteString() {
+        return "SONG; " + this.toString();
     }
 
 }
