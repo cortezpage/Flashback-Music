@@ -13,7 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import java.util.Map;
 
-public class MusicPlay extends AppCompatActivity {
+public class MusicPlayActivity extends AppCompatActivity {
 
     private MusicPlayer musicPlayer;
     private SharedPrefHelper sharedPrefHelper;

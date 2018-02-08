@@ -11,7 +11,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import java.util.Map;
 
-public class SongSelection extends AppCompatActivity {
+public class SongSelectionActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor sharedEditor;
@@ -68,7 +68,7 @@ public class SongSelection extends AppCompatActivity {
     }
 
     public void launchMusicPlay (String songID) {
-        Intent intent = new Intent(this, MusicPlay.class);
+        Intent intent = new Intent(this, MusicPlayActivity.class);
         intent.putExtra("SELECTED_ID", songID);
         intent.putExtra("MODE", "song_selection");
         startActivity(intent);
