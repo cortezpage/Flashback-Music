@@ -2,16 +2,11 @@ package com.example.cse110.flashbackmusic;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import java.util.Map;
 
 public class MusicPlayActivity extends AppCompatActivity {
 
@@ -57,7 +52,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
 
         // Link the "back" button to go back to the song selection activity
-        Button back = (Button) findViewById(R.id.button_exit_music_play);
+        ImageButton back = findViewById(R.id.button_exit_music_play);
         back.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -66,40 +61,39 @@ public class MusicPlayActivity extends AppCompatActivity {
         });
 
         // Link the "play" button with the play() method from the music player
-        Button playButton = (Button) findViewById(R.id.button_play);
+        final ImageButton playButton = findViewById(R.id.button_play);
         playButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        musicPlayer.play();
-                    }
-                }
-        );
-
-        // Link the "pause" button with the pause() method from the music player
-        Button pauseButton = (Button) findViewById(R.id.button_pause);
-        pauseButton.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        musicPlayer.pause();
+                        if (musicPlayer.isMusicPlaying()){
+                            playButton.setBackgroundResource(R.drawable.play_button);
+                            musicPlayer.pause();
+                        }
+                        else{
+                            playButton.setBackgroundResource(R.drawable.pause_button);
+                            musicPlayer.play();
+                        }
                     }
                 }
         );
 
         // Link the "reset" button with the reset() method from the music player
-        Button resetButton = (Button) findViewById(R.id.button_reset);
+        ImageButton resetButton = findViewById(R.id.button_reset);
         resetButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if (musicPlayer.isMusicPlaying()) {
+                            playButton.setBackgroundResource(R.drawable.play_button);
+                        }
                         musicPlayer.reset();
                     }
                 }
         );
 
         // Link the "previous" button with the playPreviousSong() method from the music player
-        Button previousButton = (Button) findViewById(R.id.button_previous);
+        ImageButton previousButton = findViewById(R.id.button_previous);
         previousButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -110,7 +104,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         );
 
         // Link the "next" button with the playNextSong() method from the music player
-        Button nextButton = (Button) findViewById(R.id.button_next);
+        ImageButton nextButton = findViewById(R.id.button_next);
         nextButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -120,13 +114,13 @@ public class MusicPlayActivity extends AppCompatActivity {
                 }
         );
 
-        final ImageButton likeButton = (ImageButton) findViewById(R.id.button_like);
+        final ImageButton likeButton = findViewById(R.id.button_like);
         if (musicPlayer.getCurrentLikeStatus() == 1) {
-            likeButton.setBackgroundResource(R.drawable.check_mark);
+            likeButton.setBackgroundResource(R.drawable.favorite_button);
         } else if (musicPlayer.getCurrentLikeStatus() == 0) {
-            likeButton.setBackgroundResource(R.drawable.plus);
+            likeButton.setBackgroundResource(R.drawable.neutral_button);
         } else if (musicPlayer.getCurrentLikeStatus() == 2) {
-            likeButton.setBackgroundResource(R.drawable.cross);
+            likeButton.setBackgroundResource(R.drawable.dislike_button);
         }
         likeButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -134,11 +128,11 @@ public class MusicPlayActivity extends AppCompatActivity {
                     public void onClick(View view) {
                         musicPlayer.changeCurrentLikeStatus();
                         if (musicPlayer.getCurrentLikeStatus() == 1) {
-                            likeButton.setBackgroundResource(R.drawable.check_mark);
+                            likeButton.setBackgroundResource(R.drawable.favorite_button);
                         } else if (musicPlayer.getCurrentLikeStatus() == 0) {
-                            likeButton.setBackgroundResource(R.drawable.plus);
+                            likeButton.setBackgroundResource(R.drawable.neutral_button);
                         } else if (musicPlayer.getCurrentLikeStatus() == 2) {
-                            likeButton.setBackgroundResource(R.drawable.cross);
+                            likeButton.setBackgroundResource(R.drawable.dislike_button);
                         }
                         int currID = musicPlayer.getCurrentMediaID();
                         String currSong = musicPlayer.getCurrentWriteString();
@@ -147,5 +141,14 @@ public class MusicPlayActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        TextView location = findViewById(R.id.song_location);
+        location.setText ("Location: " + "Dummy location value");
+
+        TextView date_of_week = findViewById(R.id.song_date);
+        date_of_week.setText("Date: " + "Dummy date value");
+
+        TextView time_of_day = findViewById(R.id.song_time);
+        time_of_day.setText("Time: " + "Dummy time value");
     }
 }

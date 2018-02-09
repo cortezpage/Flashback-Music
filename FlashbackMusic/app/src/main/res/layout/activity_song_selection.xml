@@ -13,27 +13,16 @@
         <LinearLayout
             android:id="@+id/all_songs_list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <Button
+            <ImageButton
                 android:id="@+id/button_exit_song_selection"
-                android:layout_width="380dp"
-                android:layout_height="46dp"
-                android:background="#FF69B4"
-                android:text="BACK"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.013" />
-
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="80dp"
+                android:background="@drawable/back_button" />
         </LinearLayout>
 
     </ScrollView>
