@@ -10,19 +10,23 @@ import java.util.Map;
 
 public class SharedPrefHelper {
 
-    private SharedPreferences sharedPref;
-    private SharedPreferences.Editor sharedEditor;
+    private SharedPreferences songSharedPref;
+    private SharedPreferences.Editor songSharedEditor;
+    private SharedPreferences albumSharedPref;
+    private SharedPreferences.Editor albumSharedEditor;
 
+    // format: album name, artist name, number of tracks, and album id number
     private String [] all_albums = {
-            "I Will Not Be Afraid; Caroline Rose",
-            "Love Is Everywhere; Stacy Jones",
-            "New & Best of Keaton Simons; Keaton Simons",
-            "Origins - The Best of Terry Oldfield; Terry Oldfield",
-            "Take Yourself Too Seriously; Forum",
-            "This is Always; Rebecca Sayre",
-            "YouTube Audio Library; Media Right Productions"
+            "I Will Not Be Afraid; Caroline Rose; 7; ALBUM_0",
+            "Love Is Everywhere; Stacy Jones; 12; ALBUM_1",
+            "New & Best of Keaton Simons; Keaton Simons; 10; ALBUM_2",
+            "Origins - The Best of Terry Oldfield; Terry Oldfield; 11; ALBUM_3",
+            "Take Yourself Too Seriously; Forum; 6; ALBUM_4",
+            "This is Always; Rebecca Sayre; 12; ALBUM_5",
+            "YouTube Audio Library; Media Right Productions; 1; ALBUM_6"
     };
 
+    // format: song name, artist name, album name, duration in seconds, and like status
     private String [] all_songs = {
             "123 Go; Keaton Simons; New & Best of Keaton Simons; 209; 0",
             "After the Storm; Terry Oldfield; Origins - The Best of Terry Oldfield; 318; 0",
@@ -87,9 +91,12 @@ public class SharedPrefHelper {
     private int [] all_IDs;
     private String [] initial_song_data;
 
-    public SharedPrefHelper (SharedPreferences prefs, SharedPreferences.Editor editor) {
-        this.sharedPref = prefs;
-        this.sharedEditor = editor;
+    public SharedPrefHelper (SharedPreferences songPrefs, SharedPreferences.Editor songEditor,
+                             SharedPreferences albumPrefs, SharedPreferences.Editor albumEditor) {
+        this.songSharedPref = songPrefs;
+        this.songSharedEditor = songEditor;
+        this.albumSharedPref = albumPrefs;
+        this.albumSharedEditor = albumEditor;
 
         this.all_IDs = new int [] {
                 R.raw.one_two_three_go,
@@ -158,8 +165,61 @@ public class SharedPrefHelper {
         }
     }
 
+    public boolean hasPreviousAlbumData() {
+        String hasData = this.albumSharedPref.getString("ALBUM_DATA_EXISTENCE_STATUS", "NONEXISTENT");
+        if (hasData.equals("EXISTS")) {
+            return true;
+        }
+        return false;
+    }
+
+    public String [] getInitialAlbumData() { return this.all_albums; }
+
+    public String [] getStoredAlbumData() {
+        String curr_data;
+        String [] album_data = new String [all_albums.length];
+        for (int index = 0; index < all_albums.length; index++) {
+            curr_data = albumSharedPref.getString("ALBUM_" + index, "NOT FOUND");
+            if (!(curr_data.equals("NOT FOUND"))) {
+                album_data[index] = curr_data;
+            }
+        }
+        return album_data;
+    }
+
+    public Album [] createAlbums () {
+        Album [] albums;
+        String [] album_data;
+        boolean hasStoredData = this.hasPreviousAlbumData();
+        if (!hasStoredData) {
+            album_data = this.getInitialAlbumData();
+            this.writeAlbumData("ALBUM_DATA_EXISTENCE_STATUS", "EXISTS");
+        } else {
+            album_data = this.getStoredAlbumData();
+        }
+
+        albums = new Album[album_data.length];
+        Gson gson = new Gson();
+        Album new_album;
+        for (int index = 0; index < album_data.length; index++) {
+            if (hasStoredData) {
+                String json = albumSharedPref.getString("ALBUM_" + index, "NOT FOUND");
+                if (!(json.equals("NOT FOUND"))) {
+                    new_album = gson.fromJson(json, Album.class);
+                    albums[index] = new_album;
+                }
+            } else {
+                new_album = new Album(album_data[index]);
+                albums[index] = new_album;
+                writeAlbumData("" + new_album.getID(), new_album.toString());
+            }
+        }
+
+        return albums;
+    }
+
     public boolean hasPreviousSongData() {
-        String hasData = this.sharedPref.getString("SONG_DATA_EXISTENCE_STATUS", "NONEXISTENT");
+        String hasData = this.songSharedPref.getString("SONG_DATA_EXISTENCE_STATUS", "NONEXISTENT");
         if (hasData.equals("EXISTS")) {
             return true;
         }
@@ -174,7 +234,7 @@ public class SharedPrefHelper {
         String curr_data;
         String [] song_data = new String [all_IDs.length];
         for (int index = 0; index < all_IDs.length; index++) {
-            curr_data = sharedPref.getString("" + all_IDs[index], "NOT FOUND");
+            curr_data = songSharedPref.getString("" + all_IDs[index], "NOT FOUND");
             if (!(curr_data.equals("NOT FOUND"))) {
                 song_data[index] = curr_data;
             }
@@ -188,7 +248,7 @@ public class SharedPrefHelper {
         boolean hasStoredData = this.hasPreviousSongData();
         if (!hasStoredData) {
             song_data = this.getInitialSongData();
-            this.writeData("SONG_DATA_EXISTENCE_STATUS", "EXISTS");
+            this.writeSongData("SONG_DATA_EXISTENCE_STATUS", "EXISTS");
         } else {
             song_data = this.getStoredSongData();
         }
@@ -198,7 +258,7 @@ public class SharedPrefHelper {
         Song new_song;
         for (int index = 0; index < song_data.length && index < all_IDs.length; index++) {
             if (hasStoredData) {
-                String json = sharedPref.getString("" + all_IDs[index], "NOT FOUND");
+                String json = songSharedPref.getString("" + all_IDs[index], "NOT FOUND");
                 if (!(json.equals("NOT FOUND"))) {
                     new_song = gson.fromJson(json, Song.class);
                     songs[index] = new_song;
@@ -206,18 +266,26 @@ public class SharedPrefHelper {
             } else {
                 new_song = new Song(song_data[index]);
                 songs[index] = new_song;
-                writeData("" + new_song.getMediaID(), new_song.toString());
+                writeSongData("" + new_song.getMediaID(), new_song.toString());
             }
         }
 
         return songs;
     }
 
-    public void writeData(String id, String data) {
-        this.sharedEditor.putString(id, data);
+    public void writeAlbumData(String id, String data) {
+        this.albumSharedEditor.putString(id, data);
     }
 
-    public void applyChanges() {
-        this.sharedEditor.apply();
+    public void applyAlbumChanges() {
+        this.albumSharedEditor.apply();
+    }
+
+    public void writeSongData(String id, String data) {
+        this.songSharedEditor.putString(id, data);
+    }
+
+    public void applySongChanges() {
+        this.songSharedEditor.apply();
     }
 }

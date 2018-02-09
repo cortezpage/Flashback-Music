@@ -1,6 +1,5 @@
 package com.example.cse110.flashbackmusic;
 
-import android.arch.persistence.room.PrimaryKey;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,24 +8,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-
 import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
 
     private static MusicPlayer musicPlayer = null;
-    private static SharedPrefHelper songSharedPrefHelper;
+    private static SharedPrefHelper sharedPrefHelper;
     private static Song [] songs;
+    private static Album [] albums;
     private SharedPreferences songSharedPref;
     private SharedPreferences.Editor songDataEditor;
-    private String [] song_data;
+    private SharedPreferences albumSharedPref;
+    private SharedPreferences.Editor albumDataEditor;
 
     public static MusicPlayer getMusicPlayer() {
         return musicPlayer;
     }
 
     public static SharedPrefHelper getSongSharedPrefHelper() {
-        return songSharedPrefHelper;
+        return sharedPrefHelper;
     }
 
     public static Song [] getSongs() {
@@ -47,11 +47,16 @@ public class MainActivity extends AppCompatActivity {
 
         Context context = this.getApplicationContext();
         String song_data_filename = "com.example.cse110.flashbackmusic.song_data_preferences";
+        String album_data_filename = "com.example.cse110.flashbackmusic.album_data_preferences";
+
         songSharedPref = context.getSharedPreferences(song_data_filename, Context.MODE_PRIVATE);
         songDataEditor = songSharedPref.edit();
+        albumSharedPref = context.getSharedPreferences(album_data_filename, Context.MODE_PRIVATE);
+        albumDataEditor = albumSharedPref.edit();
 
-        songSharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor);
-        songs = songSharedPrefHelper.createSongList();
+        sharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor, albumSharedPref, albumDataEditor);
+        songs = sharedPrefHelper.createSongList();
+        albums = sharedPrefHelper.createAlbums();
 
         musicPlayer = new MusicPlayer (this.getResources());
 
@@ -88,7 +93,15 @@ public class MainActivity extends AppCompatActivity {
         Song curr_song;
         for (int index = 0; index < songs.length; index++) {
             curr_song = songs[index];
-            songSharedPrefHelper.writeData("" + curr_song.getMediaID(), curr_song.toString());
+            sharedPrefHelper.writeSongData("" + curr_song.getMediaID(), curr_song.toString());
+        }
+    }
+
+    public void updateAlbumData() {
+        Album curr_album;
+        for (int index = 0; index < albums.length; index++) {
+            curr_album = albums[index];
+            sharedPrefHelper.writeSongData(curr_album.getID(), curr_album.toString());
         }
     }
 }

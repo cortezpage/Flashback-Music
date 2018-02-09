@@ -127,8 +127,8 @@ public class MusicPlayActivity extends AppCompatActivity {
                         }
                         int currID = musicPlayer.getCurrentMediaID();
                         String currSong = musicPlayer.getCurrentWriteString();
-                        songSharedPrefHelper.writeData("" + currID, currSong);
-                        songSharedPrefHelper.applyChanges();
+                        songSharedPrefHelper.writeSongData("" + currID, currSong);
+                        songSharedPrefHelper.applySongChanges();
                     }
                 }
         );
