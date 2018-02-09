@@ -69,12 +69,15 @@ public class MusicPlayer {
     }
 
     public void selectSong(int selected_id) {
-        for (int index = 0; index < this.songs.length; index++) {
-            if (this.songs[index].getMediaID() == selected_id) {
-                this.play_index = index;
+        // preventing a reload of the song if the currently-playing song is selected again
+        if (!(this.songs[play_index].getMediaID() == selected_id)) {
+            for (int index = 0; index < this.songs.length; index++) {
+                if (this.songs[index].getMediaID() == selected_id) {
+                    this.play_index = index;
+                }
             }
+            this.reset();
         }
-        this.reset();
     }
   
     public boolean isMusicPlaying() {
