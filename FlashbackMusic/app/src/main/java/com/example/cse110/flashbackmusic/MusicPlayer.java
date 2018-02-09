@@ -76,6 +76,14 @@ public class MusicPlayer {
         }
         loadSong(this.songs[play_index].getMediaID());
     }
+  
+    public boolean isMusicPlaying() {
+        if (this.player.isPlaying()){
+            return true;
+        }
+
+        return false;
+    }
 
     public void changeCurrentLikeStatus() {
         this.songs[play_index].incrementLikeStatus();
