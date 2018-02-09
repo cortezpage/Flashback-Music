@@ -12,15 +12,16 @@ public class MusicPlayer {
     private MediaPlayer player;
     private Song [] songs;
     // private Album [] albums ?
-    private int play_index;
+    private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
-    public MusicPlayer(Resources resources, String mode) {
+    public MusicPlayer(Resources resources) {
         this.song_resources = resources;
         this.player = new MediaPlayer();
         this.songs = new Song[3];
         this.play_index = 0;
-        this.play_mode = 0; // assume song selection
+        this.play_mode = 0;
+        this.songs = MainActivity.getSongs();
     }
 
     public void destroy() { this.player.release(); }
@@ -41,6 +42,7 @@ public class MusicPlayer {
         loadSong(songs[play_index].getMediaID());
     }
 
+    // only available in album play and flashback mode
     public void goToPreviousSong() {
         if (play_mode != 0) {
             play_index--;
@@ -53,6 +55,7 @@ public class MusicPlayer {
         }
     }
 
+    // only available in album play and flashback mode
     public void goToNextSong() {
         if (play_mode != 0) {
             play_index++;
@@ -65,6 +68,15 @@ public class MusicPlayer {
         }
     }
 
+    public void selectSong(int selected_id) {
+        for (int index = 0; index < this.songs.length; index++) {
+            if (this.songs[index].getMediaID() == selected_id) {
+                this.play_index = index;
+            }
+        }
+        loadSong(this.songs[play_index].getMediaID());
+    }
+  
     public boolean isMusicPlaying() {
         if (this.player.isPlaying()){
             return true;
@@ -85,7 +97,7 @@ public class MusicPlayer {
 
     public String getCurrentString() { return this.songs[play_index].toString(); }
 
-    public String getCurrentWriteString() { return this.songs[play_index].toWriteString(); }
+    public String getCurrentWriteString() { return this.songs[play_index].toString(); }
 
     public String getCurrentSongName() { return this.songs[play_index].getSongName(); }
 
@@ -93,17 +105,18 @@ public class MusicPlayer {
 
     public String getCurrentSongAlbum() { return this.songs[play_index].getAlbumName(); }
 
-    // Calls loadSong() on each song to be loaded
-    // Loads songs based on previously-saved data in string format
-    public void loadSongs(String [] song_data, int selected_id) {
-        this.songs = new Song[song_data.length];
-        for (int index = 0; index < song_data.length; index++) {
-            songs[index] = new Song(song_data[index]);
-            if (songs[index].getMediaID() == selected_id) {
-                play_index = index;
-            }
+    public int getPlayMode() { return this.play_mode; }
+
+    public void setPlayMode(String mode) {
+        if (mode.equals("song_selection")) {
+            this.play_mode = 0;
+        } else if (mode.equals("album_play")) {
+            this.play_mode = 1;
+        } else if (mode.equals("flashback")) {
+            this.play_mode = 2;
+        } else {
+            this.play_mode = 0; // default case
         }
-        loadSong(songs[play_index].getMediaID()); // load the first song to be played
     }
 
     /* loadSong is based on the loadMedia method from Lab 4.
@@ -111,6 +124,7 @@ public class MusicPlayer {
      */
     public void loadSong(int resourceId) {
 
+        // Determines the behavior that will occur when the song is over
         this.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -122,6 +136,14 @@ public class MusicPlayer {
         try {
             this.player.setDataSource(songFD);
             this.player.prepareAsync();
+
+            this.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer player) {
+                    player.start();
+                }
+
+            });
         } catch (Exception e) {
             System.out.println(e.toString());
         }

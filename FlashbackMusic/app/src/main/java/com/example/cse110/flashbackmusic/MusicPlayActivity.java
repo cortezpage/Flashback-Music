@@ -1,9 +1,7 @@
 package com.example.cse110.flashbackmusic;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -11,36 +9,23 @@ import android.widget.TextView;
 public class MusicPlayActivity extends AppCompatActivity {
 
     private MusicPlayer musicPlayer;
-    private SharedPrefHelper sharedPrefHelper;
-    private SharedPreferences.Editor dataEditor;
-    private String [] song_data;
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        musicPlayer.destroy();
-    }
+    private SharedPrefHelper songSharedPrefHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_play);
 
-        song_data = new String[0];
-
-        Context context = this.getApplicationContext();
-        String filename = "com.example.cse110.flashbackmusic.song_data_preferences";
-        SharedPreferences sharedPref = context.getSharedPreferences(filename, Context.MODE_PRIVATE);
-        dataEditor = sharedPref.edit();
-
-        sharedPrefHelper = new SharedPrefHelper(sharedPref, dataEditor);
-        sharedPrefHelper.validateSongData();
-        song_data = sharedPrefHelper.getAllSongEntries();
+        musicPlayer = MainActivity.getMusicPlayer();
+        songSharedPrefHelper = MainActivity.getSongSharedPrefHelper();
 
         String mode = getIntent().getStringExtra("MODE");
-        musicPlayer = new MusicPlayer(this.getResources(), mode);
-        int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
-        musicPlayer.loadSongs(song_data, selected_id);
+        musicPlayer.setPlayMode(mode);
+
+        if (musicPlayer.getPlayMode() == 0) {
+            int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
+            musicPlayer.selectSong(selected_id);
+        }
 
         TextView songNameDisplay = (TextView) findViewById(R.id.song_name_music_play);
         songNameDisplay.setText(musicPlayer.getCurrentSongName());
@@ -136,8 +121,8 @@ public class MusicPlayActivity extends AppCompatActivity {
                         }
                         int currID = musicPlayer.getCurrentMediaID();
                         String currSong = musicPlayer.getCurrentWriteString();
-                        sharedPrefHelper.writeSongData(currID, currSong);
-                        sharedPrefHelper.applyChanges();
+                        songSharedPrefHelper.writeData("" + currID, currSong);
+                        songSharedPrefHelper.applyChanges();
                     }
                 }
         );
