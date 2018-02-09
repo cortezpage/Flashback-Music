@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
-import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +23,7 @@ public class MusicPlayActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        musicPlayer.destroy();
     }
 
     @Override
@@ -43,11 +43,9 @@ public class MusicPlayActivity extends AppCompatActivity {
         song_data = sharedPrefHelper.getAllSongEntries();
 
         String mode = getIntent().getStringExtra("MODE");
-        musicPlayer = MusicPlayer.getMusicPlayer(this.getResources(), mode);
+        musicPlayer = new MusicPlayer(this.getResources(), mode);
         int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
         musicPlayer.loadSongs(song_data, selected_id);
-        musicPlayer.reset();
-        musicPlayer.play();
 
         TextView songNameDisplay = (TextView) findViewById(R.id.song_name_music_play);
         songNameDisplay.setText(musicPlayer.getCurrentSongName());
