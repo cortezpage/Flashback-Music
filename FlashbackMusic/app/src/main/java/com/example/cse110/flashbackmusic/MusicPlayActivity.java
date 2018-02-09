@@ -79,6 +79,9 @@ public class MusicPlayActivity extends AppCompatActivity {
 
         // Link the "previous" button with the playPreviousSong() method from the music player
         ImageButton previousButton = findViewById(R.id.button_previous);
+        if (musicPlayer.getPlayMode() == 0) {
+            previousButton.getBackground().setAlpha(50);
+        }
         previousButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
@@ -90,6 +93,9 @@ public class MusicPlayActivity extends AppCompatActivity {
 
         // Link the "next" button with the playNextSong() method from the music player
         ImageButton nextButton = findViewById(R.id.button_next);
+        if (musicPlayer.getPlayMode() == 0) {
+            nextButton.getBackground().setAlpha(50);
+        }
         nextButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
