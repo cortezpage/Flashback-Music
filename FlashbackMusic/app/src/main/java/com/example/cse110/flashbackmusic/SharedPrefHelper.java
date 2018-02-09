@@ -3,6 +3,8 @@ package com.example.cse110.flashbackmusic;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.util.Map;
 
 
@@ -83,7 +85,7 @@ public class SharedPrefHelper {
     };
 
     private int [] all_IDs;
-    private String [] all_data;
+    private String [] initial_song_data;
 
     public SharedPrefHelper (SharedPreferences prefs, SharedPreferences.Editor editor) {
         this.sharedPref = prefs;
@@ -150,45 +152,69 @@ public class SharedPrefHelper {
                 R.raw.windows_are_the_eyes_to_the_house
         };
 
-        this.all_data = new String[this.all_songs.length];
-        for (int index = 0; index < this.all_data.length; index++) {
-            this.all_data[index] = "SONG; " + this.all_songs[index] + "; " + this.all_IDs[index];
+        this.initial_song_data = new String[this.all_songs.length];
+        for (int index = 0; index < this.initial_song_data.length; index++) {
+            this.initial_song_data[index] = this.all_songs[index] + "; " + this.all_IDs[index];
         }
     }
 
-    public void validateSongData() {
-        String currSong;
-        int write_count = 0;
-        for (int index = 0; index < all_data.length && index < all_IDs.length; index++) {
-            currSong = this.sharedPref.getString("" + all_IDs[index], "NOTHING FOUND");
-            if (currSong == "NOTHING FOUND") {
-                writeSongData(all_IDs[index], all_data[index]);
-                write_count++;
-                Log.i("New data written", all_data[index]);
-            }
+    public boolean hasPreviousSongData() {
+        String hasData = this.sharedPref.getString("SONG_DATA_EXISTENCE_STATUS", "NONEXISTENT");
+        if (hasData.equals("EXISTS")) {
+            return true;
         }
-        if (write_count > 0) { this.applyChanges(); }
+        return false;
     }
 
-    public String [] getAllSongEntries() {
-        Map<String, ?> allEntries = sharedPref.getAll();
-        String [] song_data = new String[allEntries.size()];
+    public String [] getInitialSongData() {
+        return initial_song_data;
+    }
+
+    public String [] getStoredSongData() {
         String curr_data;
-        int index = 0;
-        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
-            curr_data = entry.getValue().toString();
-            Log.i("Read data", entry.getKey() + ": " + curr_data);
-            if (curr_data.split("; ")[0].equals("SONG")) {
+        String [] song_data = new String [all_IDs.length];
+        for (int index = 0; index < all_IDs.length; index++) {
+            curr_data = sharedPref.getString("" + all_IDs[index], "NOT FOUND");
+            if (!(curr_data.equals("NOT FOUND"))) {
                 song_data[index] = curr_data;
-                index++;
             }
         }
         return song_data;
     }
 
-    public void writeSongData(int ID, String data) {
-        Log.i("Updating song: ", data);
-        this.sharedEditor.putString("" + ID, data);
+    public Song [] createSongList () {
+        Song [] songs;
+        String [] song_data;
+        boolean hasStoredData = this.hasPreviousSongData();
+        if (!hasStoredData) {
+            song_data = this.getInitialSongData();
+            this.writeData("SONG_DATA_EXISTENCE_STATUS", "EXISTS");
+        } else {
+            song_data = this.getStoredSongData();
+        }
+
+        songs = new Song[song_data.length];
+        Gson gson = new Gson();
+        Song new_song;
+        for (int index = 0; index < song_data.length && index < all_IDs.length; index++) {
+            if (hasStoredData) {
+                String json = sharedPref.getString("" + all_IDs[index], "NOT FOUND");
+                if (!(json.equals("NOT FOUND"))) {
+                    new_song = gson.fromJson(json, Song.class);
+                    songs[index] = new_song;
+                }
+            } else {
+                new_song = new Song(song_data[index]);
+                songs[index] = new_song;
+                writeData("" + new_song.getMediaID(), new_song.toString());
+            }
+        }
+
+        return songs;
+    }
+
+    public void writeData(String id, String data) {
+        this.sharedEditor.putString(id, data);
     }
 
     public void applyChanges() {
