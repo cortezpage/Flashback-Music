@@ -188,17 +188,19 @@ public class SharedPrefHelper {
     }
 
     public Album [] createAlbums () {
-        Album [] albums;
         String [] album_data;
+        Album [] albums;
+        Song [] songs;
+
         boolean hasStoredData = this.hasPreviousAlbumData();
         if (!hasStoredData) {
             album_data = this.getInitialAlbumData();
-            this.writeAlbumData("ALBUM_DATA_EXISTENCE_STATUS", "EXISTS");
         } else {
             album_data = this.getStoredAlbumData();
         }
 
         albums = new Album[album_data.length];
+        songs = MainActivity.getSongs();
         Gson gson = new Gson();
         Album new_album;
         for (int index = 0; index < album_data.length; index++) {
@@ -211,8 +213,19 @@ public class SharedPrefHelper {
             } else {
                 new_album = new Album(album_data[index]);
                 albums[index] = new_album;
+                int song_count = 0;
+                for (int song_index = 0; song_index < songs.length && song_count < new_album.getNumTracks(); song_index++) {
+                    if (songs[song_index].getAlbumName().equals(new_album.getAlbumName())) {
+                        new_album.addSong(songs[song_index], song_count);
+                        song_count++;
+                    }
+                }
                 writeAlbumData("" + new_album.getID(), new_album.toString());
             }
+        }
+
+        if (!hasStoredData) {
+            this.writeAlbumData("ALBUM_DATA_EXISTENCE_STATUS", "EXISTS");
         }
 
         return albums;
