@@ -18,6 +18,8 @@ public class Album {
         this.songs = new Song[this.num_tracks];
     }
 
+    public String getAlbumName() { return this.album_name; }
+
     public String getID() {
         return this.id;
     }

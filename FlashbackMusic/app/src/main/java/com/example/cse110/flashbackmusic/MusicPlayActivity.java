@@ -9,7 +9,7 @@ import android.widget.TextView;
 public class MusicPlayActivity extends AppCompatActivity {
 
     private MusicPlayer musicPlayer;
-    private SharedPrefHelper songSharedPrefHelper;
+    private SharedPrefHelper sharedPrefHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,7 +17,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_play);
 
         musicPlayer = MainActivity.getMusicPlayer();
-        songSharedPrefHelper = MainActivity.getSongSharedPrefHelper();
+        sharedPrefHelper = MainActivity.getSongSharedPrefHelper();
 
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
@@ -127,8 +127,8 @@ public class MusicPlayActivity extends AppCompatActivity {
                         }
                         int currID = musicPlayer.getCurrentMediaID();
                         String currSong = musicPlayer.getCurrentWriteString();
-                        songSharedPrefHelper.writeSongData("" + currID, currSong);
-                        songSharedPrefHelper.applySongChanges();
+                        sharedPrefHelper.writeSongData("" + currID, currSong);
+                        sharedPrefHelper.applySongChanges();
                     }
                 }
         );

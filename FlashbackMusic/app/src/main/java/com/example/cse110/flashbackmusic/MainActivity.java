@@ -33,9 +33,14 @@ public class MainActivity extends AppCompatActivity {
         return songs;
     }
 
+    public static Album [] getAlbums() {
+        return albums;
+    }
+
     @Override
     public void onDestroy() {
         updateSongData();
+        updateAlbumData();
         musicPlayer.destroy();
         super.onDestroy();
     }
@@ -101,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         Album curr_album;
         for (int index = 0; index < albums.length; index++) {
             curr_album = albums[index];
-            sharedPrefHelper.writeSongData(curr_album.getID(), curr_album.toString());
+            sharedPrefHelper.writeAlbumData(curr_album.getID(), curr_album.toString());
         }
     }
 }
