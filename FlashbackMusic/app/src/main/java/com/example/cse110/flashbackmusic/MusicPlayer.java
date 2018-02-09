@@ -74,7 +74,7 @@ public class MusicPlayer {
                 this.play_index = index;
             }
         }
-        loadSong(this.songs[play_index].getMediaID());
+        this.reset();
     }
   
     public boolean isMusicPlaying() {
