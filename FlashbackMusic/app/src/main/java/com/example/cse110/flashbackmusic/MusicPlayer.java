@@ -8,19 +8,33 @@ import android.util.Log;
 /* TO-DO: SAVE THE PLAY MODE IN SHARED PREFERENCES */
 
 public class MusicPlayer {
+    private static MusicPlayer musicPlayer = null;
+
     private Resources song_resources;
     private MediaPlayer player;
     private Song [] songs;
     // private Album [] albums ?
     private int play_index;
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
+    private boolean songs_loaded = false;
 
     public MusicPlayer(Resources resources, String mode) {
         this.song_resources = resources;
         this.player = new MediaPlayer();
         this.songs = new Song[3];
         this.play_index = 0;
-        this.play_mode = 0; // assume song selection
+        setPlayMode(mode);
+    }
+
+    // Creates new MusicPlayer if needed, otherwise updates
+    public static MusicPlayer getMusicPlayer(Resources resources, String mode) {
+        if (musicPlayer == null) {
+            musicPlayer = new MusicPlayer(resources, mode);
+        } else {
+            musicPlayer.song_resources = resources;
+            musicPlayer.setPlayMode(mode);
+        }
+        return musicPlayer;
     }
 
     public void destroy() { this.player.release(); }
@@ -88,6 +102,20 @@ public class MusicPlayer {
     // Calls loadSong() on each song to be loaded
     // Loads songs based on previously-saved data in string format
     public void loadSongs(String [] song_data, int selected_id) {
+        // If songs already loaded, find play_index and ready that song
+        if (songs_loaded) {
+            for (int index = 0; index < song_data.length; index++) {
+                if (songs[index].getMediaID() == selected_id) {
+                    play_index = index;
+                }
+            }
+            loadSong(songs[play_index].getMediaID()); // load the first song to be played
+            return;
+
+        } else {
+            songs_loaded = true;
+        }
+
         this.songs = new Song[song_data.length];
         for (int index = 0; index < song_data.length; index++) {
             songs[index] = new Song(song_data[index]);
@@ -117,5 +145,9 @@ public class MusicPlayer {
         } catch (Exception e) {
             System.out.println(e.toString());
         }
+    }
+
+    private void setPlayMode(String mode) {
+        this.play_mode = 0; // assume song selection
     }
 }
