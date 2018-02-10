@@ -13,7 +13,8 @@ public class MusicPlayer {
     private Resources song_resources;
     private MediaPlayer player;
     private Song [] songs;
-    // private Album [] albums ?
+    private Album [] albums;
+    private Album curr_album;
     private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
@@ -24,6 +25,8 @@ public class MusicPlayer {
         this.play_index = 0;
         this.play_mode = 0;
         this.songs = MainActivity.getSongs();
+        this.albums = MainActivity.getAlbums();
+        this.curr_album = null;
     }
 
     public void destroy() { this.player.release(); }
@@ -46,27 +49,17 @@ public class MusicPlayer {
 
     // only available in album play and flashback mode
     public void goToPreviousSong() {
-        if (play_mode != 0) {
-            play_index--;
-            if (play_index < 0) {
-                play_index = songs.length - 1;
-            }
-            this.reset();
-        } else {
-            Log.i("MusicPlayer.goToPreviousSong()", "Cannot go to previous song in single song selection mode!");
+        if (this.play_mode == 1) {
+            this.curr_album.toPreviousSong();
+            selectSong(this.curr_album.getCurrSongID());
         }
     }
 
     // only available in album play and flashback mode
     public void goToNextSong() {
-        if (play_mode != 0) {
-            play_index++;
-            if (play_index >= songs.length) {
-                play_index = 0;
-            }
-            this.reset();
-        } else {
-            Log.i("MusicPlayer.goToNextSong()", "Cannot go to next song in single song selection mode!");
+        if (this.play_mode == 1) {
+            this.curr_album.toNextSong();
+            selectSong(this.curr_album.getCurrSongID());
         }
     }
 
@@ -79,6 +72,11 @@ public class MusicPlayer {
         }
         this.reset();
         songs[play_index].setDateLastPlayed(Calendar.getInstance().getTime());
+    }
+
+    public void selectAlbum(int selected_index) {
+        this.curr_album = this.albums[selected_index];
+        this.selectSong(curr_album.getCurrSongID());
     }
   
     public boolean isMusicPlaying() {
@@ -116,14 +114,14 @@ public class MusicPlayer {
     public int getPlayMode() { return this.play_mode; }
 
     public void setPlayMode(String mode) {
-        if (mode.equals("song_selection")) {
-            this.play_mode = 0;
-        } else if (mode.equals("album_play")) {
+        if (mode.equals("album_selection")) {
             this.play_mode = 1;
         } else if (mode.equals("flashback")) {
             this.play_mode = 2;
-        } else {
-            this.play_mode = 0; // default case
+            this.curr_album = null;
+        } else { // default case
+            this.play_mode = 0;
+            this.curr_album = null;
         }
     }
 

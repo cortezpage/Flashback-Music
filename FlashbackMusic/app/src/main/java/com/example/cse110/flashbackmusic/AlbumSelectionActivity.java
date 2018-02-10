@@ -3,6 +3,7 @@ package com.example.cse110.flashbackmusic;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -55,7 +56,7 @@ public class AlbumSelectionActivity extends AppCompatActivity {
 
     public void launchMusicPlay (String albumID) {
         Intent intent = new Intent(this, MusicPlayActivity.class);
-        intent.putExtra("SELECTED_ID", albumID);
+        intent.putExtra("SELECTED_INDEX", albumID);
         intent.putExtra("MODE", "album_selection");
         startActivity(intent);
     }
