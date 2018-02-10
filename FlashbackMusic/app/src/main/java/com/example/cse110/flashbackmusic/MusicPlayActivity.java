@@ -2,6 +2,7 @@ package com.example.cse110.flashbackmusic;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -27,14 +28,12 @@ public class MusicPlayActivity extends AppCompatActivity {
             musicPlayer.selectSong(selected_id);
         }
 
-        TextView songNameDisplay = (TextView) findViewById(R.id.song_name_music_play);
-        songNameDisplay.setText(musicPlayer.getCurrentSongName());
+        else if (musicPlayer.getPlayMode() == 1) {
+            int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
+            musicPlayer.selectAlbum(selected_index);
+        }
 
-        TextView songArtistDisplay = (TextView) findViewById(R.id.artist_name_music_play);
-        songArtistDisplay.setText(musicPlayer.getCurrentSongArtist());
-
-        TextView albumNameDisplay = (TextView) findViewById(R.id.album_name_music_play);
-        albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
+        updateUIWithSongInfo();
 
         // Link the "back" button to go back to the song selection activity
         ImageButton back = findViewById(R.id.button_exit_music_play);
@@ -87,6 +86,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         musicPlayer.goToPreviousSong();
+                        updateUIWithSongInfo();
                     }
                 }
         );
@@ -101,6 +101,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         musicPlayer.goToNextSong();
+                        updateUIWithSongInfo();
                     }
                 }
         );
@@ -132,6 +133,17 @@ public class MusicPlayActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    public void updateUIWithSongInfo () {
+        TextView songNameDisplay = (TextView) findViewById(R.id.song_name_music_play);
+        songNameDisplay.setText(musicPlayer.getCurrentSongName());
+
+        TextView songArtistDisplay = (TextView) findViewById(R.id.artist_name_music_play);
+        songArtistDisplay.setText(musicPlayer.getCurrentSongArtist());
+
+        TextView albumNameDisplay = (TextView) findViewById(R.id.album_name_music_play);
+        albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
 
         TextView location = findViewById(R.id.song_location);
         location.setText ("Location: " + "Dummy location value");
