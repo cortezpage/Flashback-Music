@@ -26,17 +26,9 @@ public class MusicPlayActivity extends AppCompatActivity {
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
 
-        int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
-        Song selectedSong = MainActivity.getSong(selected_id);
-        Date dateLastPlayed = selectedSong.getDateLastPlayed(); // must be done before playing song
-        // prevent reload of song if currently playing song is selected again
-        if (musicPlayer.getPlayMode() == 0 && musicPlayer.getCurrentMediaID() != selected_id) {
+        if (musicPlayer.getPlayMode() == 0) {
+            int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
             musicPlayer.selectSong(selected_id);
-            
-            int currID = musicPlayer.getCurrentMediaID();
-            String currSong = musicPlayer.getCurrentWriteString();
-            sharedPrefHelper.writeSongData("" + currID, currSong);
-            sharedPrefHelper.applySongChanges();
         }
 
         else if (musicPlayer.getPlayMode() == 1) {
@@ -137,10 +129,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                         } else if (musicPlayer.getCurrentLikeStatus() == 2) {
                             likeButton.setBackgroundResource(R.drawable.dislike_button);
                         }
-                        int currID = musicPlayer.getCurrentMediaID();
-                        String currSong = musicPlayer.getCurrentWriteString();
-                        sharedPrefHelper.writeSongData("" + currID, currSong);
-                        sharedPrefHelper.applySongChanges();
+                        sharedPrefHelper.saveSongData(musicPlayer.getCurrentMediaID());
                     }
                 }
         );
@@ -156,9 +145,11 @@ public class MusicPlayActivity extends AppCompatActivity {
         TextView albumNameDisplay = (TextView) findViewById(R.id.album_name_music_play);
         albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
 
-        if (dateLastPlayed != null) {
-            ((TextView) findViewById(R.id.song_last_played_info)).setText("Last played on \n" +
-              new SimpleDateFormat("MMM d, yyyy").format(dateLastPlayed) + "\n" +
-              new SimpleDateFormat("h:mm a").format(dateLastPlayed)); }
+        Date dateLastPlayedOld = musicPlayer.getCurrentSong().getDateLastPlayedOld();
+        ((TextView) findViewById(R.id.song_last_played_info)).setText(
+            dateLastPlayedOld == null ? "Never played before" :
+            "Last played on \n" +
+            new SimpleDateFormat("MMM d, yyyy").format(dateLastPlayedOld) + "\n" +
+            new SimpleDateFormat("h:mm a").format(dateLastPlayedOld));
     }
 }

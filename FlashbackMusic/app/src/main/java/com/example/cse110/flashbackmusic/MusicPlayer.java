@@ -64,14 +64,17 @@ public class MusicPlayer {
     }
 
     public void selectSong(int selected_id) {
-        for (int index = 0; index < this.songs.length; index++) {
-            if (this.songs[index].getMediaID() == selected_id) {
-                this.play_index = index;
-                break;
+        // preventing a reload of the song if the currently-playing song is selected again
+        if (!(this.songs[play_index].getMediaID() == selected_id)) {
+            for (int index = 0; index < this.songs.length; index++) {
+                if (this.songs[index].getMediaID() == selected_id) {
+                    this.play_index = index;
+                }
             }
+            this.reset();
+            songs[play_index].setDateLastPlayed(Calendar.getInstance().getTime());
+            MainActivity.getSongSharedPrefHelper().saveSongData(selected_id);
         }
-        this.reset();
-        songs[play_index].setDateLastPlayed(Calendar.getInstance().getTime());
     }
 
     public void selectAlbum(int selected_index) {
@@ -102,8 +105,6 @@ public class MusicPlayer {
     public int getCurrentMediaID() { return this.songs[play_index].getMediaID(); }
 
     public String getCurrentString() { return this.songs[play_index].toString(); }
-
-    public String getCurrentWriteString() { return this.songs[play_index].toString(); }
 
     public String getCurrentSongName() { return this.songs[play_index].getSongName(); }
 

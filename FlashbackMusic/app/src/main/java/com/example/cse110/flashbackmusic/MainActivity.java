@@ -12,7 +12,7 @@ import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
 
-    private boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
+    private boolean ERASE_DATA_AT_START = true; // for testing (set to false for release)
 
     private static MusicPlayer musicPlayer = null;
     private static SharedPrefHelper sharedPrefHelper;

@@ -294,11 +294,13 @@ public class SharedPrefHelper {
         this.albumSharedEditor.apply();
     }
 
-    public void writeSongData(String id, String data) {
-        this.songSharedEditor.putString(id, data);
+    public void saveSongData(int id)
+    {
+        writeSongData("" + id, MainActivity.getSong(id).toString());
     }
 
-    public void applySongChanges() {
-        this.songSharedEditor.apply();
+    public void writeSongData(String id, String data) {
+        this.songSharedEditor.putString(id, data);
+        songSharedEditor.apply();
     }
 }

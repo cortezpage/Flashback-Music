@@ -28,6 +28,7 @@ public class Song {
     // an array of previous coordinates/locations at which this song was played
     private Location [] locations;
 
+    private Date dateLastPlayedOld = null;
     private Date dateLastPlayed = null;
 
     // This constructor builds a song from a string filled with data about the song.
@@ -107,8 +108,14 @@ public class Song {
         return new Gson().toJson(this);
     }
 
-    // may return null
-    public Date getDateLastPlayed() {return dateLastPlayed;}
+    public void setDateLastPlayed(Date dateLastPlayed) {
+        dateLastPlayedOld = this.dateLastPlayed;
+        this.dateLastPlayed = dateLastPlayed;
+    }
 
-    public void setDateLastPlayed(Date dateLastPlayed) {this.dateLastPlayed = dateLastPlayed;}
+    // may return null
+    public Date getDateLastPlayedOld()
+    {
+        return dateLastPlayedOld;
+    }
 }
