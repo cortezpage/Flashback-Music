@@ -3,6 +3,8 @@ package com.example.cse110.flashbackmusic;
 import android.util.Log;
 import com.google.gson.Gson;
 
+import java.util.Date;
+
 public class Song {
     private String song_name; // name of the song
     private String artist_name; // name of the artist of the song
@@ -25,6 +27,8 @@ public class Song {
 
     // an array of previous coordinates/locations at which this song was played
     private Location [] locations;
+
+    private Date dateLastPlayed = null;
 
     // This constructor builds a song from a string filled with data about the song.
     public Song(String data) {
@@ -102,4 +106,9 @@ public class Song {
     public String toString() {
         return new Gson().toJson(this);
     }
+
+    // may return null
+    public Date getDateLastPlayed() {return dateLastPlayed;}
+
+    public void setDateLastPlayed(Date dateLastPlayed) {this.dateLastPlayed = dateLastPlayed;}
 }

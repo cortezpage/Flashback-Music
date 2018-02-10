@@ -5,6 +5,8 @@ import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import java.util.Calendar;
+
 /* TO-DO: SAVE THE PLAY MODE IN SHARED PREFERENCES */
 
 public class MusicPlayer {
@@ -69,15 +71,14 @@ public class MusicPlayer {
     }
 
     public void selectSong(int selected_id) {
-        // preventing a reload of the song if the currently-playing song is selected again
-        if (!(this.songs[play_index].getMediaID() == selected_id)) {
-            for (int index = 0; index < this.songs.length; index++) {
-                if (this.songs[index].getMediaID() == selected_id) {
-                    this.play_index = index;
-                }
+        for (int index = 0; index < this.songs.length; index++) {
+            if (this.songs[index].getMediaID() == selected_id) {
+                this.play_index = index;
+                break;
             }
-            this.reset();
         }
+        this.reset();
+        songs[play_index].setDateLastPlayed(Calendar.getInstance().getTime());
     }
   
     public boolean isMusicPlaying() {
@@ -90,6 +91,10 @@ public class MusicPlayer {
 
     public void changeCurrentLikeStatus() {
         this.songs[play_index].incrementLikeStatus();
+    }
+
+    public Song getCurrentSong() {
+        return this.songs[play_index];
     }
 
     public int getCurrentLikeStatus() {

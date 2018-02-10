@@ -6,6 +6,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MusicPlayActivity extends AppCompatActivity {
 
     private MusicPlayer musicPlayer;
@@ -22,9 +25,17 @@ public class MusicPlayActivity extends AppCompatActivity {
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
 
-        if (musicPlayer.getPlayMode() == 0) {
-            int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
+        int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
+        Song selectedSong = MainActivity.getSong(selected_id);
+        Date dateLastPlayed = selectedSong.getDateLastPlayed(); // must be done before playing song
+        // prevent reload of song if currently playing song is selected again
+        if (musicPlayer.getPlayMode() == 0 && musicPlayer.getCurrentMediaID() != selected_id) {
             musicPlayer.selectSong(selected_id);
+            
+            int currID = musicPlayer.getCurrentMediaID();
+            String currSong = musicPlayer.getCurrentWriteString();
+            sharedPrefHelper.writeSongData("" + currID, currSong);
+            sharedPrefHelper.applySongChanges();
         }
 
         TextView songNameDisplay = (TextView) findViewById(R.id.song_name_music_play);
@@ -133,13 +144,9 @@ public class MusicPlayActivity extends AppCompatActivity {
                 }
         );
 
-        TextView location = findViewById(R.id.song_location);
-        location.setText ("Location: " + "Dummy location value");
-
-        TextView date_of_week = findViewById(R.id.song_date);
-        date_of_week.setText("Date: " + "Dummy date value");
-
-        TextView time_of_day = findViewById(R.id.song_time);
-        time_of_day.setText("Time: " + "Dummy time value");
+        if (dateLastPlayed != null) {
+            ((TextView) findViewById(R.id.song_last_played_info)).setText("Last played on \n" +
+              new SimpleDateFormat("MMM d, yyyy").format(dateLastPlayed) + "\n" +
+              new SimpleDateFormat("h:mm a").format(dateLastPlayed)); }
     }
 }

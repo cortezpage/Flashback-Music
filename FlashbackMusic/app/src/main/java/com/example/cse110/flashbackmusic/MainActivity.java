@@ -12,6 +12,8 @@ import com.google.gson.Gson;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
+
     private static MusicPlayer musicPlayer = null;
     private static SharedPrefHelper sharedPrefHelper;
     private static Song [] songs;
@@ -58,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         songDataEditor = songSharedPref.edit();
         albumSharedPref = context.getSharedPreferences(album_data_filename, Context.MODE_PRIVATE);
         albumDataEditor = albumSharedPref.edit();
+
+        if (ERASE_DATA_AT_START) {songDataEditor.clear().commit(); albumDataEditor.clear().commit();}
 
         sharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor, albumSharedPref, albumDataEditor);
         songs = sharedPrefHelper.createSongList();
@@ -108,5 +112,15 @@ public class MainActivity extends AppCompatActivity {
             curr_album = albums[index];
             sharedPrefHelper.writeAlbumData(curr_album.getID(), curr_album.toString());
         }
+    }
+
+    public static Song getSong(int id)
+    {
+        for (int index = 0; index < songs.length; index++) {
+            if (songs[index].getMediaID() == id) {
+                return songs[index];
+            }
+        }
+        return null;
     }
 }
