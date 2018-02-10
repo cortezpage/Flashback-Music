@@ -3,6 +3,9 @@ package com.example.cse110.flashbackmusic;
 import android.util.Log;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 public class Song {
     private String song_name; // name of the song
     private String artist_name; // name of the artist of the song
@@ -23,8 +26,11 @@ public class Song {
     // index 0 = Sunday, 1 = Monday, 2 = Tuesday, etc.
     private boolean [] days_of_the_week;
 
-    // an array of previous coordinates/locations at which this song was played
-    private Location [] locations;
+    // an array of previous coordinates/latLons at which this song was played
+    private ArrayList<LatLon> latLons;
+
+    private Date dateLastPlayedOld = null;
+    private Date dateLastPlayed = null;
 
     // This constructor builds a song from a string filled with data about the song.
     public Song(String data) {
@@ -39,7 +45,7 @@ public class Song {
             this.duration = 102;
             this.like_status = 0;
             this.media_id = 2131427333;
-            this.locations = new Location[0];
+            this.latLons = new ArrayList<LatLon>();
             this.times_of_day = new boolean[6];
             this.days_of_the_week = new boolean[7];
         } else {
@@ -49,7 +55,7 @@ public class Song {
             this.duration = Integer.parseInt(substrings[3]);
             this.like_status = Integer.parseInt(substrings[4]);
             this.media_id = Integer.parseInt(substrings[5]);
-            this.locations = new Location[0];
+            this.latLons = new ArrayList<LatLon>();
             this.times_of_day = new boolean[6];
             this.days_of_the_week = new boolean[7];
         }
@@ -88,18 +94,24 @@ public class Song {
 
     public void setToDisliked() { this.like_status = 2; }
 
-    public Location [] getLocations() { return this.locations; }
-
-    public void addNewLocation(Location newLocation) {
-        Location [] newLocations = new Location[this.locations.length + 1];
-        for (int index = 0; index < locations.length; index++) {
-            newLocations[index] = locations[index];
-        }
-        newLocations[this.locations.length] = newLocation;
-        this.locations = newLocations;
-    }
+    public ArrayList<LatLon> getLatLons() { return this.latLons; }
 
     public String toString() {
         return new Gson().toJson(this);
     }
+
+    public void setDateLastPlayed(Date dateLastPlayed) {
+        dateLastPlayedOld = this.dateLastPlayed;
+        this.dateLastPlayed = dateLastPlayed;}
+
+    public Date getDateLastPlayedOld()
+    {
+        return dateLastPlayedOld;
+    }
+
+    public LatLon getLastLatLonOld(){
+        return latLons.get(latLons.size() - 1 - 1);}
+
+    public boolean wasPlayedBefore() {
+        return dateLastPlayedOld != null;}
 }
