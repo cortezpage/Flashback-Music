@@ -2,6 +2,7 @@ package com.example.cse110.flashbackmusic;
 
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.location.Location;
 import android.media.MediaPlayer;
 import android.util.Log;
 
@@ -18,11 +19,13 @@ public class MusicPlayer {
     private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
+    private boolean loadingSong;
+
     public MusicPlayer(Resources resources) {
         this.song_resources = resources;
         this.player = new MediaPlayer();
         this.songs = new Song[3];
-        this.play_index = 0;
+        this.play_index = -1;
         this.play_mode = 0;
         this.songs = MainActivity.getSongs();
         this.albums = MainActivity.getAlbums();
@@ -37,9 +40,7 @@ public class MusicPlayer {
     }
 
     public void pause() {
-        if (this.player.isPlaying()) {
-            this.player.pause();
-        }
+        player.pause();
     }
 
     public void reset() {
@@ -65,16 +66,16 @@ public class MusicPlayer {
 
     public void selectSong(int selected_id) {
         // preventing a reload of the song if the currently-playing song is selected again
-        if (!(this.songs[play_index].getMediaID() == selected_id)) {
-            for (int index = 0; index < this.songs.length; index++) {
-                if (this.songs[index].getMediaID() == selected_id) {
-                    this.play_index = index;
-                }
+        if (play_index != -1 && songs[play_index].getMediaID() == selected_id) {return;}
+        for (int index = 0; index < this.songs.length; index++) {
+            if (this.songs[index].getMediaID() == selected_id) {
+                this.play_index = index;
             }
-            this.reset();
-            songs[play_index].setDateLastPlayed(Calendar.getInstance().getTime());
-            MainActivity.getSongSharedPrefHelper().saveSongData(selected_id);
         }
+        this.reset();
+        songs[play_index].setDateLastPlayed(Calendar.getInstance().getTime());
+        songs[play_index].getLatLons().add(MainActivity.getLastLatLon());
+        MainActivity.getSongSharedPrefHelper().saveSongData(selected_id);
     }
 
     public void selectAlbum(int selected_index) {
@@ -83,11 +84,7 @@ public class MusicPlayer {
     }
   
     public boolean isMusicPlaying() {
-        if (this.player.isPlaying()){
-            return true;
-        }
-
-        return false;
+        return player.isPlaying();
     }
 
     public void changeCurrentLikeStatus() {
@@ -130,7 +127,6 @@ public class MusicPlayer {
      * This method allows us to load a song's data into the media player.
      */
     public void loadSong(int resourceId) {
-
         // Determines the behavior that will occur when the song is over
         this.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -144,15 +140,17 @@ public class MusicPlayer {
             this.player.setDataSource(songFD);
             this.player.prepareAsync();
 
+            loadingSong = true;
             this.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer player) {
                     player.start();
+                    loadingSong = false;
                 }
-
             });
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+        } catch (Exception e) {System.out.println(e.toString());}
     }
+
+    public boolean isLoadingSong() {
+        return loadingSong;}
 }
