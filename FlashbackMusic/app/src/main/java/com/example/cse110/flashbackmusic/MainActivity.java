@@ -109,6 +109,15 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         musicPlayer = new MusicPlayer (this.getResources());
 
+        Button toFlashbackMode = (Button) findViewById(R.id.button_to_flashback_mode);
+
+        toFlashbackMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchFlashbackMode();
+            }
+        });
+
         Button toSongSelection = (Button) findViewById(R.id.button_to_song_selection);
 
         toSongSelection.setOnClickListener(new View.OnClickListener() {
@@ -126,6 +135,12 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
                 launchAlbumSelection();
             }
         });
+    }
+
+    public void launchFlashbackMode () {
+        getMusicPlayer().setPlayMode("flashback");
+        Intent intent = new Intent(this, FlashbackActivity.class);
+        startActivity(intent);
     }
 
     public void launchSongSelection () {
