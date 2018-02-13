@@ -73,7 +73,7 @@ public class MusicPlayer {
             }
         }
         this.reset();
-        songs[play_index].setDateLastPlayed(Calendar.getInstance().getTime());
+        songs[play_index].getDates().add(Calendar.getInstance().getTime());
         songs[play_index].getLatLons().add(MainActivity.getLastLatLon());
         MainActivity.getSongSharedPrefHelper().saveSongData(selected_id);
     }

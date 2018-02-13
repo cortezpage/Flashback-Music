@@ -2,7 +2,6 @@ package com.example.cse110.flashbackmusic;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -137,11 +136,11 @@ public class MusicPlayActivity extends AppCompatActivity {
         albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
 
         Song curSong = musicPlayer.getCurrentSong();
-        ((TextView) findViewById(R.id.song_last_played_info)).setText(!curSong.wasPlayedBefore() ?
+        ((TextView) findViewById(R.id.song_last_played_info)).setText(!curSong.wasPlayedPreviously() ?
             "Never played before" :
             "Last played on \n" +
-            curSong.getLastLatLonOld().getAddressLine(this) + "\n" +
-            new SimpleDateFormat("MMM d, yyyy").format(curSong.getDateLastPlayedOld()) + "\n" +
-            new SimpleDateFormat("h:mm a").format(curSong.getDateLastPlayedOld()));
+            curSong.getPreviousLatLon().getAddressLine(this) + "\n" +
+            new SimpleDateFormat("MMM d, yyyy").format(curSong.getPreviousDate()) + "\n" +
+            new SimpleDateFormat("h:mm a").format(curSong.getPreviousDate()));
     }
 }
