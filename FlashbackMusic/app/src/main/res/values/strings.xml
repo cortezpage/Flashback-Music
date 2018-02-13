@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Flashback Music</string>
     <string name="title_activity_music_selection">MusicSelection</string>
+    <string name="title_activity_flashback">FlashbackActivity</string>
 </resources>
