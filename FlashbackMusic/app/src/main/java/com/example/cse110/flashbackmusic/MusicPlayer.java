@@ -74,8 +74,11 @@ public class MusicPlayer {
         }
         this.reset();
         songs[play_index].getDates().add(Calendar.getInstance().getTime());
-        songs[play_index].getLatLons().add(MainActivity.getLastLatLon());
-        MainActivity.getSongSharedPrefHelper().saveSongData(selected_id);
+        LatLon newLatLon = MainActivity.getLastLatLon();
+        if (newLatLon != null) {
+            songs[play_index].getLatLons().add(newLatLon);
+            MainActivity.getSongSharedPrefHelper().saveSongData(selected_id);
+        }
     }
 
     public void selectAlbum(int selected_index) {
