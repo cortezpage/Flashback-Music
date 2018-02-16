@@ -190,7 +190,10 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     {
         if (locationManager == null) { return null;}
         Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        return new LatLon(lastLocation.getLatitude(), lastLocation.getLongitude());
+        if (lastLocation != null) {
+            return new LatLon(lastLocation.getLatitude(), lastLocation.getLongitude());
+        }
+        return null;
     }
 
 }
