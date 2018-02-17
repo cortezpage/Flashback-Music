@@ -1,11 +1,8 @@
 package com.example.cse110.flashbackmusic;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
-
-import java.util.Map;
 
 
 public class SharedPrefHelper {

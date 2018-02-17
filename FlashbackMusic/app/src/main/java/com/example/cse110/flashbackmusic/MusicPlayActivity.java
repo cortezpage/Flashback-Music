@@ -139,8 +139,8 @@ public class MusicPlayActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.song_last_played_info)).setText(!curSong.wasPlayedPreviously() ?
             "Never played before" :
             "Last played on \n" +
-            curSong.getPreviousLatLon().getAddressLine(this) + "\n" +
-            new SimpleDateFormat("MMM d, yyyy").format(curSong.getPreviousDate()) + "\n" +
-            new SimpleDateFormat("h:mm a").format(curSong.getPreviousDate()));
+            curSong.getPreviousLocation().getAddressLine(this) + "\n" +
+            new SimpleDateFormat("MMM d, yyyy").format(curSong.getLastPlayedDate()) + "\n" +
+            new SimpleDateFormat("h:mm a").format(curSong.getLastPlayedDate()));
     }
 }
