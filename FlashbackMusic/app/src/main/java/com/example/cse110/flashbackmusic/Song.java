@@ -38,7 +38,7 @@ public class Song {
     // Time of the day
     private boolean [] times_of_day;
 
-    // Days of the wekk
+    // Days of the week
     private boolean [] days_of_the_week;
 
     // Recently Played Rank
@@ -108,7 +108,7 @@ public class Song {
     public Date getLastPlayedDate() { return this.lastPlayedDate; }
 
     public boolean wasPlayedPreviously() {
-        return (this.lastPlayedDate != null);
+        return ((this.lastPlayedDate != null) && (this.latLons.size() > 0));
     }
 
     public void setDate(Date newDate) { this.lastPlayedDate = newDate; }
@@ -146,7 +146,7 @@ public class Song {
     public ArrayList<LatLon> getLatLons() { return this.latLons; }
 
     public LatLon getPreviousLocation() {
-        return this.latLons.get(latLons.size() - 1 - 1);
+        return this.latLons.get(latLons.size() - 1);
     }
 
     public void addLocation(LatLon newLocation) {
