@@ -36,7 +36,6 @@ public class MusicPlayer {
     public void destroy() { this.player.release(); }
 
     public void play() {
-        Log.i("Now playing:", this.getCurrentString());
         this.player.start();
     }
 
