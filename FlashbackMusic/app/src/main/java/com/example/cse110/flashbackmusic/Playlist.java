@@ -6,19 +6,46 @@ import android.location.Location;
 import android.location.LocationManager;
 
 import java.util.Calendar;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class Playlist {
 
     private Song [] songs;
     private int play_index;
+    private Queue<Integer> idPQ = new PriorityQueue<>(100);
+
 
     public Playlist () {
         this.songs = MainActivity.getSongs();
         this.play_index = 0;
+
+        addSongToList();
+    }
+
+    private void addSongToList () {
+
+        // calculate the score for each song and then put them into the priority queue
+        for (int k = 0; k < songs.length; k++) {
+            calculateRank(songs[k]);
+        }
+
+        for (int i = 0; i < songs.length; i++) {
+            idPQ.add(songs[i].getRank());
+        }
+    }
+
+    private void calculateRank (Song song) {
+        // calculate the score for the songs
+        //TODO implement the real funcionality for rank calculating
+        song.setRank(song.getMediaID());
     }
 
     public int getCurrSongID() {
-        return this.songs[this.play_index].getMediaID();
+        System.err.println("idPQ size is " + idPQ.size());
+
+        return idPQ.poll();
+        //return this.songs[this.play_index].getMediaID();
     }
 
     public void toPreviousSong() {

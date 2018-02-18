@@ -10,6 +10,9 @@ import android.widget.ImageButton;
 
 public class FlashbackActivity extends AppCompatActivity {
 
+    MusicPlayer musicPlayer;
+    Playlist playlist;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +37,11 @@ public class FlashbackActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        musicPlayer = MainActivity.getMusicPlayer();
+        playlist = musicPlayer.getFlashback_playlist();
+
+        musicPlayer.loadSong(playlist.getCurrSongID());
     }
 
 }

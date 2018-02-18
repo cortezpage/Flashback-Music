@@ -164,4 +164,6 @@ public class MusicPlayer {
     public boolean isLoadingSong() {
         return loadingSong;
     }
+
+    public Playlist getFlashback_playlist () {return flashback_playlist;}
 }
