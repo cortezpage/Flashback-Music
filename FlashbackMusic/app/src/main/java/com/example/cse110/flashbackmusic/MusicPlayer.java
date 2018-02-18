@@ -3,7 +3,6 @@ package com.example.cse110.flashbackmusic;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -141,6 +140,7 @@ public class MusicPlayer {
         this.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
+
                 mediaPlayer.start();
             }
         });
