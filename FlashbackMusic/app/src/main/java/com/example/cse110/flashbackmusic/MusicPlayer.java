@@ -48,6 +48,10 @@ public class MusicPlayer {
         loadSong(songs[play_index].getMediaID());
     }
 
+    public MediaPlayer getMediaPlayer() {
+        return this.player;
+    }
+
     // only available in album play and flashback mode
     public void goToPreviousSong() {
         if (this.play_mode == 1) {
@@ -137,13 +141,13 @@ public class MusicPlayer {
      * This method allows us to load a song's data into the media player.
      */
     public void loadSong(int resourceId) {
-        // Determines the behavior that will occur when the song is over
+        /* Determines the behavior that will occur when the song is over
         this.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
             }
-        });
+        }); */
 
         AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
         try {
@@ -151,6 +155,7 @@ public class MusicPlayer {
             this.player.prepareAsync();
 
             loadingSong = true;
+
             this.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer player) {
@@ -158,6 +163,7 @@ public class MusicPlayer {
                     loadingSong = false;
                 }
             });
+
         } catch (Exception e) {System.out.println(e.toString());}
     }
 
