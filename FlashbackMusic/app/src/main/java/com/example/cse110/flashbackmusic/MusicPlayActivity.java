@@ -34,6 +34,10 @@ public class MusicPlayActivity extends AppCompatActivity {
             int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
             musicPlayer.selectAlbum(selected_index);
         }
+        else if (musicPlayer.getPlayMode() == 2) {
+            int first_id = MainActivity.getSongs()[0].getMediaID();
+            musicPlayer.selectSong(first_id);
+        }
 
         // Link the "back" button to go back to the song selection activity
         ImageButton back = findViewById(R.id.button_exit_music_play);
@@ -53,7 +57,8 @@ public class MusicPlayActivity extends AppCompatActivity {
                     if (musicPlayer.isMusicPlaying()) {
                         musicPlayer.pause();}
                     else {
-                        musicPlayer.play(); }
+                        musicPlayer.play();
+                    }
                 }
                 updatePlayButtonImage();
             }

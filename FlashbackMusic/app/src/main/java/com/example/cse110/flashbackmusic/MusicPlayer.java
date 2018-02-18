@@ -15,6 +15,7 @@ public class MusicPlayer {
     private Song [] songs;
     private Album [] albums;
     private Album curr_album;
+    private Playlist flashback_playlist;
     private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
@@ -29,6 +30,7 @@ public class MusicPlayer {
         this.songs = MainActivity.getSongs();
         this.albums = MainActivity.getAlbums();
         this.curr_album = null;
+        this.flashback_playlist = new Playlist();
     }
 
     public void destroy() { this.player.release(); }
@@ -52,6 +54,9 @@ public class MusicPlayer {
         if (this.play_mode == 1) {
             this.curr_album.toPreviousSong();
             selectSong(this.curr_album.getCurrSongID());
+        } else if (this.play_mode == 2) {
+            this.flashback_playlist.toPreviousSong();
+            selectSong(this.flashback_playlist.getCurrSongID());
         }
     }
 
@@ -60,6 +65,9 @@ public class MusicPlayer {
         if (this.play_mode == 1) {
             this.curr_album.toNextSong();
             selectSong(this.curr_album.getCurrSongID());
+        } else if (this.play_mode == 2) {
+            this.flashback_playlist.toNextSong();
+            selectSong(this.flashback_playlist.getCurrSongID());
         }
     }
 
@@ -119,6 +127,7 @@ public class MusicPlayer {
         } else if (mode.equals("flashback")) {
             this.play_mode = 2;
             this.curr_album = null;
+            this.flashback_playlist.sortPlaylist(Calendar.getInstance());
         } else { // default case
             this.play_mode = 0;
             this.curr_album = null;
@@ -154,5 +163,6 @@ public class MusicPlayer {
     }
 
     public boolean isLoadingSong() {
-        return loadingSong;}
+        return loadingSong;
+    }
 }

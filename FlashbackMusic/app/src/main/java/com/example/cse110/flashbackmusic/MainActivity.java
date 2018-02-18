@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         return albums;
     }
 
+    public static LocationManager getLocationManager() { return locationManager; }
+
     @Override
     public void onDestroy() {
         updateSongData();
@@ -140,8 +142,10 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     }
 
     public void launchFlashbackMode () {
-        getMusicPlayer().setPlayMode("flashback");
-        Intent intent = new Intent(this, FlashbackActivity.class);
+        //TODO: getMusicPlayer().setPlayMode("flashback");
+        //Intent intent = new Intent(this, FlashbackActivity.class);
+        Intent intent = new Intent(this, MusicPlayActivity.class);
+        intent.putExtra("MODE", "flashback");
         startActivity(intent);
     }
 
