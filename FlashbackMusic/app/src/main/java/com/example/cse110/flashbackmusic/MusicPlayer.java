@@ -2,7 +2,6 @@ package com.example.cse110.flashbackmusic;
 
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
-import android.location.Location;
 import android.media.MediaPlayer;
 import android.util.Log;
 
@@ -73,7 +72,7 @@ public class MusicPlayer {
             }
         }
         this.reset();
-        songs[play_index].getDates().add(Calendar.getInstance().getTime());
+        songs[play_index].setDate(Calendar.getInstance().getTime());
         LatLon newLatLon = MainActivity.getLastLatLon();
         if (newLatLon != null) {
             songs[play_index].getLatLons().add(newLatLon);

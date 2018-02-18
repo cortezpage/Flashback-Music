@@ -1,11 +1,8 @@
 package com.example.cse110.flashbackmusic;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.gson.Gson;
-
-import java.util.Map;
 
 
 public class SharedPrefHelper {
@@ -18,7 +15,7 @@ public class SharedPrefHelper {
     // format: album name, artist name, number of tracks, and album id number
     private String [] all_albums = {
             "I Will Not Be Afraid; Caroline Rose; 7; ALBUM_0",
-            "Love Is Everywhere; Stacy Jones; 12; ALBUM_1",
+            "Love Is Everywhere; Stacy Jones; 11; ALBUM_1",
             "New & Best of Keaton Simons; Keaton Simons; 10; ALBUM_2",
             "Origins - The Best of Terry Oldfield; Terry Oldfield; 11; ALBUM_3",
             "Take Yourself Too Seriously; Forum; 6; ALBUM_4",

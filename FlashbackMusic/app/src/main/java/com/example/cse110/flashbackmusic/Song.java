@@ -4,6 +4,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class Song {
@@ -17,20 +18,31 @@ public class Song {
     /* CURRENT PLAN: FIND THIS AT SCORE CALCULATION INSTEAD
      * an array of T/F values indicating the times of day at which the song has been played
      * possible split:
-     * index 0 = 6 AM to 9 AM, index 1 = 9 AM to 12 PM, index 2 = 12 PM to 3 PM,
-     * index 3 = 3 PM to 6 PM, index 4 = 6 PM to 9 PM, index 5 = 9 PM to 12 AM
+     * index 0 = 12 AM to 3 AM, index 1 = 3 AM to 6 AM,
+     * index 2 = 6 AM to 9 AM, index 3 = 9 AM to 12 PM, index 4 = 12 PM to 3 PM,
+     * index 5 = 3 PM to 6 PM, index 6 = 6 PM to 9 PM, index 7 = 9 PM to 12 AM
      * We could split into 3 or 4 times of day if that is preferred!
      */
-    //private boolean [] times_of_day;
 
     // CURRENT PLAN: FIND THIS AT SCORE CALCULATION INSTEAD
     // an array of T/F values indicating the days of the week on which the song has been played
-    // index 0 = Sunday, 1 = Monday, 2 = Tuesday, etc.
-    //private boolean [] days_of_the_week;
+    // index 0 = Sunday, 1 = Monday, 2 = Tuesday, etc. (Sunday has value 1 in Calendar)
+
 
     // an array of previous coordinates/latLons at which this song was played
     private ArrayList<LatLon> latLons;
-    private ArrayList<Date> dates;
+
+    // Dates
+    private Date lastPlayedDate;
+
+    // Time of the day
+    private boolean [] times_of_day;
+
+    // Days of the week
+    private boolean [] days_of_the_week;
+
+    // Recently Played Rank
+    private int rank;
 
     // This constructor builds a song from a string filled with data about the song.
     public Song(String data) {
@@ -54,7 +66,10 @@ public class Song {
             this.media_id = Integer.parseInt(substrings[5]);
         }
         this.latLons = new ArrayList<LatLon>();
-        this.dates = new ArrayList<Date>();
+        this.lastPlayedDate = null;
+        this.times_of_day = new boolean[8];
+        this.days_of_the_week = new boolean[7];
+        this.rank = 0;
     }
 
     public String getSongName() { return this.song_name; }
@@ -80,30 +95,65 @@ public class Song {
 
     public boolean isNeutral() { return (this.like_status == 0); }
 
-    public boolean isFavorited() { return (this.like_status == 1); }
-
-    public boolean isDisliked() { return (this.like_status == 2); }
-
     public void setToNeutral() { this.like_status = 0; }
+
+    public boolean isFavorited() { return (this.like_status == 1); }
 
     public void setToFavorite() { this.like_status = 1; }
 
+    public boolean isDisliked() { return (this.like_status == 2); }
+
     public void setToDisliked() { this.like_status = 2; }
+
+    public Date getLastPlayedDate() { return this.lastPlayedDate; }
+
+    public boolean wasPlayedPreviously() {
+        return ((this.lastPlayedDate != null) && (this.latLons.size() > 0));
+    }
+
+    public void setDate(Date newDate) { this.lastPlayedDate = newDate; }
+
+    public boolean[] getTimeOfDay() { return this.times_of_day; }
+
+    public boolean playedAtTime(Calendar currTime) {
+        int currHour = currTime.HOUR_OF_DAY;
+        int index = currHour/3;
+        return (this.times_of_day[index]);
+    }
+
+    public void setPlayedAtTime(Calendar currTime) {
+        int currHour = currTime.HOUR_OF_DAY;
+        int index = currHour/3;
+        this.times_of_day[index] = true;
+    }
+
+    public boolean[] getDaysOfTheWeek() { return this.days_of_the_week; }
+
+    public boolean playedOnDayOfTheWeek(Calendar currTime) {
+        int currDay = currTime.DAY_OF_WEEK;
+        return days_of_the_week[currDay - 1];
+    }
+
+    public void setPlayedOnDayOfTheWeek(Calendar currTime) {
+        int currDay = currTime.DAY_OF_WEEK;
+        days_of_the_week[currDay - 1] = true;
+    }
+
+    public int getRank() { return this.rank; }
+
+    public void setRank(int newRank) { this.rank = newRank; }
+
+    public ArrayList<LatLon> getLatLons() { return this.latLons; }
+
+    public LatLon getPreviousLocation() {
+        return this.latLons.get(latLons.size() - 1);
+    }
+
+    public void addLocation(LatLon newLocation) {
+        this.latLons.add(newLocation);
+    }
 
     public String toString() {
         return new Gson().toJson(this);
     }
-
-    public ArrayList<LatLon> getLatLons() { return latLons; }
-
-    public LatLon getPreviousLatLon(){
-        return latLons.get(latLons.size() - 1 - 1);}
-
-    public ArrayList<Date> getDates() { return dates; }
-
-    public Date getPreviousDate(){
-        return dates.get(dates.size() - 1 - 1);}
-
-    public boolean wasPlayedPreviously() {
-        return dates.size() > 1;}
 }

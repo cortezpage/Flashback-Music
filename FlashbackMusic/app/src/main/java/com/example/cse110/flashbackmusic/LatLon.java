@@ -5,8 +5,7 @@ import android.location.Geocoder;
 
 import java.io.IOException;
 
-public class LatLon
-{
+public class LatLon {
     private double latitude;
     private double longitude;
 
