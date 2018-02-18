@@ -54,9 +54,9 @@ public class Playlist {
      * FAVORITED: +303
      * DISLIKED: rank set to -1, no other factors are counted
      *
-     * WITHIN 200M: +300
-     * WITHIN 400M: +200
-     * WITHIN 600M: +100
+     * WITHIN 200M: +301
+     * WITHIN 400M: +201
+     * WITHIN 600M: +101
      *
      * SAME DAY OF WEEK: +202
      *
@@ -64,18 +64,18 @@ public class Playlist {
      * 2 HOURS APART: +200
      * 1 HOUR APART: +100
      */
-    private int findRank (Song song, LatLon currentLatLon, Date now) {
+    public int findRank (Song song, LatLon currentLatLon, Date now) {
         int rank = 0;
         if (song.isDisliked()) {
             rank = -1;
             song.setRank(rank);
             return rank;
         } else if (song.isFavorited()) {
-            rank += 3;
+            rank += 303;
         }
 
         // If song not played before, has a rank of 0
-        if (song.getPreviousLocation() == null) {
+        if (song.getPreviousLocation() == null || song.getLastPlayedDate() == null) {
             rank = 0;
             song.setRank(rank);
             return rank;
@@ -85,11 +85,11 @@ public class Playlist {
         // Distance in meters between current loc and previously played loc
         float locDiff = abs(songLatLon.findDistance(currentLatLon));
         if (locDiff < 200.0) {
-            rank += 3;
+            rank += 301;
         } else if (locDiff < 400.0) {
-            rank += 2;
+            rank += 201;
         } else if (locDiff < 600.0) {
-            rank += 1;
+            rank += 101;
         }
 
         Calendar songCalendar = new GregorianCalendar();
@@ -97,19 +97,17 @@ public class Playlist {
         Calendar nowCalendar = new GregorianCalendar();
         nowCalendar.setTime(now);
         if (songCalendar.get(Calendar.DAY_OF_WEEK) == nowCalendar.get(Calendar.DAY_OF_WEEK)) {
-            rank += 2;
+            rank += 202;
         }
 
         int songHour = songCalendar.get(Calendar.HOUR_OF_DAY);
-        int nowHour = songCalendar.get(Calendar.HOUR_OF_DAY);
-        int hourDiff = abs(songHour - nowHour);
-        if (hourDiff <= 1) {
-            rank += 3;
-        } else if (hourDiff == 2) {
-            rank += 2;
-        } else if (hourDiff == 3) {
-            rank += 1;
-        }
+        int nowHour = nowCalendar.get(Calendar.HOUR_OF_DAY);
+        int hourDiff = abs(songHour / 4 - nowHour / 4);
+        if (hourDiff == 0) {
+            rank += 300;
+        } /*else if (hourDiff == 1) { // Makes being in the adjacent time bracket half credit
+            rank += 100;
+        }*/
 
         song.setRank(rank);
         return rank;

@@ -36,8 +36,8 @@ public class LatLon {
         locThis.setLatitude(this.getLatitude());
         locThis.setLongitude(this.getLongitude());
         Location locOther = new Location("Other location");
-        locOther.setLatitude(this.getLatitude());
-        locOther.setLongitude(this.getLongitude());
+        locOther.setLatitude(other.getLatitude());
+        locOther.setLongitude(other.getLongitude());
         return locThis.distanceTo(locOther);
     }
 }
