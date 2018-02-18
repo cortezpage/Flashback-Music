@@ -2,6 +2,7 @@ package com.example.cse110.flashbackmusic;
 
 import android.content.Context;
 import android.location.Geocoder;
+import android.location.Location;
 
 import java.io.IOException;
 
@@ -27,5 +28,16 @@ public class LatLon {
         if (!Geocoder.isPresent()) { return ""; }
         try { return new Geocoder(context).getFromLocation(latitude, longitude, 1).get(0).getAddressLine(0);}
         catch (IOException e) { e.printStackTrace(); return ""; }
+    }
+
+    // Finds the approx distance in meters between two LatLocs
+    public float findDistance(LatLon other) {
+        Location locThis = new Location("Current location");
+        locThis.setLatitude(this.getLatitude());
+        locThis.setLongitude(this.getLongitude());
+        Location locOther = new Location("Other location");
+        locOther.setLatitude(this.getLatitude());
+        locOther.setLongitude(this.getLongitude());
+        return locThis.distanceTo(locOther);
     }
 }
