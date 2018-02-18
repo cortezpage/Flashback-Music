@@ -63,6 +63,9 @@ public class Playlist {
      * SAME HOUR/1 HOUR APART: +300
      * 2 HOURS APART: +200
      * 1 HOUR APART: +100
+     *
+     * Testing for this file at `FlashbackMusic/app/src/androidTest/java/tests/FlashbackAlgorithmTests.java`
+     * Please run tests after making any changes to this function, and update values as needed
      */
     public int findRank (Song song, LatLon currentLatLon, Date now) {
         int rank = 0;
