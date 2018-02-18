@@ -1,7 +1,10 @@
 package com.example.cse110.flashbackmusic;
 
+import android.annotation.SuppressLint;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.util.Log;
 
@@ -50,6 +53,15 @@ public class MusicPlayer {
 
     public MediaPlayer getMediaPlayer() {
         return this.player;
+    }
+
+    @SuppressLint("MissingPermission")
+    public void updatePlaylist() {
+        Calendar currTime = Calendar.getInstance();
+        Location currLoc = MainActivity.getLocationManager().getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (this.flashback_playlist.shouldSort(currTime, currLoc)) {
+            this.flashback_playlist.sortPlaylist(currTime, currLoc);
+        }
     }
 
     // only available in album play and flashback mode
@@ -130,7 +142,7 @@ public class MusicPlayer {
         } else if (mode.equals("flashback")) {
             this.play_mode = 2;
             this.curr_album = null;
-            this.flashback_playlist.sortPlaylist(Calendar.getInstance());
+            this.updatePlaylist();
         } else { // default case
             this.play_mode = 0;
             this.curr_album = null;

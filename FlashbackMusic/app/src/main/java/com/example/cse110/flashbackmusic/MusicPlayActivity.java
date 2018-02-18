@@ -1,5 +1,6 @@
 package com.example.cse110.flashbackmusic;
 
+import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MusicPlayActivity extends AppCompatActivity {
 
@@ -47,7 +49,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                 public void onCompletion(MediaPlayer mediaPlayer) {
                     musicPlayer.goToNextSong();
                     updateUIWithSongInfo();
-                    // TODO: determine if we should resort the flashback playlist HERE
+                    musicPlayer.updatePlaylist();
                 }
             });
         }
