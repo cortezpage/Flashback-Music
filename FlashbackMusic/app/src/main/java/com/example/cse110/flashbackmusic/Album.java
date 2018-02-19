@@ -53,4 +53,8 @@ public class Album {
             this.play_index = 0;
         }
     }
+
+    public boolean atEnd() {
+        return (this.play_index > this.songs.length - 1);
+    }
 }

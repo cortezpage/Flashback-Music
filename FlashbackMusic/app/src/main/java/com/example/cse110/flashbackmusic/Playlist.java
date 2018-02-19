@@ -1,17 +1,11 @@
 package com.example.cse110.flashbackmusic;
 
-
-import android.annotation.SuppressLint;
-import android.location.Location;
-import android.location.LocationManager;
 import android.util.Log;
-
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import static java.lang.Math.abs;
 
@@ -21,7 +15,7 @@ public class Playlist {
 
     private Song [] songs;
     private int play_index;
-    private Queue<Song> idPQ = new PriorityQueue<>(100, rankComp);
+    private Queue<Song> songPQ;
 
     public static Comparator<Song> rankComp = new Comparator<Song>() {
         @Override
@@ -35,14 +29,14 @@ public class Playlist {
     };
   
     private Calendar lastSortedCal;
-    private Location lastSortedLoc;
+    private LatLon lastSortedLoc;
 
     public Playlist () {
         this.songs = MainActivity.getSongs();
         this.play_index = 0;
-        lastSortedCal = null;
-        lastSortedLoc = null;
-      
+        this.lastSortedCal = null;
+        this.lastSortedLoc = null;
+        this.songPQ = new PriorityQueue<>(100, rankComp);
         addSongToList();
     }
 
@@ -53,43 +47,33 @@ public class Playlist {
         }
 
         for (int i = 0; i < songs.length; i++) {
-            idPQ.add(songs[i]);
+            // skipping over disliked songs
+            if (songs[i].getLikeStatus() == 2) {
+                continue;
+            }
+            songPQ.add(songs[i]);
         }
+
+        Log.i("PQ Size", "" + songPQ.size());
     }
 
-    @SuppressLint("MissingPermission")
     private void calculateRank (Song song) {
         // calculate the score for the song
-        Location currLoc = MainActivity.getLocationManager().getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        LatLon latlon = new LatLon(currLoc.getLatitude(), currLoc.getLongitude());
+        LatLon latlon = MainActivity.getLastLatLon();
         Date currDate = Calendar.getInstance().getTime();
         int rank = findRank(song, latlon, currDate);
-        //rank = MAX_POSSIBLE_SCORE - rank;
         song.setRank(rank);
     }
 
     public int getCurrSongID() {
-        Log.i("Playlist getCurrSongID", "" + idPQ.peek().getRank());
-        return idPQ.poll().getMediaID();
-        //return this.songs[this.play_index].getMediaID();
+        return songPQ.poll().getMediaID();
     }
 
-    public void toPreviousSong() {
-        this.play_index--;
-        if (this.play_index < 0) {
-            this.play_index = this.songs.length - 1;
-        }
+    public boolean atEnd() {
+        return (this.songPQ.size() == 0);
     }
 
-    public void toNextSong() {
-        this.play_index++;
-        if (this.play_index > this.songs.length - 1) {
-            this.play_index = 0;
-        }
-    }
-
-    // TODO: may need to replace with LatLon
-    public boolean shouldSort (Calendar currTime, Location currLoc) {
+    public boolean shouldSort (Calendar currTime, LatLon currLoc) {
         if (lastSortedCal == null || lastSortedLoc == null || currTime == null || currLoc == null) {
             return true;
         }
@@ -105,7 +89,6 @@ public class Playlist {
         return false;
     }
 
-    // TODO: may need to change this if we change our time groups
     public boolean timeOfDayHasChanged (int currHour) {
         int currHourIndex = currHour/TIME_OF_DAY_DIVISION;
         int prevHourIndex = lastSortedCal.HOUR_OF_DAY/TIME_OF_DAY_DIVISION;
@@ -115,32 +98,23 @@ public class Playlist {
         return false;
     }
 
-    /* TODO: may need to use LatLon instead
-     * Also need to
-     */
-    public boolean locationHasChanged (Location currLoc) {
+    public boolean locationHasChanged (LatLon currLoc) {
         // distanceTo returns a float representing the distance in meters
-        if (currLoc.distanceTo(lastSortedLoc) > 250.0) {
+        if (currLoc.findDistance(lastSortedLoc) > 250.0) {
             return true;
         }
         return false;
     }
 
-    // TODO: may need to use LatLon instead
-    @SuppressLint("MissingPermission")
-    public void sortPlaylist(Calendar currTime, Location currLoc) {
-        // getting relevant data to help us sort the playlist according to scores
-        //int currHour = currTime.HOUR_OF_DAY;
-        //int currDay = currTime.DAY_OF_WEEK;
-        //LocationManager manager = MainActivity.getLocationManager();
-        //Location currLocation = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        idPQ.clear();
+    public void sortPlaylist(Calendar currTime, LatLon currLoc) {
+        lastSortedLoc = currLoc;
+        lastSortedCal = currTime;
+        songPQ.clear();
         addSongToList();
     }
 
     //0 - neutral; 1 - favorite; 2 - dislike
-    public int breakTieWithLike (Song song1, Song song2){
+    public static int breakTieWithLike (Song song1, Song song2){
         int songStatus1 = song1.getLikeStatus();
         int songStatus2 = song2.getLikeStatus();
 
@@ -154,7 +128,10 @@ public class Playlist {
         return 1;
     }
 
-    public int breakTieWithRecentPlay (Song songOne, Song songTwo) {
+    public static int breakTieWithRecentPlay (Song songOne, Song songTwo) {
+        if (songOne.getLastPlayedDate() == null || songTwo.getLastPlayedDate() == null) {
+            return -1;
+        }
         if(songOne.getLastPlayedDate().compareTo(songTwo.getLastPlayedDate()) < 0) {
             return -1;
         }
@@ -192,13 +169,13 @@ public class Playlist {
         }
 
         // If song not played before, has a rank of 0
-        if (song.getPreviousLocation() == null || song.getLastPlayedDate() == null) {
+        if (!song.wasPlayedPreviously()) {
             rank = 0;
             song.setRank(rank);
             return rank;
         }
 
-        LatLon songLatLon = song.getPreviousLocation();
+        LatLon songLatLon = song.getLastPlayedLocation();
         // Distance in meters between current loc and previously played loc
         float locDiff = abs(songLatLon.findDistance(currentLatLon));
         if (locDiff < 200.0) {
@@ -209,22 +186,14 @@ public class Playlist {
             rank += 101;
         }
 
-        Calendar songCalendar = new GregorianCalendar();
-        songCalendar.setTime(song.getLastPlayedDate());
-        Calendar nowCalendar = new GregorianCalendar();
-        nowCalendar.setTime(now);
-        if (songCalendar.get(Calendar.DAY_OF_WEEK) == nowCalendar.get(Calendar.DAY_OF_WEEK)) {
+        Calendar nowCalendar = Calendar.getInstance();
+        if (song.playedOnDayOfTheWeek(nowCalendar)) {
             rank += 202;
         }
 
-        int songHour = songCalendar.get(Calendar.HOUR_OF_DAY);
-        int nowHour = nowCalendar.get(Calendar.HOUR_OF_DAY);
-        int hourDiff = abs(songHour / 4 - nowHour / 4);
-        if (hourDiff == 0) {
+        if (song.playedAtTimeOfDay(nowCalendar)) {
             rank += 300;
-        } /*else if (hourDiff == 1) { // Makes being in the adjacent time bracket half credit
-            rank += 100;
-        }*/
+        }
 
         song.setRank(rank);
         return rank;
