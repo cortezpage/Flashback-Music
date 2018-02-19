@@ -3,6 +3,7 @@ package com.example.cse110.flashbackmusic;
 import android.util.Log;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Date;
@@ -186,7 +187,8 @@ public class Playlist {
             rank += 101;
         }
 
-        Calendar nowCalendar = Calendar.getInstance();
+        Calendar nowCalendar = new GregorianCalendar();
+        nowCalendar.setTime(now);
         if (song.playedOnDayOfTheWeek(nowCalendar)) {
             rank += 202;
         }
