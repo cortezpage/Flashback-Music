@@ -140,7 +140,7 @@ public class Playlist {
     }
 
     //0 - neutral; 1 - favorite; 2 - dislike
-    public int breakTieWithLike (Song song1, Song song2){
+    public static int breakTieWithLike (Song song1, Song song2){
         int songStatus1 = song1.getLikeStatus();
         int songStatus2 = song2.getLikeStatus();
 
@@ -154,7 +154,7 @@ public class Playlist {
         return 1;
     }
 
-    public int breakTieWithRecentPlay (Song songOne, Song songTwo) {
+    public static int breakTieWithRecentPlay (Song songOne, Song songTwo) {
         if(songOne.getLastPlayedDate().compareTo(songTwo.getLastPlayedDate()) < 0) {
             return -1;
         }
