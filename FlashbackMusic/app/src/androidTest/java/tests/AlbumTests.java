@@ -5,4 +5,5 @@ package tests;
  */
 
 public class AlbumTests {
+
 }

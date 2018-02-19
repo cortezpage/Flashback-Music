@@ -3,6 +3,7 @@ package com.example.cse110.flashbackmusic;
 import android.content.Context;
 import android.location.Geocoder;
 import android.location.Location;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -13,6 +14,15 @@ public class LatLon {
     public LatLon(double lat, double lon) {
         this.latitude = lat;
         this.longitude = lon;
+
+        if (lat < -90 || lat > 90)  {
+            Log.e("LatLon Constructor", "the latitude is out of range");
+            this.latitude = 0;
+        }
+        if (lon < -180 || lon > 180) {
+            Log.e("LatLon Constructor", "the latitude is out of range");
+            this.longitude = 0;
+        }
     }
 
     public double getLatitude() {
@@ -32,6 +42,11 @@ public class LatLon {
 
     // Finds the approx distance in meters between two LatLocs
     public float findDistance(LatLon other) {
+        if (other == null) {
+            Log.e("LatLon findDistance", "Destination is null, returning 0 to caller");
+            return 0;
+        }
+
         Location locThis = new Location("Current location");
         locThis.setLatitude(this.getLatitude());
         locThis.setLongitude(this.getLongitude());
