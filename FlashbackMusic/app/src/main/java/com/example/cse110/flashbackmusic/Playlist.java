@@ -53,6 +53,10 @@ public class Playlist {
         }
 
         for (int i = 0; i < songs.length; i++) {
+            // skipping over disliked songs
+            if (songs[i].getLikeStatus() == 2) {
+                continue;
+            }
             idPQ.add(songs[i]);
         }
     }
@@ -77,15 +81,19 @@ public class Playlist {
     public void toPreviousSong() {
         this.play_index--;
         if (this.play_index < 0) {
-            this.play_index = this.songs.length - 1;
+            this.play_index = 0;
         }
     }
 
     public void toNextSong() {
         this.play_index++;
-        if (this.play_index > this.songs.length - 1) {
+        if (this.play_index > this.idPQ.size() - 1) {
             this.play_index = 0;
         }
+    }
+
+    public boolean atEnd() {
+        return (this.play_index > this.idPQ.size() - 1);
     }
 
     // TODO: may need to replace with LatLon
@@ -129,18 +137,14 @@ public class Playlist {
     // TODO: may need to use LatLon instead
     @SuppressLint("MissingPermission")
     public void sortPlaylist(Calendar currTime, Location currLoc) {
-        // getting relevant data to help us sort the playlist according to scores
-        //int currHour = currTime.HOUR_OF_DAY;
-        //int currDay = currTime.DAY_OF_WEEK;
-        //LocationManager manager = MainActivity.getLocationManager();
-        //Location currLocation = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
+        lastSortedLoc = currLoc;
+        lastSortedCal = currTime;
         idPQ.clear();
         addSongToList();
     }
 
     //0 - neutral; 1 - favorite; 2 - dislike
-    public int breakTieWithLike (Song song1, Song song2){
+    public static int breakTieWithLike (Song song1, Song song2){
         int songStatus1 = song1.getLikeStatus();
         int songStatus2 = song2.getLikeStatus();
 
@@ -154,7 +158,10 @@ public class Playlist {
         return 1;
     }
 
-    public int breakTieWithRecentPlay (Song songOne, Song songTwo) {
+    public static int breakTieWithRecentPlay (Song songOne, Song songTwo) {
+        if (songOne.getLastPlayedDate() == null || songTwo.getLastPlayedDate() == null) {
+            return -1;
+        }
         if(songOne.getLastPlayedDate().compareTo(songTwo.getLastPlayedDate()) < 0) {
             return -1;
         }

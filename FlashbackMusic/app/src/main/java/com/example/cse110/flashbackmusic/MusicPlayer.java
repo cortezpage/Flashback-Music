@@ -50,15 +50,19 @@ public class MusicPlayer {
         loadSong(songs[play_index].getMediaID());
     }
 
+    public void stop() {
+        this.player.stop();
+    }
+
     public MediaPlayer getMediaPlayer() {
         return this.player;
     }
 
     @SuppressLint("MissingPermission")
-    public void updatePlaylist() {
+    public void updatePlaylist(boolean startingFBMode) {
         Calendar currTime = Calendar.getInstance();
         Location currLoc = MainActivity.getLocationManager().getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (this.flashback_playlist.shouldSort(currTime, currLoc)) {
+        if (this.flashback_playlist.shouldSort(currTime, currLoc) || startingFBMode) {
             this.flashback_playlist.sortPlaylist(currTime, currLoc);
         }
     }
@@ -83,6 +87,14 @@ public class MusicPlayer {
             this.flashback_playlist.toNextSong();
             selectSong(this.flashback_playlist.getCurrSongID());
         }
+    }
+
+    public boolean reachedEndOfAlbum() {
+        return this.curr_album.atEnd();
+    }
+
+    public boolean reachedEndOfPlaylist() {
+        return this.flashback_playlist.atEnd();
     }
 
     public void selectSong(int selected_id) {
@@ -141,7 +153,7 @@ public class MusicPlayer {
         } else if (mode.equals("flashback")) {
             this.play_mode = 2;
             this.curr_album = null;
-            this.updatePlaylist();
+            this.updatePlaylist(true);
         } else { // default case
             this.play_mode = 0;
             this.curr_album = null;

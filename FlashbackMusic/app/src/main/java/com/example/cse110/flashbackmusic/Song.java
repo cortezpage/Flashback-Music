@@ -15,19 +15,7 @@ public class Song {
     private int like_status; // 0 = neutral, 1 = favorited, and 2 = disliked
     private int media_id;
 
-    /* CURRENT PLAN: FIND THIS AT SCORE CALCULATION INSTEAD
-     * an array of T/F values indicating the times of day at which the song has been played
-     * possible split:
-     * index 0 = 12 AM to 3 AM, index 1 = 3 AM to 6 AM,
-     * index 2 = 6 AM to 9 AM, index 3 = 9 AM to 12 PM, index 4 = 12 PM to 3 PM,
-     * index 5 = 3 PM to 6 PM, index 6 = 6 PM to 9 PM, index 7 = 9 PM to 12 AM
-     * We could split into 3 or 4 times of day if that is preferred!
-     */
-
-    // CURRENT PLAN: FIND THIS AT SCORE CALCULATION INSTEAD
-    // an array of T/F values indicating the days of the week on which the song has been played
-    // index 0 = Sunday, 1 = Monday, 2 = Tuesday, etc. (Sunday has value 1 in Calendar)
-
+    private final int TIME_OF_DAY_DIVISION = 4;
 
     // an array of previous coordinates/latLons at which this song was played
     private ArrayList<LatLon> latLons;
@@ -36,6 +24,7 @@ public class Song {
     private Date lastPlayedDate;
 
     // Time of the day
+    // 0-4 AM, 4-8 AM, 8-12 PM, 12-16 PM, 16-20 PM, 20-24 AM
     private boolean [] times_of_day;
 
     // Days of the week
@@ -67,7 +56,7 @@ public class Song {
         }
         this.latLons = new ArrayList<LatLon>();
         this.lastPlayedDate = null;
-        this.times_of_day = new boolean[8];
+        this.times_of_day = new boolean[6];
         this.days_of_the_week = new boolean[7];
         this.rank = 0;
     }
@@ -117,13 +106,13 @@ public class Song {
 
     public boolean playedAtTime(Calendar currTime) {
         int currHour = currTime.HOUR_OF_DAY;
-        int index = currHour/3;
+        int index = currHour/TIME_OF_DAY_DIVISION;
         return (this.times_of_day[index]);
     }
 
     public void setPlayedAtTime(Calendar currTime) {
         int currHour = currTime.HOUR_OF_DAY;
-        int index = currHour/3;
+        int index = currHour/TIME_OF_DAY_DIVISION;
         this.times_of_day[index] = true;
     }
 
