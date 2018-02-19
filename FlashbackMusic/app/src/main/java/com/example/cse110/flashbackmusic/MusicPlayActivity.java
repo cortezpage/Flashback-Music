@@ -1,5 +1,7 @@
 package com.example.cse110.flashbackmusic;
 
+import android.annotation.SuppressLint;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -7,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MusicPlayActivity extends AppCompatActivity {
 
@@ -14,6 +17,7 @@ public class MusicPlayActivity extends AppCompatActivity {
     private SharedPrefHelper sharedPrefHelper;
     private LatLon latLon;
     private ImageButton playButton;
+    private int play_mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,19 +29,31 @@ public class MusicPlayActivity extends AppCompatActivity {
 
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
+        play_mode = musicPlayer.getPlayMode();
 
-        if (musicPlayer.getPlayMode() == 0) {
+        if (play_mode == 0) {
             int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
             musicPlayer.selectSong(selected_id);
         }
-        else if (musicPlayer.getPlayMode() == 1) {
+        else if (play_mode == 1) {
             int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
             musicPlayer.selectAlbum(selected_index);
         }
-        else if (musicPlayer.getPlayMode() == 2) {
+        else if (play_mode == 2) {
             int first_id = MainActivity.getSongs()[0].getMediaID();
             musicPlayer.selectSong(first_id);
         }
+
+        musicPlayer.getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (play_mode == 1 || play_mode == 2) {
+                    musicPlayer.goToNextSong();
+                    updateUIWithSongInfo();
+                    musicPlayer.updatePlaylist();
+                }
+            }
+        });
 
         // Link the "back" button to go back to the song selection activity
         ImageButton back = findViewById(R.id.button_exit_music_play);

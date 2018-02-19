@@ -1,7 +1,10 @@
 package com.example.cse110.flashbackmusic;
 
+import android.annotation.SuppressLint;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.location.Location;
+import android.location.LocationManager;
 import android.media.MediaPlayer;
 import android.util.Log;
 
@@ -46,6 +49,19 @@ public class MusicPlayer {
     public void reset() {
         this.player.reset();
         loadSong(songs[play_index].getMediaID());
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return this.player;
+    }
+
+    @SuppressLint("MissingPermission")
+    public void updatePlaylist() {
+        Calendar currTime = Calendar.getInstance();
+        Location currLoc = MainActivity.getLocationManager().getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (this.flashback_playlist.shouldSort(currTime, currLoc)) {
+            this.flashback_playlist.sortPlaylist(currTime, currLoc);
+        }
     }
 
     // only available in album play and flashback mode
@@ -126,7 +142,7 @@ public class MusicPlayer {
         } else if (mode.equals("flashback")) {
             this.play_mode = 2;
             this.curr_album = null;
-            this.flashback_playlist.sortPlaylist(Calendar.getInstance());
+            this.updatePlaylist();
         } else { // default case
             this.play_mode = 0;
             this.curr_album = null;
@@ -137,13 +153,13 @@ public class MusicPlayer {
      * This method allows us to load a song's data into the media player.
      */
     public void loadSong(int resourceId) {
-        // Determines the behavior that will occur when the song is over
+        /* Determines the behavior that will occur when the song is over
         this.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
             }
-        });
+        }); */
 
         AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
         try {
@@ -151,6 +167,7 @@ public class MusicPlayer {
             this.player.prepareAsync();
 
             loadingSong = true;
+
             this.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer player) {
@@ -158,6 +175,7 @@ public class MusicPlayer {
                     loadingSong = false;
                 }
             });
+
         } catch (Exception e) {System.out.println(e.toString());}
     }
 
