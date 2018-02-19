@@ -41,6 +41,10 @@ public class Playlist {
         addSongToList();
     }
 
+    // FAKE CONSTRUCTOR FOR TESTING
+    public Playlist (boolean fake) {}
+    // FAKE CONSTRUCTOR FOR TESTING
+
     private void addSongToList () {
         // calculate the score for each song and then put them into the priority queue
         for (int k = 0; k < songs.length; k++) {
