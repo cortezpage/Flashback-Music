@@ -48,6 +48,8 @@ public class Album {
             return;
         }
         this.songs[index] = new_song;
+        Log.i("Album addSong", "Adding song " + new_song.getSongName() +
+                " to index " + index);
     }
 
     public int getCurrSongID() {
@@ -68,5 +70,9 @@ public class Album {
             this.play_index = 0;
         }
         Log.i("Album toNextSong", "play_index changed to " + this.play_index);
+    }
+
+    public boolean atEnd() {
+        return (this.play_index > this.songs.length - 1);
     }
 }

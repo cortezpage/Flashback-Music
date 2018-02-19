@@ -70,8 +70,10 @@ public class FlashbackAlgorithmTests {
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0);
         Date songDate = new Date(fakeDate.getTime() + 86400000); // epoch plus one day
-        firstSong.setDate(songDate);
-        firstSong.addLocation(new LatLon(0, 180));
+        Calendar songCal = new GregorianCalendar();
+        songCal.setTime(songDate);
+        firstSong.setLastPlayedCalendar(songCal);
+        firstSong.setLastPlayedLocation(new LatLon(0, 180));
         int score = playlist.findRank(firstSong, fakeLatLon, fakeDate);
         assertEquals(300, score);
     }
@@ -83,8 +85,10 @@ public class FlashbackAlgorithmTests {
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0);
         Date songDate = new Date(fakeDate.getTime() + 86400000 + 3600000 * 12); // Now plus a day and 12 hours
-        firstSong.setDate(songDate);
-        firstSong.addLocation(fakeLatLon);
+        Calendar songCal = new GregorianCalendar();
+        songCal.setTime(songDate);
+        firstSong.setLastPlayedCalendar(songCal);
+        firstSong.setLastPlayedLocation(fakeLatLon);
         int score = playlist.findRank(firstSong, fakeLatLon, fakeDate);
         assertEquals(301, score);
     }
@@ -96,8 +100,10 @@ public class FlashbackAlgorithmTests {
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0); // Unix epoch
         Date songDate = new Date(86400000 * 7 + 3600000 * 12); // Epoch plus 7 days and 12 hours
-        firstSong.setDate(songDate);
-        firstSong.addLocation(new LatLon(0, 180));
+        Calendar songCal = new GregorianCalendar();
+        songCal.setTime(songDate);
+        firstSong.setLastPlayedCalendar(songCal);
+        firstSong.setLastPlayedLocation(new LatLon(0, 180));
         int score = playlist.findRank(firstSong, fakeLatLon, fakeDate);
         assertEquals(202, score);
     }
@@ -109,8 +115,10 @@ public class FlashbackAlgorithmTests {
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0); // Unix epoch
         Date songDate = new Date(86400000 + 3600000 * 12); // Epoch plus 1 day and 12 hours
-        firstSong.setDate(songDate);
-        firstSong.addLocation(new LatLon(0, 180));
+        Calendar songCal = new GregorianCalendar();
+        songCal.setTime(songDate);
+        firstSong.setLastPlayedCalendar(songCal);
+        firstSong.setLastPlayedLocation(new LatLon(0, 180));
         int score = playlist.findRank(firstSong, fakeLatLon, fakeDate);
         assertEquals(0, score);
     }
@@ -122,8 +130,10 @@ public class FlashbackAlgorithmTests {
         LatLon fakeLatLon = new LatLon(32.867876, -117.223629);
         Date fakeDate = new Date(0); // Unix epoch
         Date songDate = new Date(604800000 + 7200000); // Epoch plus a week and two hours
-        firstSong.setDate(songDate);
-        firstSong.addLocation(new LatLon(32.867770, -117.224080)); // Near to fakeLatLon
+        Calendar songCal = new GregorianCalendar();
+        songCal.setTime(songDate);
+        firstSong.setLastPlayedCalendar(songCal);
+        firstSong.setLastPlayedLocation(new LatLon(32.867770, -117.224080)); // Near to fakeLatLon
         int score = playlist.findRank(firstSong, fakeLatLon, fakeDate);
         assertEquals(1106, score);
     }

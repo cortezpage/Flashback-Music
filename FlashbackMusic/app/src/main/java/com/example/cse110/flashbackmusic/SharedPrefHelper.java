@@ -285,15 +285,7 @@ public class SharedPrefHelper {
 
     public void writeAlbumData(String id, String data) {
         this.albumSharedEditor.putString(id, data);
-    }
-
-    public void applyAlbumChanges() {
         this.albumSharedEditor.apply();
-    }
-
-    public void saveSongData(int id)
-    {
-        writeSongData("" + id, MainActivity.getSong(id).toString());
     }
 
     public void writeSongData(String id, String data) {

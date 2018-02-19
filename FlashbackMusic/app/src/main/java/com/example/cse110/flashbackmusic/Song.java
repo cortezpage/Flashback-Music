@@ -15,31 +15,13 @@ public class Song {
     private int like_status; // 0 = neutral, 1 = favorited, and 2 = disliked
     private int media_id;
 
-    /* CURRENT PLAN: FIND THIS AT SCORE CALCULATION INSTEAD
-     * an array of T/F values indicating the times of day at which the song has been played
-     * possible split:
-     * index 0 = 12 AM to 3 AM, index 1 = 3 AM to 6 AM,
-     * index 2 = 6 AM to 9 AM, index 3 = 9 AM to 12 PM, index 4 = 12 PM to 3 PM,
-     * index 5 = 3 PM to 6 PM, index 6 = 6 PM to 9 PM, index 7 = 9 PM to 12 AM
-     * We could split into 3 or 4 times of day if that is preferred!
-     */
+    private final int TIME_OF_DAY_DIVISION = 4;
 
-    // CURRENT PLAN: FIND THIS AT SCORE CALCULATION INSTEAD
-    // an array of T/F values indicating the days of the week on which the song has been played
-    // index 0 = Sunday, 1 = Monday, 2 = Tuesday, etc. (Sunday has value 1 in Calendar)
+    // the previous coordinates/LatLon at which this song was played
+    private LatLon lastPlayedLocation;
 
-
-    // an array of previous coordinates/latLons at which this song was played
-    private ArrayList<LatLon> latLons;
-
-    // Dates
-    private Date lastPlayedDate;
-
-    // Time of the day
-    private boolean [] times_of_day;
-
-    // Days of the week
-    private boolean [] days_of_the_week;
+    // the date when the song was last played
+    private Calendar lastPlayedCalendar;
 
     // Recently Played Rank
     private int rank;
@@ -65,10 +47,8 @@ public class Song {
             this.like_status = Integer.parseInt(substrings[4]);
             this.media_id = Integer.parseInt(substrings[5]);
         }
-        this.latLons = new ArrayList<LatLon>();
-        this.lastPlayedDate = null;
-        this.times_of_day = new boolean[8];
-        this.days_of_the_week = new boolean[7];
+        this.lastPlayedLocation = null;
+        this.lastPlayedCalendar = null;
         this.rank = 0;
     }
 
@@ -105,55 +85,46 @@ public class Song {
 
     public void setToDisliked() { this.like_status = 2; }
 
-    public Date getLastPlayedDate() { return this.lastPlayedDate; }
-
     public boolean wasPlayedPreviously() {
-        return ((this.lastPlayedDate != null) && (this.latLons.size() > 0));
+        return ((this.lastPlayedCalendar != null) && (this.lastPlayedLocation != null));
     }
 
-    public void setDate(Date newDate) { this.lastPlayedDate = newDate; }
+    public Calendar getLastPlayedCalendar() { return this.lastPlayedCalendar; }
 
-    public boolean[] getTimeOfDay() { return this.times_of_day; }
+    public void setLastPlayedCalendar(Calendar newCalendar) { this.lastPlayedCalendar = newCalendar; }
 
-    public boolean playedAtTime(Calendar currTime) {
-        int currHour = currTime.HOUR_OF_DAY;
-        int index = currHour/3;
-        return (this.times_of_day[index]);
+    public Date getLastPlayedDate() {
+        if (this.lastPlayedCalendar != null) {
+            return this.lastPlayedCalendar.getTime();
+        }
+        return null;
     }
 
-    public void setPlayedAtTime(Calendar currTime) {
-        int currHour = currTime.HOUR_OF_DAY;
-        int index = currHour/3;
-        this.times_of_day[index] = true;
-    }
+    public LatLon getLastPlayedLocation() { return this.lastPlayedLocation; }
 
-    public boolean[] getDaysOfTheWeek() { return this.days_of_the_week; }
+    public void setLastPlayedLocation(LatLon newLocation) { this.lastPlayedLocation = newLocation; }
+
+    public boolean playedAtTimeOfDay(Calendar currTime) {
+        if (this.lastPlayedCalendar != null) {
+            int currHour = currTime.HOUR_OF_DAY;
+            int prevHour = this.lastPlayedCalendar.HOUR_OF_DAY;
+            return ((currHour / TIME_OF_DAY_DIVISION) == (prevHour / TIME_OF_DAY_DIVISION));
+        }
+        return false;
+    }
 
     public boolean playedOnDayOfTheWeek(Calendar currTime) {
-        int currDay = currTime.DAY_OF_WEEK;
-        return days_of_the_week[currDay - 1];
-    }
-
-    public void setPlayedOnDayOfTheWeek(Calendar currTime) {
-        int currDay = currTime.DAY_OF_WEEK;
-        days_of_the_week[currDay - 1] = true;
+        if (this.lastPlayedCalendar != null) {
+            int currDay = currTime.DAY_OF_WEEK;
+            int prevDay = lastPlayedCalendar.DAY_OF_WEEK;
+            return (currDay == prevDay);
+        }
+        return false;
     }
 
     public int getRank() { return this.rank; }
 
     public void setRank(int newRank) { this.rank = newRank; }
-
-    public ArrayList<LatLon> getLatLons() { return this.latLons; }
-
-    public LatLon getPreviousLocation() {
-        if (latLons.size() == 0)
-            return null;
-        return this.latLons.get(latLons.size() - 1);
-    }
-
-    public void addLocation(LatLon newLocation) {
-        this.latLons.add(newLocation);
-    }
 
     public String toString() {
         return new Gson().toJson(this);

@@ -58,7 +58,7 @@ public class SongTests {
         firstSong.incrementLikeStatus();
         assertEquals(firstSong.getLikeStatus(), 1);
     }
-
+/*
     @Test
     public void addLocationTest () {
         assertEquals(secondSong.getLatLons().size(), 0);
@@ -96,7 +96,7 @@ public class SongTests {
         Assert.assertTrue(firstSong.playedAtTime(calendar3));
 
         Assert.assertFalse(firstSong.playedAtTime(fakeCalendar));
-        Assert.assertFalse(firstSong.playedAtTime(fakeCalendar2));*/
+        Assert.assertFalse(firstSong.playedAtTime(fakeCalendar2));
     }
 
     @Test
@@ -105,6 +105,6 @@ public class SongTests {
         calendar.set(2018, 2, 18, 18, 5, 20);
 
         firstSong.setPlayedAtTime(calendar);
-    }
+    }*/
 
 }
