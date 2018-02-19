@@ -3,6 +3,7 @@ package com.example.cse110.flashbackmusic;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -30,21 +31,30 @@ public class MusicPlayer {
         this.albums = MainActivity.getAlbums();
         this.curr_album = null;
         this.flashback_playlist = new Playlist();
+        Log.i("MusicPlayer Constructor", "Initialized with parameters play_index " +
+        play_index + "\nplay_mode " + play_mode);
     }
 
-    public void destroy() { this.player.release(); }
+    public void destroy() {
+        Log.i("MusicPlayer Destructor", "Destroyed the music player");
+        this.player.release();
+    }
 
     public void play() {
+        Log.i("MusicPlayer play", "Start to play current song");
         this.player.start();
     }
 
     public void pause() {
+        Log.i("MusicPlayer pause", "Paused the current song");
         player.pause();
     }
 
     public void reset() {
         this.player.reset();
         loadSong(songs[play_index].getMediaID());
+        Log.i("MusicPlayer reset", "Reseting current song and loading song " +
+                songs[play_index].getMediaID());
     }
 
     public void stop() {
@@ -62,6 +72,10 @@ public class MusicPlayer {
         if (newLatLon != null) {
             songs[play_index].setLastPlayedLocation(newLatLon);
             MainActivity.getSongSharedPrefHelper().writeSongData("" + curr_song.getMediaID(), curr_song.toString());
+
+            Log.i("MusicPlayer updateSongInfo", "Song " + songs[play_index].getSongName() + " is" +
+                    "being updated Location with latitude " + newLatLon.getLatitude() + " and longitude " +
+                    newLatLon.getLongitude());
         }
     }
 
@@ -69,6 +83,11 @@ public class MusicPlayer {
         Calendar currTime = Calendar.getInstance();
         LatLon currLoc = MainActivity.getLastLatLon();
         if (this.flashback_playlist.shouldSort(currTime, currLoc) || startingFBMode) {
+
+            Log.i("MusicPlayer updatePlaylist", "updating the playlist with curren time "
+                    + currTime.getTime().getTime() + " current location with latitude and longitude: " +
+                    currLoc.getLatitude() + " " + currLoc.getLongitude());
+
             this.flashback_playlist.sortPlaylist(currTime, currLoc);
         }
     }
@@ -107,6 +126,7 @@ public class MusicPlayer {
         for (int index = 0; index < this.songs.length; index++) {
             if (this.songs[index].getMediaID() == selected_id) {
                 this.play_index = index;
+                Log.i("MusicPlayer selectSong", "the current song id is " + index);
             }
         }
         this.reset();
@@ -115,6 +135,8 @@ public class MusicPlayer {
     public void selectAlbum(int selected_index) {
         this.curr_album = this.albums[selected_index];
         this.selectSong(curr_album.getCurrSongID());
+        Log.i("MusicPlayer selectAlbum", "the current album id is " + curr_album);
+
     }
   
     public boolean isMusicPlaying() {
@@ -178,7 +200,7 @@ public class MusicPlayer {
                 }
             });
 
-        } catch (Exception e) {System.out.println(e.toString());}
+        } catch (Exception e) {System.err.println(e.toString());}
     }
 
     public boolean isLoadingSong() {
