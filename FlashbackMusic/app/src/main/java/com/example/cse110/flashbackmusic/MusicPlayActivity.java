@@ -16,9 +16,10 @@ public class MusicPlayActivity extends AppCompatActivity {
 
     private MusicPlayer musicPlayer;
     private SharedPrefHelper sharedPrefHelper;
-    private LatLon latLon;
     private ImageButton playButton;
     private int play_mode;
+
+    final boolean testing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                         musicPlayer.stop();
                         finish();
                     } else {
+                        musicPlayer.updateSongInfo();
                         musicPlayer.goToNextSong();
                         updateUIWithSongInfo();
                         musicPlayer.updatePlaylist(false);
@@ -122,6 +124,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                     musicPlayer.stop();
                     finish();
                 }
+                if (testing) { musicPlayer.updateSongInfo(); }
                 musicPlayer.goToNextSong();
                 updateUIWithSongInfo();
                 updatePlayButtonImage();
@@ -140,7 +143,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                 } else if (musicPlayer.getCurrentLikeStatus() == 2) {
                     likeButton.setBackgroundResource(R.drawable.dislike_button);
                 }
-                sharedPrefHelper.saveSongData(musicPlayer.getCurrentMediaID());
+                sharedPrefHelper.writeSongData("" + musicPlayer.getCurrentMediaID(), musicPlayer.getCurrentString());
             }
         });
 
@@ -162,13 +165,13 @@ public class MusicPlayActivity extends AppCompatActivity {
         TextView albumNameDisplay = (TextView) findViewById(R.id.album_name_music_play);
         albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
 
-        Song curSong = musicPlayer.getCurrentSong();
-        ((TextView) findViewById(R.id.song_last_played_info)).setText(!curSong.wasPlayedPreviously() ?
-            "Never played before" :
-            "Last played on \n" +
-            curSong.getPreviousLocation().getAddressLine(this) + "\n" +
-            new SimpleDateFormat("MMM d, yyyy").format(curSong.getLastPlayedDate()) + "\n" +
-            new SimpleDateFormat("h:mm a").format(curSong.getLastPlayedDate()));
+        Song currSong = musicPlayer.getCurrentSong();
+        ((TextView) findViewById(R.id.song_last_played_info)).setText(!currSong.wasPlayedPreviously() ?
+            "This track has never been played before." :
+            "Last played on: \n" +
+            currSong.getLastPlayedLocation().getAddressLine(this) + "\n" +
+            new SimpleDateFormat("MMM d, yyyy").format(currSong.getLastPlayedDate()) + "\n" +
+            new SimpleDateFormat("h:mm a").format(currSong.getLastPlayedDate()));
 
         final ImageButton likeButton = findViewById(R.id.button_like);
         if (musicPlayer.getCurrentLikeStatus() == 1) {

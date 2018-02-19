@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         return albums;
     }
 
-    public static LocationManager getLocationManager() { return locationManager; }
-
     @Override
     public void onDestroy() {
         updateSongData();
@@ -142,8 +140,6 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     }
 
     public void launchFlashbackMode () {
-        //TODO: getMusicPlayer().setPlayMode("flashback");
-        //Intent intent = new Intent(this, FlashbackActivity.class);
         Intent intent = new Intent(this, MusicPlayActivity.class);
         intent.putExtra("MODE", "flashback");
         startActivity(intent);
@@ -175,16 +171,6 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         }
     }
 
-    public static Song getSong(int id)
-    {
-        for (int index = 0; index < songs.length; index++) {
-            if (songs[index].getMediaID() == id) {
-                return songs[index];
-            }
-        }
-        return null;
-    }
-
     public static boolean hasLocationPermission(Context context)
     {
         return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
@@ -194,12 +180,13 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     @SuppressWarnings({"MissingPermission"})
     public static LatLon getLastLatLon()
     {
-        if (locationManager == null) { return null;}
+        if (locationManager == null) { return null; }
         Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (lastLocation != null) {
             return new LatLon(lastLocation.getLatitude(), lastLocation.getLongitude());
         }
-        return null;
+        // Return the CSE Building if the location manager fails
+        return new LatLon(32.881801, -117.233523);
     }
 
 }
