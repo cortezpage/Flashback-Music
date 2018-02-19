@@ -96,7 +96,7 @@ public class SharedPrefHelper {
         this.albumSharedEditor = albumEditor;
 
         this.all_IDs = new int [] {
-                //R.raw.one_two_three_go,
+                R.raw.one_two_three_go,
                 R.raw.after_the_storm,
                 R.raw.all_about_ronnie,
                 R.raw.america_religious,
