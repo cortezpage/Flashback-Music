@@ -174,7 +174,7 @@ public class Playlist {
         }
 
         // If song not played before, has a rank of 0
-        if (song.getLastPlayedLocation() == null || song.getLastPlayedDate() == null) {
+        if (!song.wasPlayedPreviously()) {
             rank = 0;
             song.setRank(rank);
             return rank;
@@ -191,22 +191,15 @@ public class Playlist {
             rank += 101;
         }
 
-        Calendar songCalendar = new GregorianCalendar();
-        songCalendar.setTime(song.getLastPlayedDate());
         Calendar nowCalendar = new GregorianCalendar();
         nowCalendar.setTime(now);
-        if (songCalendar.get(Calendar.DAY_OF_WEEK) == nowCalendar.get(Calendar.DAY_OF_WEEK)) {
+        if (song.playedOnDayOfTheWeek(nowCalendar)) {
             rank += 202;
         }
 
-        int songHour = songCalendar.get(Calendar.HOUR_OF_DAY);
-        int nowHour = nowCalendar.get(Calendar.HOUR_OF_DAY);
-        int hourDiff = abs(songHour / 4 - nowHour / 4);
-        if (hourDiff == 0) {
+        if (song.playedAtTimeOfDay(nowCalendar)) {
             rank += 300;
-        } /*else if (hourDiff == 1) { // Makes being in the adjacent time bracket half credit
-            rank += 100;
-        }*/
+        }
 
         song.setRank(rank);
         return rank;

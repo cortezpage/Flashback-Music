@@ -1,29 +1,16 @@
 package tests;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.support.test.rule.ActivityTestRule;
-import android.support.v7.widget.AppCompatImageButton;
-
 import com.example.cse110.flashbackmusic.LatLon;
-import com.example.cse110.flashbackmusic.MainActivity;
-import com.example.cse110.flashbackmusic.MusicPlayActivity;
-import com.example.cse110.flashbackmusic.MusicPlayer;
 import com.example.cse110.flashbackmusic.Playlist;
-import com.example.cse110.flashbackmusic.R;
-import com.example.cse110.flashbackmusic.SharedPrefHelper;
 import com.example.cse110.flashbackmusic.Song;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import static android.support.test.internal.runner.junit4.statement.UiThreadStatement.runOnUiThread;
 import static junit.framework.Assert.assertEquals;
 
 /**

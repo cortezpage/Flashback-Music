@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import static java.lang.Math.abs;
+
 public class Song {
     private String song_name; // name of the song
     private String artist_name; // name of the artist of the song
@@ -106,8 +108,8 @@ public class Song {
 
     public boolean playedAtTimeOfDay(Calendar currTime) {
         if (this.lastPlayedCalendar != null) {
-            int currHour = currTime.HOUR_OF_DAY;
-            int prevHour = this.lastPlayedCalendar.HOUR_OF_DAY;
+            int currHour = currTime.get(Calendar.HOUR_OF_DAY);
+            int prevHour = this.lastPlayedCalendar.get(Calendar.HOUR_OF_DAY);
             return ((currHour / TIME_OF_DAY_DIVISION) == (prevHour / TIME_OF_DAY_DIVISION));
         }
         return false;
@@ -115,8 +117,8 @@ public class Song {
 
     public boolean playedOnDayOfTheWeek(Calendar currTime) {
         if (this.lastPlayedCalendar != null) {
-            int currDay = currTime.DAY_OF_WEEK;
-            int prevDay = lastPlayedCalendar.DAY_OF_WEEK;
+            int currDay = currTime.get(Calendar.DAY_OF_WEEK);
+            int prevDay = lastPlayedCalendar.get(Calendar.DAY_OF_WEEK);
             return (currDay == prevDay);
         }
         return false;
