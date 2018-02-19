@@ -17,6 +17,9 @@ import static java.lang.Math.abs;
 
 public class FlashbackActivity extends AppCompatActivity {
 
+    MusicPlayer musicPlayer;
+    Playlist playlist;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -146,6 +146,8 @@ public class Song {
     public ArrayList<LatLon> getLatLons() { return this.latLons; }
 
     public LatLon getPreviousLocation() {
+        if (latLons.size() == 0)
+            return null;
         return this.latLons.get(latLons.size() - 1);
     }
 

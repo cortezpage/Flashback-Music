@@ -182,4 +182,6 @@ public class MusicPlayer {
     public boolean isLoadingSong() {
         return loadingSong;
     }
+
+    public int getPlaylistSongID () {return flashback_playlist.getCurrSongID();}
 }

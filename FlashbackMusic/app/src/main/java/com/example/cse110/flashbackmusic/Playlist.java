@@ -4,8 +4,12 @@ package com.example.cse110.flashbackmusic;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -17,6 +21,19 @@ public class Playlist {
 
     private Song [] songs;
     private int play_index;
+    private Queue<Song> idPQ = new PriorityQueue<>(100, rankComp);
+
+    public static Comparator<Song> rankComp = new Comparator<Song>() {
+        @Override
+        public int compare(Song s1, Song s2) {
+            int temp = s2.getRank() - s1.getRank();
+            if (temp != 0) {
+                return temp;
+            }
+            return breakTieWithLike(s1, s2);
+        }
+    };
+  
     private Calendar lastSortedCal;
     private Location lastSortedLoc;
 
@@ -25,10 +42,36 @@ public class Playlist {
         this.play_index = 0;
         lastSortedCal = null;
         lastSortedLoc = null;
+      
+        addSongToList();
+    }
+
+    private void addSongToList () {
+        // calculate the score for each song and then put them into the priority queue
+        for (int k = 0; k < songs.length; k++) {
+            calculateRank(songs[k]);
+        }
+
+        for (int i = 0; i < songs.length; i++) {
+            idPQ.add(songs[i]);
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void calculateRank (Song song) {
+        // calculate the score for the song
+        Location currLoc = MainActivity.getLocationManager().getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        LatLon latlon = new LatLon(currLoc.getLatitude(), currLoc.getLongitude());
+        Date currDate = Calendar.getInstance().getTime();
+        int rank = findRank(song, latlon, currDate);
+        //rank = MAX_POSSIBLE_SCORE - rank;
+        song.setRank(rank);
     }
 
     public int getCurrSongID() {
-        return this.songs[this.play_index].getMediaID();
+        Log.i("Playlist getCurrSongID", "" + idPQ.peek().getRank());
+        return idPQ.poll().getMediaID();
+        //return this.songs[this.play_index].getMediaID();
     }
 
     public void toPreviousSong() {
@@ -87,44 +130,38 @@ public class Playlist {
     @SuppressLint("MissingPermission")
     public void sortPlaylist(Calendar currTime, Location currLoc) {
         // getting relevant data to help us sort the playlist according to scores
-        int currHour = currTime.HOUR_OF_DAY;
-        int currDay = currTime.DAY_OF_WEEK;
+        //int currHour = currTime.HOUR_OF_DAY;
+        //int currDay = currTime.DAY_OF_WEEK;
+        //LocationManager manager = MainActivity.getLocationManager();
+        //Location currLocation = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        LocationManager manager = MainActivity.getLocationManager();
-        Location currLocation = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        //TODO: If 2 songs have the same score (which is based on location, day, time), call breakTieWithLike
-
+        idPQ.clear();
+        addSongToList();
     }
 
     //0 - neutral; 1 - favorite; 2 - dislike
-    public Song breakTieWithLike (Song song1, Song song2){
-        Song winningSong = null;
+    public int breakTieWithLike (Song song1, Song song2){
         int songStatus1 = song1.getLikeStatus();
         int songStatus2 = song2.getLikeStatus();
 
         //If the like statuses are the same, break the tie based on mostly recently played
         if(songStatus1 == songStatus2) {
-            winningSong = breakTieWithRecentPlay(song1, song2);
+            return breakTieWithRecentPlay(song1, song2);
         }
         else if ((songStatus1 == 1) || (songStatus1 == 0 && songStatus2 == 2)){
-            winningSong = song1;
+            return -1;
         }
-        else {
-            winningSong = song2;
-        }
-        return winningSong;
+        return 1;
     }
 
-    public Song breakTieWithRecentPlay (Song songOne, Song songTwo) {
+    public int breakTieWithRecentPlay (Song songOne, Song songTwo) {
         if(songOne.getLastPlayedDate().compareTo(songTwo.getLastPlayedDate()) < 0) {
-            return songOne;
+            return -1;
         }
         else {
-            return songTwo;
+            return 1;
         }
     }
-
     /*
      * Sets the rank of a song, as well as returns said rank
      *
