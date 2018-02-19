@@ -53,7 +53,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                 if (play_mode == 1 || play_mode == 2) {
                     if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
                             (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
-                        Log.i("MusicPlayActivity", "reached the end of Album or playlist");
+                        Log.i("MusicPlayActivity", "Reached the end of Album or playlist");
                         musicPlayer.stop();
                         finish();
                     } else {
@@ -80,7 +80,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("MusicPlayActivity playButton", "playButton is clicked");
+                Log.i("MusicPlayActivity Play Button", "Play Button is clicked");
                 if (!musicPlayer.isLoadingSong()) {
                     if (musicPlayer.isMusicPlaying()) {
                         musicPlayer.pause();}
@@ -97,7 +97,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("MusicPlayActivity reset Button", "Previous Button is clicked");
+                Log.i("MusicPlayActivity Reset Button", "Reset Button is clicked");
                 musicPlayer.reset();
                 updatePlayButtonImage();
             }
@@ -124,6 +124,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("MusicPlayActivity Next Button", "Next Button is clicked");
                 if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
                         (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
                     musicPlayer.stop();
@@ -148,6 +149,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                 } else if (musicPlayer.getCurrentLikeStatus() == 2) {
                     likeButton.setBackgroundResource(R.drawable.dislike_button);
                 }
+                Log.i("MusicPlayActivity Like Button", "Changing the status to" + musicPlayer.getCurrentLikeStatus());
                 sharedPrefHelper.writeSongData("" + musicPlayer.getCurrentMediaID(), musicPlayer.getCurrentString());
             }
         });
@@ -157,7 +159,13 @@ public class MusicPlayActivity extends AppCompatActivity {
     }
 
     private void updatePlayButtonImage() {
-        playButton.setBackgroundResource(musicPlayer.isMusicPlaying() || musicPlayer.isLoadingSong() ? R.drawable.pause_button : R.drawable.play_button);
+        if (musicPlayer.isMusicPlaying() || musicPlayer.isLoadingSong()) {
+            playButton.setBackgroundResource(R.drawable.pause_button);
+            Log.i("MusicPlayActivity", "Displaying the pause button!");
+        } else {
+            playButton.setBackgroundResource(R.drawable.play_button);
+            Log.i("MusicPlayActivity", "Displaying the play button!");
+        }
     }
 
     public void updateUIWithSongInfo () {
@@ -171,12 +179,19 @@ public class MusicPlayActivity extends AppCompatActivity {
         albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
 
         Song currSong = musicPlayer.getCurrentSong();
-        ((TextView) findViewById(R.id.song_last_played_info)).setText(!currSong.wasPlayedPreviously() ?
-            "This track has never been played before." :
-            "Last played on: \n" +
-            currSong.getLastPlayedLocation().getAddressLine(this) + "\n" +
-            new SimpleDateFormat("MMM d, yyyy").format(currSong.getLastPlayedDate()) + "\n" +
-            new SimpleDateFormat("h:mm a").format(currSong.getLastPlayedDate()));
+        String toShow;
+        if (!currSong.wasPlayedPreviously()) {
+            toShow = "This track has never been played before.";
+        } else {
+            toShow = "Last played on: \n" +
+                    currSong.getLastPlayedLocation().getAddressLine(this) + "\n" +
+                    new SimpleDateFormat("MMM d, yyyy").format(currSong.getLastPlayedDate()) + "\n" +
+                    new SimpleDateFormat("h:mm a").format(currSong.getLastPlayedDate());
+        }
+
+        ((TextView) findViewById(R.id.song_last_played_info)).setText(toShow);
+
+        Log.i("MusicPlayActivity", "Now displaying: " + toShow);
 
         final ImageButton likeButton = findViewById(R.id.button_like);
         if (musicPlayer.getCurrentLikeStatus() == 1) {
