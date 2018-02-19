@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     private SharedPreferences.Editor songDataEditor;
     private SharedPreferences albumSharedPref;
     private SharedPreferences.Editor albumDataEditor;
+    private SharedPreferences modeSharedPref;
+    private SharedPreferences.Editor modeDataEditor;
 
     public static MusicPlayer getMusicPlayer() {
         return musicPlayer;
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         setContentView(R.layout.activity_main);
 
         if (!hasLocationPermission(this)) {
-            Log.i("MainActivity Permission", "Missing permissing to access the location");
+            Log.i("MainActivity Permission", "Missing permission to access the location");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             return;
         }
@@ -95,27 +97,46 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
             @Override public void onProviderEnabled(String s) {}
             @Override public void onProviderDisabled(String s) {}
         };
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
         Context context = this.getApplicationContext();
         String song_data_filename = "com.example.cse110.flashbackmusic.song_data_preferences";
         String album_data_filename = "com.example.cse110.flashbackmusic.album_data_preferences";
+        String mode_data_filename = "com.example.cse110.flashbackmusic.saved_mode_pref";
 
         Log.i("MainAcitivty init", "Initializing song shared preference and album shared" +
                 "preference");
+
         songSharedPref = context.getSharedPreferences(song_data_filename, Context.MODE_PRIVATE);
         songDataEditor = songSharedPref.edit();
         albumSharedPref = context.getSharedPreferences(album_data_filename, Context.MODE_PRIVATE);
         albumDataEditor = albumSharedPref.edit();
+        modeSharedPref = context.getSharedPreferences(mode_data_filename, Context.MODE_PRIVATE);
+        modeDataEditor = modeSharedPref.edit();
 
-        if (ERASE_DATA_AT_START) {songDataEditor.clear().commit(); albumDataEditor.clear().commit();}
+        if (ERASE_DATA_AT_START) {
+            songDataEditor.clear().commit();
+            albumDataEditor.clear().commit();
+            modeDataEditor.clear().commit();
+        }
 
         sharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor, albumSharedPref, albumDataEditor);
         songs = sharedPrefHelper.createSongList();
         albums = sharedPrefHelper.createAlbums();
 
         musicPlayer = new MusicPlayer (this.getResources());
+
+        String mode = modeSharedPref.getString("LAST_PLAYED_MODE", "NOT FOUND");
+        Log.i("MODE", mode);
+        if (mode.equals("song_selection")) {
+            launchSongSelection();
+        } else if (mode.equals("album_selection")) {
+            launchAlbumSelection();
+        } else if (mode.equals("flashback")) {
+            launchFlashbackMode();
+        }
 
         Button toFlashbackMode = (Button) findViewById(R.id.button_to_flashback_mode);
 
@@ -146,6 +167,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     }
 
     public void launchFlashbackMode () {
+        updateMode(2);
         Log.i("MainAcitivity LaunchFlashbackMode", "Launching Flashback Mode");
         Intent intent = new Intent(this, MusicPlayActivity.class);
         intent.putExtra("MODE", "flashback");
@@ -153,12 +175,14 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     }
 
     public void launchSongSelection () {
+        updateMode(0);
         Log.i("MainAcitivity LaunchSongSelection", "Launching Song Selection Mode");
         Intent intent = new Intent(this, SongSelectionActivity.class);
         startActivity(intent);
     }
 
     public void launchAlbumSelection () {
+        updateMode(1);
         Log.i("MainAcitivity LaunchAlbumSelection", "Launching Album Selection Mode");
         Intent intent = new Intent(this, AlbumSelectionActivity.class);
         startActivity(intent);
@@ -182,6 +206,19 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
             Log.i("MainAcitivity updateAlbumData", "updating Album: " + curr_album.getAlbumName()
                     + " data into shared preference");
         }
+    }
+
+    public void updateMode(int app_mode) {
+        String toWrite = "NOT FOUND";
+        if (app_mode == 0) {
+            toWrite = "song_selection";
+        } else if (app_mode == 1) {
+            toWrite = "album_selection";
+        } else if (app_mode == 2) {
+            toWrite = "flashback";
+        }
+        modeDataEditor.putString("LAST_PLAYED_MODE", "" + toWrite);
+        modeDataEditor.apply();
     }
 
     public static boolean hasLocationPermission(Context context)
