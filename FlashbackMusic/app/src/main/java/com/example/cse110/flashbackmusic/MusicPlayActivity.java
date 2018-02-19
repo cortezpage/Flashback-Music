@@ -33,6 +33,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         musicPlayer.setPlayMode(mode);
         play_mode = musicPlayer.getPlayMode();
 
+        Log.i("MusicPlayActivity", "set play_mode to " + play_mode);
         if (play_mode == 0) {
             int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
             musicPlayer.selectSong(selected_id);
@@ -52,6 +53,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                 if (play_mode == 1 || play_mode == 2) {
                     if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
                             (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
+                        Log.i("MusicPlayActivity", "reached the end of Album or playlist");
                         musicPlayer.stop();
                         finish();
                     } else {
@@ -78,6 +80,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("MusicPlayActivity playButton", "playButton is clicked");
                 if (!musicPlayer.isLoadingSong()) {
                     if (musicPlayer.isMusicPlaying()) {
                         musicPlayer.pause();}
@@ -94,6 +97,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("MusicPlayActivity reset Button", "Previous Button is clicked");
                 musicPlayer.reset();
                 updatePlayButtonImage();
             }
@@ -106,6 +110,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("MusicPlayActivity Previous Button", "Previous Button is clicked");
                 musicPlayer.goToPreviousSong();
                 updateUIWithSongInfo();
                 updatePlayButtonImage();

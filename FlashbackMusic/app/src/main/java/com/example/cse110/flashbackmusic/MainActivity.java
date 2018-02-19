@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
     @Override
     public void onDestroy() {
+        Log.i("MainActivity Destructor", "Destroying the MainActivity");
         updateSongData();
         updateAlbumData();
         musicPlayer.destroy();
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         setContentView(R.layout.activity_main);
 
         if (!hasLocationPermission(this)) {
+            Log.i("MainActivity Permission", "Missing permissing to access the location");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             return;
         }
@@ -75,9 +77,11 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            Log.i("MainActivity Request Permission Result", "Permission granted");
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 init();}
             else {
+                Log.i("MainActivity Request Permission Result", "Permission denied, asking again");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);}
         }
     }
@@ -98,6 +102,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         String song_data_filename = "com.example.cse110.flashbackmusic.song_data_preferences";
         String album_data_filename = "com.example.cse110.flashbackmusic.album_data_preferences";
 
+        Log.i("MainAcitivty init", "Initializing song shared preference and album shared" +
+                "preference");
         songSharedPref = context.getSharedPreferences(song_data_filename, Context.MODE_PRIVATE);
         songDataEditor = songSharedPref.edit();
         albumSharedPref = context.getSharedPreferences(album_data_filename, Context.MODE_PRIVATE);
@@ -140,17 +146,20 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     }
 
     public void launchFlashbackMode () {
+        Log.i("MainAcitivity LaunchFlashbackMode", "Launching Flashback Mode");
         Intent intent = new Intent(this, MusicPlayActivity.class);
         intent.putExtra("MODE", "flashback");
         startActivity(intent);
     }
 
     public void launchSongSelection () {
+        Log.i("MainAcitivity LaunchSongSelection", "Launching Song Selection Mode");
         Intent intent = new Intent(this, SongSelectionActivity.class);
         startActivity(intent);
     }
 
     public void launchAlbumSelection () {
+        Log.i("MainAcitivity LaunchAlbumSelection", "Launching Album Selection Mode");
         Intent intent = new Intent(this, AlbumSelectionActivity.class);
         startActivity(intent);
     }
@@ -160,6 +169,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         for (int index = 0; index < songs.length; index++) {
             curr_song = songs[index];
             sharedPrefHelper.writeSongData("" + curr_song.getMediaID(), curr_song.toString());
+            Log.i("MainAcitivity updateSongData", "updating Song: " + curr_song.getSongName()
+                    + " data into shared preference");
         }
     }
 
@@ -168,6 +179,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         for (int index = 0; index < albums.length; index++) {
             curr_album = albums[index];
             sharedPrefHelper.writeAlbumData(curr_album.getID(), curr_album.toString());
+            Log.i("MainAcitivity updateAlbumData", "updating Album: " + curr_album.getAlbumName()
+                    + " data into shared preference");
         }
     }
 
@@ -183,9 +196,12 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         if (locationManager == null) { return null; }
         Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (lastLocation != null) {
+            Log.i("MainActivity getLastLatLon", "returning lon = " + lastLocation.getLongitude() +
+            "; returning lat = " + lastLocation.getLatitude());
             return new LatLon(lastLocation.getLatitude(), lastLocation.getLongitude());
         }
         // Return the CSE Building if the location manager fails
+        Log.e("MainActivity getLastLatLon", "location access failed, returning default location");
         return new LatLon(32.881801, -117.233523);
     }
 
