@@ -1,16 +1,9 @@
 package tests;
 
 import com.example.cse110.flashbackmusic.LatLon;
-import com.example.cse110.flashbackmusic.MainActivity;
-import com.example.cse110.flashbackmusic.MusicPlayActivity;
-import com.example.cse110.flashbackmusic.MusicPlayer;
-import com.example.cse110.flashbackmusic.Playlist;
-import com.example.cse110.flashbackmusic.R;
-import com.example.cse110.flashbackmusic.SharedPrefHelper;
 import com.example.cse110.flashbackmusic.Song;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Calendar;

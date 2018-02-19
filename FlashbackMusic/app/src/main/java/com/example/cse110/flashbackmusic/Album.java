@@ -14,12 +14,22 @@ public class Album {
 
     public Album (String album_data) {
         String [] data = album_data.split("; ");
-        this.album_name = data[0];
-        this.artist_name = data[1];
-        this.num_tracks = Integer.parseInt(data[2]);
-        this.id = data[3];
-        this.songs = new Song[this.num_tracks];
-        this.play_index = 0;
+        if (data.length != 4) {
+            Log.e("Album Constructor", "Data String does not satisfy the format");
+            this.album_name = "YouTube Audio Library";
+            this.artist_name = "Media Right Productions";
+            this.num_tracks = 1;
+            this.id = "ALBUM_6";
+            this.songs = new Song[this.num_tracks];
+            this.play_index = 0;
+        } else {
+            this.album_name = data[0];
+            this.artist_name = data[1];
+            this.num_tracks = Integer.parseInt(data[2]);
+            this.id = data[3];
+            this.songs = new Song[this.num_tracks];
+            this.play_index = 0;
+        }
     }
 
     public String getAlbumName() { return this.album_name; }
@@ -33,6 +43,10 @@ public class Album {
     public String toString() { return new Gson().toJson(this); }
 
     public void addSong(Song new_song, int index) {
+        if ((index < 0) || (index >= songs.length)) {
+            Log.e("Album addSong", "index out of range");
+            return;
+        }
         this.songs[index] = new_song;
     }
 
@@ -45,6 +59,7 @@ public class Album {
         if (this.play_index < 0) {
             this.play_index = this.songs.length - 1;
         }
+        Log.i("Album toPreviousSong", "play_index changed to " + this.play_index);
     }
 
     public void toNextSong() {
@@ -52,5 +67,6 @@ public class Album {
         if (this.play_index > this.songs.length - 1) {
             this.play_index = 0;
         }
+        Log.i("Album toNextSong", "play_index changed to " + this.play_index);
     }
 }
