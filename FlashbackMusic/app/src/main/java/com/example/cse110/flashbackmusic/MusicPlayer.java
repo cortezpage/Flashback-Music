@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -157,6 +156,7 @@ public class MusicPlayer {
         this.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
+
                 mediaPlayer.start();
             }
         }); */
