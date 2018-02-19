@@ -17,8 +17,6 @@ import static java.lang.Math.abs;
 
 public class Playlist {
 
-    private final int MAX_POSSIBLE_SCORE = 5000;
-
     private Song [] songs;
     private int play_index;
     private Queue<Song> idPQ = new PriorityQueue<>(100, rankComp);
