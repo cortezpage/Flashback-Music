@@ -9,6 +9,8 @@ import java.util.Calendar;
 
 public class Playlist {
 
+    private final int TIME_OF_DAY_DIVISION = 4;
+
     private Song [] songs;
     private int play_index;
     private Calendar lastSortedCal;
@@ -41,7 +43,7 @@ public class Playlist {
 
     // TODO: may need to replace with LatLon
     public boolean shouldSort (Calendar currTime, Location currLoc) {
-        if (currTime == null || currLoc == null) {
+        if (lastSortedCal == null || lastSortedLoc == null || currTime == null || currLoc == null) {
             return true;
         }
         if (currTime.DAY_OF_WEEK != lastSortedCal.DAY_OF_WEEK) {
@@ -58,8 +60,8 @@ public class Playlist {
 
     // TODO: may need to change this if we change our time groups
     public boolean timeOfDayHasChanged (int currHour) {
-        int currHourIndex = currHour/3;
-        int prevHourIndex = lastSortedCal.HOUR_OF_DAY/3;
+        int currHourIndex = currHour/TIME_OF_DAY_DIVISION;
+        int prevHourIndex = lastSortedCal.HOUR_OF_DAY/TIME_OF_DAY_DIVISION;
         if (currHourIndex != prevHourIndex) {
             return true;
         }
@@ -71,7 +73,7 @@ public class Playlist {
      */
     public boolean locationHasChanged (Location currLoc) {
         // distanceTo returns a float representing the distance in meters
-        if (currLoc.distanceTo(lastSortedLoc) > 1000.0) {
+        if (currLoc.distanceTo(lastSortedLoc) > 250.0) {
             return true;
         }
         return false;

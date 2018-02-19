@@ -17,6 +17,7 @@ public class MusicPlayActivity extends AppCompatActivity {
     private SharedPrefHelper sharedPrefHelper;
     private LatLon latLon;
     private ImageButton playButton;
+    private int play_mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +29,7 @@ public class MusicPlayActivity extends AppCompatActivity {
 
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
-        int play_mode = musicPlayer.getPlayMode();
+        play_mode = musicPlayer.getPlayMode();
 
         if (play_mode == 0) {
             int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
@@ -43,16 +44,16 @@ public class MusicPlayActivity extends AppCompatActivity {
             musicPlayer.selectSong(first_id);
         }
 
-        if (play_mode == 1 || play_mode == 2) {
-            musicPlayer.getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
+        musicPlayer.getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (play_mode == 1 || play_mode == 2) {
                     musicPlayer.goToNextSong();
                     updateUIWithSongInfo();
                     musicPlayer.updatePlaylist();
                 }
-            });
-        }
+            }
+        });
 
         // Link the "back" button to go back to the song selection activity
         ImageButton back = findViewById(R.id.button_exit_music_play);
