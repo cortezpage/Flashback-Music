@@ -2,6 +2,7 @@ package com.example.cse110.flashbackmusic;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         }
         else if (musicPlayer.getPlayMode() == 2) {
             int curr_id = musicPlayer.getPlaylistSongID();
+            Log.i("MusicPlayActivity onCreate", "The media id of current song is " + curr_id);
             musicPlayer.selectSong(curr_id);
         }
 

@@ -4,8 +4,10 @@ package com.example.cse110.flashbackmusic;
 import android.annotation.SuppressLint;
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Date;
@@ -19,8 +21,14 @@ public class Playlist {
 
     private Song [] songs;
     private int play_index;
-    private Queue<Integer> idPQ = new PriorityQueue<>(100);
+    private Queue<Song> idPQ = new PriorityQueue<>(100, rankComp);
 
+    public static Comparator<Song> rankComp = new Comparator<Song>() {
+        @Override
+        public int compare(Song s1, Song s2) {
+            return (int) (s2.getRank() - s1.getRank());
+        }
+    };
 
     public Playlist () {
         this.songs = MainActivity.getSongs();
@@ -37,7 +45,7 @@ public class Playlist {
         }
 
         for (int i = 0; i < songs.length; i++) {
-            idPQ.add(songs[i].getRank());
+            idPQ.add(songs[i]);
         }
     }
 
@@ -48,14 +56,13 @@ public class Playlist {
         LatLon latlon = new LatLon(currLoc.getLatitude(), currLoc.getLongitude());
         Date currDate = Calendar.getInstance().getTime();
         int rank = findRank(song, latlon, currDate);
-        rank = MAX_POSSIBLE_SCORE - rank;
+        //rank = MAX_POSSIBLE_SCORE - rank;
         song.setRank(rank);
     }
 
     public int getCurrSongID() {
-        //System.err.println("idPQ size is " + idPQ.size());
-
-        return idPQ.poll();
+        Log.i("Playlist getCurrSongID", "" + idPQ.peek().getRank());
+        return idPQ.poll().getMediaID();
         //return this.songs[this.play_index].getMediaID();
     }
 
