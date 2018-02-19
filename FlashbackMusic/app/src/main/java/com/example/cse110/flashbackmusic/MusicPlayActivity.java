@@ -53,7 +53,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                 if (play_mode == 1 || play_mode == 2) {
                     if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
                             (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
-                        Log.i("MusicPlayActivity", "reached the end of Album or playlist")
+                        Log.i("MusicPlayActivity", "reached the end of Album or playlist");
                         musicPlayer.stop();
                         finish();
                     } else {
@@ -80,7 +80,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("MusicPlayActivity playButton", "playButton is clicked")
+                Log.i("MusicPlayActivity playButton", "playButton is clicked");
                 if (!musicPlayer.isLoadingSong()) {
                     if (musicPlayer.isMusicPlaying()) {
                         musicPlayer.pause();}
@@ -110,7 +110,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("MusicPlayActivity Previous Button", "Previous Button is clicked")
+                Log.i("MusicPlayActivity Previous Button", "Previous Button is clicked");
                 musicPlayer.goToPreviousSong();
                 updateUIWithSongInfo();
                 updatePlayButtonImage();
@@ -151,7 +151,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                 sharedPrefHelper.writeSongData("" + musicPlayer.getCurrentMediaID(), musicPlayer.getCurrentString());
             }
         });
-f
+
         updateUIWithSongInfo();
         updatePlayButtonImage();
     }
