@@ -31,21 +31,17 @@ import static junit.framework.Assert.assertEquals;
  */
 
 public class FlashbackAlgorithmTests {
-    Song[] songs;
+    Song firstSong;
     Playlist playlist;
-
-    @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, false, true);
 
     @Before
     public void setup() {
-        songs = mActivityTestRule.getActivity().getSongs();
-        playlist = new Playlist();
+        firstSong = new Song("Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0; 2131427333");
+        playlist = new Playlist(false);
     }
 
     @Test
     public void nonPlayedSongReturns0() {
-        Song firstSong = songs[0];
         firstSong.setToNeutral();
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date();
@@ -55,7 +51,6 @@ public class FlashbackAlgorithmTests {
 
     @Test
     public void dislikedSongReturnsNeg1() {
-        Song firstSong = songs[0];
         firstSong.setToDisliked();
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date();
@@ -65,7 +60,6 @@ public class FlashbackAlgorithmTests {
 
     @Test
     public void sameTimePlayed() {
-        Song firstSong = songs[0];
         firstSong.setToNeutral();
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0);
@@ -80,7 +74,6 @@ public class FlashbackAlgorithmTests {
 
     @Test
     public void sameLocation() {
-        Song firstSong = songs[0];
         firstSong.setToNeutral();
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0);
@@ -95,7 +88,6 @@ public class FlashbackAlgorithmTests {
 
     @Test
     public void sameDayOfWeek() {
-        Song firstSong = songs[0];
         firstSong.setToNeutral();
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0); // Unix epoch
@@ -110,7 +102,6 @@ public class FlashbackAlgorithmTests {
 
     @Test
     public void nonIdealSong() {
-        Song firstSong = songs[0];
         firstSong.setToNeutral();
         LatLon fakeLatLon = new LatLon(0, 0);
         Date fakeDate = new Date(0); // Unix epoch
@@ -125,7 +116,6 @@ public class FlashbackAlgorithmTests {
 
     @Test
     public void idealSong() {
-        Song firstSong = songs[0];
         firstSong.setToFavorite();
         LatLon fakeLatLon = new LatLon(32.867876, -117.223629);
         Date fakeDate = new Date(0); // Unix epoch

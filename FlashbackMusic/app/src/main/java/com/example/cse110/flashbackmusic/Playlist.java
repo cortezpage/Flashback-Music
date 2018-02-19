@@ -41,6 +41,10 @@ public class Playlist {
         addSongToList();
     }
 
+    // FAKE CONSTRUCTOR FOR TESTING
+    public Playlist (boolean fake) {}
+    // FAKE CONSTRUCTOR FOR TESTING
+
     private void addSongToList () {
         // calculate the score for each song and then put them into the priority queue
         for (int k = 0; k < songs.length; k++) {
@@ -170,7 +174,7 @@ public class Playlist {
         }
 
         // If song not played before, has a rank of 0
-        if (!song.wasPlayedPreviously()) {
+        if (song.getLastPlayedLocation() == null || song.getLastPlayedDate() == null) {
             rank = 0;
             song.setRank(rank);
             return rank;
@@ -187,15 +191,22 @@ public class Playlist {
             rank += 101;
         }
 
+        Calendar songCalendar = new GregorianCalendar();
+        songCalendar.setTime(song.getLastPlayedDate());
         Calendar nowCalendar = new GregorianCalendar();
         nowCalendar.setTime(now);
-        if (song.playedOnDayOfTheWeek(nowCalendar)) {
+        if (songCalendar.get(Calendar.DAY_OF_WEEK) == nowCalendar.get(Calendar.DAY_OF_WEEK)) {
             rank += 202;
         }
 
-        if (song.playedAtTimeOfDay(nowCalendar)) {
+        int songHour = songCalendar.get(Calendar.HOUR_OF_DAY);
+        int nowHour = nowCalendar.get(Calendar.HOUR_OF_DAY);
+        int hourDiff = abs(songHour / 4 - nowHour / 4);
+        if (hourDiff == 0) {
             rank += 300;
-        }
+        } /*else if (hourDiff == 1) { // Makes being in the adjacent time bracket half credit
+            rank += 100;
+        }*/
 
         song.setRank(rank);
         return rank;
