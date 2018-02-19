@@ -58,53 +58,5 @@ public class SongTests {
         firstSong.incrementLikeStatus();
         assertEquals(firstSong.getLikeStatus(), 1);
     }
-/*
-    @Test
-    public void addLocationTest () {
-        assertEquals(secondSong.getLatLons().size(), 0);
-        LatLon latlon = new LatLon(32.867876, -117.223629);
-        secondSong.addLocation(latlon);
-        assertEquals(secondSong.getLatLons().size(), 1);
-        Assert.assertTrue(secondSong.getLatLons().contains(latlon));
-
-
-        assertEquals(secondSong.getLatLons().size(), 1);
-        LatLon latlon2 = new LatLon(87.3, -1.2);
-        secondSong.addLocation(latlon2);
-        assertEquals(secondSong.getLatLons().size(), 2);
-        Assert.assertTrue(secondSong.getLatLons().contains(latlon2));
-    }
-
-    @Test
-    public void setPlayedAtTimeTest () {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2018, 2, 18, 18, 5, 20);
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.set(2018, 2, 18, 18, 10, 20);
-        Calendar calendar3 = Calendar.getInstance();
-        calendar3.set(2018, 2, 18, 19, 5, 20);
-
-        Calendar fakeCalendar = Calendar.getInstance();
-        fakeCalendar.set(2018, 2, 18, 8, 5, 20);
-        Calendar fakeCalendar2 = Calendar.getInstance();
-        fakeCalendar2.set(2018, 2, 18, 20, 5, 20);
-
-        firstSong.setPlayedAtTime(calendar);
-
-        /*Assert.assertTrue(firstSong.playedAtTime(calendar));
-        Assert.assertTrue(firstSong.playedAtTime(calendar2));
-        Assert.assertTrue(firstSong.playedAtTime(calendar3));
-
-        Assert.assertFalse(firstSong.playedAtTime(fakeCalendar));
-        Assert.assertFalse(firstSong.playedAtTime(fakeCalendar2));
-    }
-
-    @Test
-    public void wasPrevioueslyPlayedTest () {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2018, 2, 18, 18, 5, 20);
-
-        firstSong.setPlayedAtTime(calendar);
-    }*/
 
 }

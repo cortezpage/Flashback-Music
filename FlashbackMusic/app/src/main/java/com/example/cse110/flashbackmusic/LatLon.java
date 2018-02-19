@@ -35,6 +35,7 @@ public class LatLon {
 
     public String getAddressLine(Context context)
     {
+        Log.i("LatLon getAddressLine", "Getting Address Line from LatLon");
         if (!Geocoder.isPresent()) { return ""; }
         try { return new Geocoder(context).getFromLocation(latitude, longitude, 1).get(0).getAddressLine(0);}
         catch (IOException e) { e.printStackTrace(); return ""; }
@@ -46,6 +47,10 @@ public class LatLon {
             Log.e("LatLon findDistance", "Destination is null, returning 0 to caller");
             return 0;
         }
+
+        Log.i("LatLon findDistance", "Calculating distance between two Location " +
+        this.latitude + " " + this.longitude + " the other Location: " + other.getLatitude() + " "
+        + other.getLongitude());
 
         Location locThis = new Location("Current location");
         locThis.setLatitude(this.getLatitude());

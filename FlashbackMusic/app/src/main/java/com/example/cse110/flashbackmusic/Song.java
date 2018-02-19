@@ -52,6 +52,8 @@ public class Song {
         this.lastPlayedLocation = null;
         this.lastPlayedCalendar = null;
         this.rank = 0;
+        Log.i("Song Constructor", "Song " + song_name + " with artist " + artist_name +
+            " in album " + album_name + " is created.");
     }
 
     public String getSongName() { return this.song_name; }
@@ -73,6 +75,7 @@ public class Song {
         if (this.like_status > 2) {
             this.like_status = 0;
         }
+        Log.i("Song incrementLikeStatus", "Like status changed to " + like_status);
     }
 
     public boolean isNeutral() { return (this.like_status == 0); }

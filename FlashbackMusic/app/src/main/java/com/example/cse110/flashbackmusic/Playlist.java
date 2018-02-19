@@ -39,6 +39,7 @@ public class Playlist {
         this.lastSortedLoc = null;
         this.songPQ = new PriorityQueue<>(100, rankComp);
         addSongToList();
+        Log.i("Playlist Constructor", "Created a playlist with play_index" + play_index);
     }
 
     // FAKE CONSTRUCTOR FOR TESTING
@@ -49,6 +50,8 @@ public class Playlist {
         // calculate the score for each song and then put them into the priority queue
         for (int k = 0; k < songs.length; k++) {
             calculateRank(songs[k]);
+            Log.i("Playlist addSongToList", "Calculating the rank of "
+                    + songs[k].getSongName());
         }
 
         for (int i = 0; i < songs.length; i++) {
@@ -57,9 +60,11 @@ public class Playlist {
                 continue;
             }
             songPQ.add(songs[i]);
+            Log.i("Playlist addSongToList", "Adding the song " + songs[i].getSongName() +
+                    " to the priority queue");
         }
 
-        Log.i("PQ Size", "" + songPQ.size());
+        Log.i("Playlist addSongToList", "The size of priority queue is " + songPQ.size());
     }
 
     private void calculateRank (Song song) {
@@ -67,6 +72,7 @@ public class Playlist {
         LatLon latlon = MainActivity.getLastLatLon();
         Date currDate = Calendar.getInstance().getTime();
         int rank = findRank(song, latlon, currDate);
+        Log.i("Playlist calculateRank", "rank of current song is " + rank);
         song.setRank(rank);
     }
 
@@ -112,6 +118,7 @@ public class Playlist {
     }
 
     public void sortPlaylist(Calendar currTime, LatLon currLoc) {
+        Log.i("Playlist sortPlaylist", "Playlist is being resorted by current location and time");
         lastSortedLoc = currLoc;
         lastSortedCal = currTime;
         songPQ.clear();
