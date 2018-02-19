@@ -1,6 +1,7 @@
 package com.example.cse110.flashbackmusic;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -160,6 +161,9 @@ public class SharedPrefHelper {
         for (int index = 0; index < this.initial_song_data.length; index++) {
             this.initial_song_data[index] = this.all_songs[index] + "; " + this.all_IDs[index];
         }
+
+        Log.i("SharedPrefHelper Constructor", "sharedPrefHelper is created with " +
+            all_IDs.length + " songs");
     }
 
     public boolean hasPreviousAlbumData() {
@@ -214,6 +218,10 @@ public class SharedPrefHelper {
                 for (int song_index = 0; song_index < songs.length && song_count < new_album.getNumTracks(); song_index++) {
                     if (songs[song_index].getAlbumName().equals(new_album.getAlbumName())) {
                         new_album.addSong(songs[song_index], song_count);
+
+                        Log.i("SharedPrefHelper createAlbums", "Trying to add song " +
+                                songs[song_index].getSongName() + " into the album " + new_album.getAlbumName());
+
                         song_count++;
                     }
                 }
@@ -284,11 +292,13 @@ public class SharedPrefHelper {
     }
 
     public void writeAlbumData(String id, String data) {
+        Log.i("SharedPrefHelper", "Writing updates to Album data");
         this.albumSharedEditor.putString(id, data);
         this.albumSharedEditor.apply();
     }
 
     public void writeSongData(String id, String data) {
+        Log.i("SharedPrefHelper", "Writing updates to Song data");
         this.songSharedEditor.putString(id, data);
         songSharedEditor.apply();
     }
