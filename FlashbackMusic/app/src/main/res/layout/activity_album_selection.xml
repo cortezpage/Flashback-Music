@@ -12,17 +12,21 @@
 
         <LinearLayout
             android:id="@+id/all_albums_list"
-            android:layout_width="match_parent"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:orientation="vertical">
 
-            <ImageButton
+            <android.support.design.widget.FloatingActionButton
                 android:id="@+id/button_exit_album_selection"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="left|top"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="80dp"
-                android:background="@drawable/back_button" />
+                android:layout_margin="10dp"
+                android:src="@drawable/back_button"
+                app:backgroundTint="#FFFFFF"
+                app:rippleColor="@android:color/white" />
 
         </LinearLayout>
 
