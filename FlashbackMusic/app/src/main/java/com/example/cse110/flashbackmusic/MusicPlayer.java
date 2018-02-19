@@ -3,7 +3,6 @@ package com.example.cse110.flashbackmusic;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -15,6 +14,7 @@ public class MusicPlayer {
     private Song [] songs;
     private Album [] albums;
     private Album curr_album;
+    private Playlist flashback_playlist;
     private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
@@ -29,12 +29,12 @@ public class MusicPlayer {
         this.songs = MainActivity.getSongs();
         this.albums = MainActivity.getAlbums();
         this.curr_album = null;
+        this.flashback_playlist = new Playlist();
     }
 
     public void destroy() { this.player.release(); }
 
     public void play() {
-        Log.i("Now playing:", this.getCurrentString());
         this.player.start();
     }
 
@@ -47,11 +47,39 @@ public class MusicPlayer {
         loadSong(songs[play_index].getMediaID());
     }
 
+    public void stop() {
+        this.player.stop();
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return this.player;
+    }
+
+    public void updateSongInfo() {
+        Song curr_song = songs[play_index];
+        curr_song.setLastPlayedCalendar(Calendar.getInstance());
+        LatLon newLatLon = MainActivity.getLastLatLon();
+        if (newLatLon != null) {
+            songs[play_index].setLastPlayedLocation(newLatLon);
+            MainActivity.getSongSharedPrefHelper().writeSongData("" + curr_song.getMediaID(), curr_song.toString());
+        }
+    }
+
+    public void updatePlaylist(boolean startingFBMode) {
+        Calendar currTime = Calendar.getInstance();
+        LatLon currLoc = MainActivity.getLastLatLon();
+        if (this.flashback_playlist.shouldSort(currTime, currLoc) || startingFBMode) {
+            this.flashback_playlist.sortPlaylist(currTime, currLoc);
+        }
+    }
+
     // only available in album play and flashback mode
     public void goToPreviousSong() {
         if (this.play_mode == 1) {
             this.curr_album.toPreviousSong();
             selectSong(this.curr_album.getCurrSongID());
+        } else if (this.play_mode == 2 && !this.flashback_playlist.atEnd()) {
+            selectSong(this.flashback_playlist.getCurrSongID());
         }
     }
 
@@ -60,7 +88,17 @@ public class MusicPlayer {
         if (this.play_mode == 1) {
             this.curr_album.toNextSong();
             selectSong(this.curr_album.getCurrSongID());
+        } else if (this.play_mode == 2 && !this.flashback_playlist.atEnd()) {
+            selectSong(this.flashback_playlist.getCurrSongID());
         }
+    }
+
+    public boolean reachedEndOfAlbum() {
+        return this.curr_album.atEnd();
+    }
+
+    public boolean reachedEndOfPlaylist() {
+        return this.flashback_playlist.atEnd();
     }
 
     public void selectSong(int selected_id) {
@@ -72,12 +110,6 @@ public class MusicPlayer {
             }
         }
         this.reset();
-        songs[play_index].setDate(Calendar.getInstance().getTime());
-        LatLon newLatLon = MainActivity.getLastLatLon();
-        if (newLatLon != null) {
-            songs[play_index].getLatLons().add(newLatLon);
-            MainActivity.getSongSharedPrefHelper().saveSongData(selected_id);
-        }
     }
 
     public void selectAlbum(int selected_index) {
@@ -119,6 +151,7 @@ public class MusicPlayer {
         } else if (mode.equals("flashback")) {
             this.play_mode = 2;
             this.curr_album = null;
+            this.updatePlaylist(true);
         } else { // default case
             this.play_mode = 0;
             this.curr_album = null;
@@ -129,13 +162,6 @@ public class MusicPlayer {
      * This method allows us to load a song's data into the media player.
      */
     public void loadSong(int resourceId) {
-        // Determines the behavior that will occur when the song is over
-        this.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                mediaPlayer.start();
-            }
-        });
 
         AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
         try {
@@ -143,6 +169,7 @@ public class MusicPlayer {
             this.player.prepareAsync();
 
             loadingSong = true;
+
             this.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer player) {
@@ -150,9 +177,14 @@ public class MusicPlayer {
                     loadingSong = false;
                 }
             });
+
         } catch (Exception e) {System.out.println(e.toString());}
     }
 
     public boolean isLoadingSong() {
-        return loadingSong;}
+        return loadingSong;
+    }
+
+    // This is to be called ONLY ONCE when we first enter flashback mode.
+    public int getPlaylistSongID () {return flashback_playlist.getCurrSongID();}
 }

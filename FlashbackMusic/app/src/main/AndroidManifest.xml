@@ -29,10 +29,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MusicPlayActivity" />
         <activity android:name=".AlbumSelectionActivity" />
-        <activity
-            android:name=".FlashbackActivity"
-            android:label="@string/title_activity_flashback"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

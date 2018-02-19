@@ -1,19 +1,25 @@
 package com.example.cse110.flashbackmusic;
 
+import android.annotation.SuppressLint;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MusicPlayActivity extends AppCompatActivity {
 
     private MusicPlayer musicPlayer;
     private SharedPrefHelper sharedPrefHelper;
-    private LatLon latLon;
     private ImageButton playButton;
+    private int play_mode;
+
+    final boolean testing = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,15 +31,40 @@ public class MusicPlayActivity extends AppCompatActivity {
 
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
+        play_mode = musicPlayer.getPlayMode();
 
-        if (musicPlayer.getPlayMode() == 0) {
+        Log.i("MusicPlayActivity", "set play_mode to " + play_mode);
+        if (play_mode == 0) {
             int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
             musicPlayer.selectSong(selected_id);
         }
-        else if (musicPlayer.getPlayMode() == 1) {
+        else if (play_mode == 1) {
             int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
             musicPlayer.selectAlbum(selected_index);
         }
+        else if (musicPlayer.getPlayMode() == 2) {
+            int curr_id = musicPlayer.getPlaylistSongID();
+            musicPlayer.selectSong(curr_id);
+        }
+
+        musicPlayer.getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (play_mode == 1 || play_mode == 2) {
+                    if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
+                            (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
+                        Log.i("MusicPlayActivity", "reached the end of Album or playlist");
+                        musicPlayer.stop();
+                        finish();
+                    } else {
+                        musicPlayer.updateSongInfo();
+                        musicPlayer.goToNextSong();
+                        updateUIWithSongInfo();
+                        musicPlayer.updatePlaylist(false);
+                    }
+                }
+            }
+        });
 
         // Link the "back" button to go back to the song selection activity
         ImageButton back = findViewById(R.id.button_exit_music_play);
@@ -49,11 +80,13 @@ public class MusicPlayActivity extends AppCompatActivity {
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("MusicPlayActivity playButton", "playButton is clicked");
                 if (!musicPlayer.isLoadingSong()) {
                     if (musicPlayer.isMusicPlaying()) {
                         musicPlayer.pause();}
                     else {
-                        musicPlayer.play(); }
+                        musicPlayer.play();
+                    }
                 }
                 updatePlayButtonImage();
             }
@@ -64,6 +97,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("MusicPlayActivity reset Button", "Previous Button is clicked");
                 musicPlayer.reset();
                 updatePlayButtonImage();
             }
@@ -72,10 +106,11 @@ public class MusicPlayActivity extends AppCompatActivity {
         // Link the "previous" button with the playPreviousSong() method from the music player
         ImageButton previousButton = findViewById(R.id.button_previous);
         previousButton.getBackground().setAlpha(40);
-        if (musicPlayer.getPlayMode() == 1 || musicPlayer.getPlayMode() == 2) { previousButton.getBackground().setAlpha(255); }
+        if (musicPlayer.getPlayMode() != 0) { previousButton.getBackground().setAlpha(255); }
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("MusicPlayActivity Previous Button", "Previous Button is clicked");
                 musicPlayer.goToPreviousSong();
                 updateUIWithSongInfo();
                 updatePlayButtonImage();
@@ -85,10 +120,16 @@ public class MusicPlayActivity extends AppCompatActivity {
         // Link the "next" button with the playNextSong() method from the music player
         ImageButton nextButton = findViewById(R.id.button_next);
         nextButton.getBackground().setAlpha(40);
-        if (musicPlayer.getPlayMode() == 1) { nextButton.getBackground().setAlpha(255); }
+        if (musicPlayer.getPlayMode() != 0) { nextButton.getBackground().setAlpha(255); }
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
+                        (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
+                    musicPlayer.stop();
+                    finish();
+                }
+                if (testing) { musicPlayer.updateSongInfo(); }
                 musicPlayer.goToNextSong();
                 updateUIWithSongInfo();
                 updatePlayButtonImage();
@@ -96,13 +137,6 @@ public class MusicPlayActivity extends AppCompatActivity {
         });
 
         final ImageButton likeButton = findViewById(R.id.button_like);
-        if (musicPlayer.getCurrentLikeStatus() == 1) {
-            likeButton.setBackgroundResource(R.drawable.favorite_button);
-        } else if (musicPlayer.getCurrentLikeStatus() == 0) {
-            likeButton.setBackgroundResource(R.drawable.neutral_button);
-        } else if (musicPlayer.getCurrentLikeStatus() == 2) {
-            likeButton.setBackgroundResource(R.drawable.dislike_button);
-        }
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -114,9 +148,10 @@ public class MusicPlayActivity extends AppCompatActivity {
                 } else if (musicPlayer.getCurrentLikeStatus() == 2) {
                     likeButton.setBackgroundResource(R.drawable.dislike_button);
                 }
-                sharedPrefHelper.saveSongData(musicPlayer.getCurrentMediaID());
+                sharedPrefHelper.writeSongData("" + musicPlayer.getCurrentMediaID(), musicPlayer.getCurrentString());
             }
         });
+
         updateUIWithSongInfo();
         updatePlayButtonImage();
     }
@@ -135,12 +170,21 @@ public class MusicPlayActivity extends AppCompatActivity {
         TextView albumNameDisplay = (TextView) findViewById(R.id.album_name_music_play);
         albumNameDisplay.setText(musicPlayer.getCurrentSongAlbum());
 
-        Song curSong = musicPlayer.getCurrentSong();
-        ((TextView) findViewById(R.id.song_last_played_info)).setText(!curSong.wasPlayedPreviously() ?
-            "Never played before" :
-            "Last played on \n" +
-            curSong.getPreviousLocation().getAddressLine(this) + "\n" +
-            new SimpleDateFormat("MMM d, yyyy").format(curSong.getLastPlayedDate()) + "\n" +
-            new SimpleDateFormat("h:mm a").format(curSong.getLastPlayedDate()));
+        Song currSong = musicPlayer.getCurrentSong();
+        ((TextView) findViewById(R.id.song_last_played_info)).setText(!currSong.wasPlayedPreviously() ?
+            "This track has never been played before." :
+            "Last played on: \n" +
+            currSong.getLastPlayedLocation().getAddressLine(this) + "\n" +
+            new SimpleDateFormat("MMM d, yyyy").format(currSong.getLastPlayedDate()) + "\n" +
+            new SimpleDateFormat("h:mm a").format(currSong.getLastPlayedDate()));
+
+        final ImageButton likeButton = findViewById(R.id.button_like);
+        if (musicPlayer.getCurrentLikeStatus() == 1) {
+            likeButton.setBackgroundResource(R.drawable.favorite_button);
+        } else if (musicPlayer.getCurrentLikeStatus() == 0) {
+            likeButton.setBackgroundResource(R.drawable.neutral_button);
+        } else if (musicPlayer.getCurrentLikeStatus() == 2) {
+            likeButton.setBackgroundResource(R.drawable.dislike_button);
+        }
     }
 }
