@@ -35,8 +35,8 @@ public class MusicPlayActivity extends AppCompatActivity {
             musicPlayer.selectAlbum(selected_index);
         }
         else if (musicPlayer.getPlayMode() == 2) {
-            int first_id = MainActivity.getSongs()[0].getMediaID();
-            musicPlayer.selectSong(first_id);
+            int curr_id = musicPlayer.getPlaylistSongID();
+            musicPlayer.selectSong(curr_id);
         }
 
         // Link the "back" button to go back to the song selection activity

@@ -165,5 +165,5 @@ public class MusicPlayer {
         return loadingSong;
     }
 
-    public Playlist getFlashback_playlist () {return flashback_playlist;}
+    public int getPlaylistSongID () {return flashback_playlist.getCurrSongID();}
 }
