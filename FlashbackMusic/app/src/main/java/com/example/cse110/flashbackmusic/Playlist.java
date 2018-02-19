@@ -17,6 +17,8 @@ import static java.lang.Math.abs;
 
 public class Playlist {
 
+    private final int TIME_OF_DAY_DIVISION = 4;
+
     private Song [] songs;
     private int play_index;
     private Queue<Song> idPQ = new PriorityQueue<>(100, rankComp);
@@ -24,19 +26,27 @@ public class Playlist {
     public static Comparator<Song> rankComp = new Comparator<Song>() {
         @Override
         public int compare(Song s1, Song s2) {
-            return (int) (s2.getRank() - s1.getRank());
+            int temp = s2.getRank() - s1.getRank();
+            if (temp != 0) {
+                return temp;
+            }
+            return breakTieWithLike(s1, s2);
         }
     };
+  
+    private Calendar lastSortedCal;
+    private Location lastSortedLoc;
 
     public Playlist () {
         this.songs = MainActivity.getSongs();
         this.play_index = 0;
-
+        lastSortedCal = null;
+        lastSortedLoc = null;
+      
         addSongToList();
     }
 
     private void addSongToList () {
-
         // calculate the score for each song and then put them into the priority queue
         for (int k = 0; k < songs.length; k++) {
             calculateRank(songs[k]);
@@ -78,8 +88,47 @@ public class Playlist {
         }
     }
 
+    // TODO: may need to replace with LatLon
+    public boolean shouldSort (Calendar currTime, Location currLoc) {
+        if (lastSortedCal == null || lastSortedLoc == null || currTime == null || currLoc == null) {
+            return true;
+        }
+        if (currTime.DAY_OF_WEEK != lastSortedCal.DAY_OF_WEEK) {
+            return true;
+        }
+        if (timeOfDayHasChanged(currTime.HOUR_OF_DAY)) {
+            return true;
+        }
+        if (locationHasChanged(currLoc)) {
+            return true;
+        }
+        return false;
+    }
+
+    // TODO: may need to change this if we change our time groups
+    public boolean timeOfDayHasChanged (int currHour) {
+        int currHourIndex = currHour/TIME_OF_DAY_DIVISION;
+        int prevHourIndex = lastSortedCal.HOUR_OF_DAY/TIME_OF_DAY_DIVISION;
+        if (currHourIndex != prevHourIndex) {
+            return true;
+        }
+        return false;
+    }
+
+    /* TODO: may need to use LatLon instead
+     * Also need to
+     */
+    public boolean locationHasChanged (Location currLoc) {
+        // distanceTo returns a float representing the distance in meters
+        if (currLoc.distanceTo(lastSortedLoc) > 250.0) {
+            return true;
+        }
+        return false;
+    }
+
+    // TODO: may need to use LatLon instead
     @SuppressLint("MissingPermission")
-    public void sortPlaylist(Calendar currTime) {
+    public void sortPlaylist(Calendar currTime, Location currLoc) {
         // getting relevant data to help us sort the playlist according to scores
         //int currHour = currTime.HOUR_OF_DAY;
         //int currDay = currTime.DAY_OF_WEEK;
@@ -90,6 +139,29 @@ public class Playlist {
         addSongToList();
     }
 
+    //0 - neutral; 1 - favorite; 2 - dislike
+    public int breakTieWithLike (Song song1, Song song2){
+        int songStatus1 = song1.getLikeStatus();
+        int songStatus2 = song2.getLikeStatus();
+
+        //If the like statuses are the same, break the tie based on mostly recently played
+        if(songStatus1 == songStatus2) {
+            return breakTieWithRecentPlay(song1, song2);
+        }
+        else if ((songStatus1 == 1) || (songStatus1 == 0 && songStatus2 == 2)){
+            return -1;
+        }
+        return 1;
+    }
+
+    public int breakTieWithRecentPlay (Song songOne, Song songTwo) {
+        if(songOne.getLastPlayedDate().compareTo(songTwo.getLastPlayedDate()) < 0) {
+            return -1;
+        }
+        else {
+            return 1;
+        }
+    }
     /*
      * Sets the rank of a song, as well as returns said rank
      *
