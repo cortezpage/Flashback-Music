@@ -17,6 +17,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
@@ -70,6 +73,16 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
             return;
         }
+
+        /*User user = new User("Bob");
+        LatLon location = new LatLon(1, 2);
+        Calendar calendar = GregorianCalendar.getInstance();
+        PlayInstance playInstance = new PlayInstance(user, location, calendar);
+
+        Song song = new Song("Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0");
+        DatabaseManager databaseManager = new DatabaseManager();
+        databaseManager.storePlayInstance(playInstance, song);
+        Log.i("Created thing", "Created thing");*/
 
         init();
     }

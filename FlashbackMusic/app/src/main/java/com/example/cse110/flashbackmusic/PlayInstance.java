@@ -8,22 +8,16 @@ import java.util.Calendar;
  */
 
 public class PlayInstance {
-    Song song;
-    LatLon location;
-    Calendar time;
+    String userId;
+    double latitude;
+    double longitude;
+    long timeInMillis;
 
     // Standard constructor
-    public PlayInstance (Song song, LatLon location, Calendar time) {
-        this.song = song;
-        this.location = location;
-        this.time = time;
+    public PlayInstance (User user, LatLon location, Calendar time) {
+        this.userId = user.getUserId();
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+        this.timeInMillis = time.getTimeInMillis();
     }
-
-    // Constructor that builds PlayInstance from String retrieved from Firebase
-    public PlayInstance (String stringified) {};
-
-    // Convert PlayInstance into String easily stored in Firebase
-    public String stringify () {
-        return "Example! =D";
-    };
 }

@@ -19,6 +19,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-database:11.0.4'
     compile 'com.google.code.gson:gson:2.8.0'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.1.0'
@@ -34,3 +35,6 @@ dependencies {
     // Test helpers for Room
     testImplementation "android.arch.persistence.room:testing:1.0.0"
 }
+
+
+apply plugin: 'com.google.gms.google-services'
