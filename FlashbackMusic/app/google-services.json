@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "787403082568",
+    "firebase_url": "https://vibemode-2b73b.firebaseio.com",
+    "project_id": "vibemode-2b73b",
+    "storage_bucket": "vibemode-2b73b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:787403082568:android:859f5f1b50150eef",
+        "android_client_info": {
+          "package_name": "com.example.cse110.flashbackmusic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "787403082568-c8a3vj831var2fpnube4and68l3e7715.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cse110.flashbackmusic",
+            "certificate_hash": "263bfe90f39cb8154aeafee3d84017be9b70790d"
+          }
+        },
+        {
+          "client_id": "787403082568-fgl6qfqr64ed5jsd0uk8a7a4jmoo996m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK9dk26BWDQERS3JYMt9XOeqCBolPDEuM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "787403082568-fgl6qfqr64ed5jsd0uk8a7a4jmoo996m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
