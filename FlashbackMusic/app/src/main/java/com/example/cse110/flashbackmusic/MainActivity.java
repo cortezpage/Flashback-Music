@@ -74,16 +74,6 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
             return;
         }
 
-        /*User user = new User("Bob");
-        LatLon location = new LatLon(1, 2);
-        Calendar calendar = GregorianCalendar.getInstance();
-        PlayInstance playInstance = new PlayInstance(user, location, calendar);
-
-        Song song = new Song("Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0");
-        DatabaseManager databaseManager = new DatabaseManager();
-        databaseManager.storePlayInstance(playInstance, song);
-        Log.i("Created thing", "Created thing");*/
-
         init();
     }
 

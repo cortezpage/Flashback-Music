@@ -24,7 +24,6 @@ public class DatabaseManager {
         DatabaseReference myFirebaseRef = database.getReference();
 
         myFirebaseRef.child(song.getSongName()).setValue(databaseEntry.toString());
-        myFirebaseRef.setValue("Fred");
     };
 
     // Returns ALL play instances for a song, by all users
