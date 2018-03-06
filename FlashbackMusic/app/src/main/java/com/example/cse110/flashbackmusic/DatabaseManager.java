@@ -2,35 +2,90 @@ package com.example.cse110.flashbackmusic;
 
 import android.arch.persistence.room.Database;
 import android.provider.ContactsContract;
+import android.util.Log;
+import android.view.Window;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+
 
 /**
  * Created by CubicDolphin on 3/3/18.
  */
 
 public class DatabaseManager {
+    // Instance variable needed to get data out of onDataChange listener
+    private ArrayList<PlayInstance> playInstances;
+
     // Call sto store a specific play of a specific song
-    public void storePlayInstance (PlayInstance playInstance, Song song) {
-        DatabaseEntry databaseEntry = new DatabaseEntry(song);
-        databaseEntry.addPlayInstance(playInstance);
-
+    public void storePlayInstance (final PlayInstance playInstance, final Song song) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myFirebaseRef = database.getReference();
+        final DatabaseReference databaseReference = database.getReference(song.getSongName());
 
-        myFirebaseRef.child(song.getSongName()).setValue(databaseEntry.toString());
+        // Retrieves data
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String codedEntry = (String)dataSnapshot.getValue();
+                DatabaseEntry databaseEntry;
+
+                if (codedEntry == null || codedEntry == "") {
+                    // If first time song is played, create new object to store
+                    databaseEntry = new DatabaseEntry(song);
+                    databaseEntry.addPlayInstance(playInstance);
+                    Log.i("Database Manager", "Added " + song.getSongName() + " to database");
+                } else {
+                    // If object already created, just add our play to end
+                    databaseEntry = DatabaseEntry.decodeJson(codedEntry);
+                    databaseEntry.addPlayInstance(playInstance);
+                    Log.i("Database Manager", "Stored new play of " + song.getSongName());
+                }
+
+                databaseReference.setValue(DatabaseEntry.encodeJson(databaseEntry));
+            }
+
+            // Not used
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
     };
 
     // Returns ALL play instances for a song, by all users
-    public PlayInstance[] getPlayInstances (Song song) {
-        PlayInstance playInstance = new PlayInstance(new User("Fred"), new LatLon(0, 0), new GregorianCalendar());
-        PlayInstance[] instances = { playInstance };
-        return instances;
+    public ArrayList<PlayInstance> getPlayInstances (final Song song, final Callback callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference databaseReference = database.getReference(song.getSongName());
+
+        // Retrieves data
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String codedEntry = (String) dataSnapshot.getValue();
+
+                if (codedEntry == null || codedEntry == "") {
+                    playInstances = new ArrayList<PlayInstance>();
+                    Log.i("Database Manager", "No plays found for " + song.getSongName());
+                } else {
+                    // If object already created, just add our play to end
+                    DatabaseEntry databaseEntry = DatabaseEntry.decodeJson(codedEntry);
+                    playInstances = databaseEntry.playInstances;
+                }
+
+                callback.onComplete(playInstances);
+            }
+            // Not used
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        return playInstances;
     };
 
     /* HOW TO USE DATABASE:
