@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.Map;
+
 
 public class SharedPrefHelper {
 
@@ -12,6 +14,8 @@ public class SharedPrefHelper {
     private SharedPreferences.Editor songSharedEditor;
     private SharedPreferences albumSharedPref;
     private SharedPreferences.Editor albumSharedEditor;
+    private SharedPreferences idSharedPref;
+    private SharedPreferences.Editor idSharedEditor;
 
     // format: album name, artist name, number of tracks, and album id number
     private String [] all_albums = {
@@ -86,76 +90,79 @@ public class SharedPrefHelper {
             "Windows are the Eyes to the House; Forum; Take Yourself Too Seriously; 246; 0"
     };
 
-    private int [] all_IDs;
+    private int [] all_IDs = {
+            R.raw.one_two_three_go,
+            R.raw.after_the_storm,
+            R.raw.all_about_ronnie,
+            R.raw.america_religious,
+            R.raw.at_midnight,
+            R.raw.back_east,
+            R.raw.beautiful_pain,
+            R.raw.blood_on_your_bootheels,
+            R.raw.cant_find_love,
+            R.raw.cant_you_be_mine,
+            R.raw.crane_city,
+            R.raw.currently,
+            R.raw.dead_dove_do_not_eat,
+            R.raw.dreamatorium,
+            R.raw.everything_i_love,
+            R.raw.flight_of_the_eagle,
+            R.raw.gotta_get_over_you,
+            R.raw.hero_hell,
+            R.raw.hey_there,
+            R.raw.i_fell_in_love,
+            R.raw.i_get_a_kick_out_of_you,
+            R.raw.i_just_want_to_tell_you_both_good_luck,
+            R.raw.i_will_not_be_afraid,
+            R.raw.ill_be_on_my_way,
+            R.raw.in_the_still_of_the_night,
+            R.raw.jazz_in_paris,
+            R.raw.just_in_time,
+            R.raw.just_this_side_of_insane,
+            R.raw.lift_me_up,
+            R.raw.love_is_everywhere_1,
+            R.raw.mangalam,
+            R.raw.mojo_potion_61_49,
+            R.raw.om_namo_bhavagate,
+            R.raw.one_stop_light,
+            R.raw.origin,
+            R.raw.other_side,
+            R.raw.out_of_this_world,
+            R.raw.perdido,
+            R.raw.reach_out,
+            R.raw.set_me_free,
+            R.raw.sisters_of_the_sun,
+            R.raw.sky_dancer,
+            R.raw.sky_full_of_ghosts,
+            R.raw.stomp_jump_boogie,
+            R.raw.sweet_sue_just_you,
+            R.raw.the_writing_on_the_wall,
+            R.raw.this_is_always,
+            R.raw.tightrope_walker,
+            R.raw.tough_girls_never_cry,
+            R.raw.unstoppable,
+            R.raw.wait_for_heaven,
+            R.raw.waves,
+            R.raw.whats_your_story_morning_glory,
+            R.raw.when_i_go,
+            R.raw.when_you_go,
+            R.raw.who_cares_,
+            R.raw.wilderness,
+            R.raw.windows_are_the_eyes_to_the_house
+    };
+
     private String [] initial_song_data;
+    private int id_write_index;
 
     public SharedPrefHelper (SharedPreferences songPrefs, SharedPreferences.Editor songEditor,
-                             SharedPreferences albumPrefs, SharedPreferences.Editor albumEditor) {
+                             SharedPreferences albumPrefs, SharedPreferences.Editor albumEditor,
+                             SharedPreferences idPrefs, SharedPreferences.Editor idEditor) {
         this.songSharedPref = songPrefs;
         this.songSharedEditor = songEditor;
         this.albumSharedPref = albumPrefs;
         this.albumSharedEditor = albumEditor;
-
-        this.all_IDs = new int [] {
-                R.raw.one_two_three_go,
-                R.raw.after_the_storm,
-                R.raw.all_about_ronnie,
-                R.raw.america_religious,
-                R.raw.at_midnight,
-                R.raw.back_east,
-                R.raw.beautiful_pain,
-                R.raw.blood_on_your_bootheels,
-                R.raw.cant_find_love,
-                R.raw.cant_you_be_mine,
-                R.raw.crane_city,
-                R.raw.currently,
-                R.raw.dead_dove_do_not_eat,
-                R.raw.dreamatorium,
-                R.raw.everything_i_love,
-                R.raw.flight_of_the_eagle,
-                R.raw.gotta_get_over_you,
-                R.raw.hero_hell,
-                R.raw.hey_there,
-                R.raw.i_fell_in_love,
-                R.raw.i_get_a_kick_out_of_you,
-                R.raw.i_just_want_to_tell_you_both_good_luck,
-                R.raw.i_will_not_be_afraid,
-                R.raw.ill_be_on_my_way,
-                R.raw.in_the_still_of_the_night,
-                R.raw.jazz_in_paris,
-                R.raw.just_in_time,
-                R.raw.just_this_side_of_insane,
-                R.raw.lift_me_up,
-                R.raw.love_is_everywhere_1,
-                R.raw.mangalam,
-                R.raw.mojo_potion_61_49,
-                R.raw.om_namo_bhavagate,
-                R.raw.one_stop_light,
-                R.raw.origin,
-                R.raw.other_side,
-                R.raw.out_of_this_world,
-                R.raw.perdido,
-                R.raw.reach_out,
-                R.raw.set_me_free,
-                R.raw.sisters_of_the_sun,
-                R.raw.sky_dancer,
-                R.raw.sky_full_of_ghosts,
-                R.raw.stomp_jump_boogie,
-                R.raw.sweet_sue_just_you,
-                R.raw.the_writing_on_the_wall,
-                R.raw.this_is_always,
-                R.raw.tightrope_walker,
-                R.raw.tough_girls_never_cry,
-                R.raw.unstoppable,
-                R.raw.wait_for_heaven,
-                R.raw.waves,
-                R.raw.whats_your_story_morning_glory,
-                R.raw.when_i_go,
-                R.raw.when_you_go,
-                R.raw.who_cares_,
-                R.raw.wilderness,
-                R.raw.windows_are_the_eyes_to_the_house
-        };
+        this.idSharedPref = idPrefs;
+        this.idSharedEditor = idEditor;
 
         this.initial_song_data = new String[this.all_songs.length];
         for (int index = 0; index < this.initial_song_data.length; index++) {
@@ -250,6 +257,23 @@ public class SharedPrefHelper {
 
     public String [] getStoredSongData() {
         String curr_data;
+
+        // Grabs all id entries from the ID shared preferences file
+        Map<String, ?> allIDEntries = idSharedPref.getAll();
+        if (allIDEntries.size() > 0) {
+            this.all_IDs = new int[allIDEntries.size()];
+            int index = 0;
+
+            // Sets all_IDs to stored data
+            for (Map.Entry<String, ?> entry : allIDEntries.entrySet()) {
+                int id = Integer.parseInt(entry.getValue().toString());
+                this.all_IDs[index] = id;
+                index++;
+            }
+
+            id_write_index = index;
+        }
+
         String [] song_data = new String [all_IDs.length];
         for (int index = 0; index < all_IDs.length; index++) {
             curr_data = songSharedPref.getString("" + all_IDs[index], "NOT FOUND");
@@ -263,10 +287,17 @@ public class SharedPrefHelper {
     public Song [] createSongList () {
         Song [] songs;
         String [] song_data;
+
         boolean hasStoredData = this.hasPreviousSongData();
+
+        // Sets initial song and id data
         if (!hasStoredData) {
             song_data = this.getInitialSongData();
             this.writeSongData("SONG_DATA_EXISTENCE_STATUS", "EXISTS");
+
+            for (int index = 0; index < all_IDs.length; index++) {
+                this.writeIDData("" + index, "" + all_IDs[index]);
+            }
         } else {
             song_data = this.getStoredSongData();
         }
@@ -291,6 +322,8 @@ public class SharedPrefHelper {
         return songs;
     }
 
+    public int getIdWriteIndex() {return id_write_index++;}
+
     public void writeAlbumData(String id, String data) {
         Log.i("SharedPrefHelper", "Writing updates to Album data");
         this.albumSharedEditor.putString(id, data);
@@ -301,5 +334,11 @@ public class SharedPrefHelper {
         Log.i("SharedPrefHelper", "Writing updates to Song data");
         this.songSharedEditor.putString(id, data);
         songSharedEditor.apply();
+    }
+
+    public void writeIDData(String id, String data) {
+        Log.i("SharedPrefHelper", "Writing updates to ID data");
+        this.idSharedEditor.putString(id, data);
+        idSharedEditor.apply();
     }
 }

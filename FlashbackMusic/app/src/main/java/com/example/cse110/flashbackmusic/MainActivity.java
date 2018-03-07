@@ -5,21 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompatSideChannelService;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -34,6 +28,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     private static LocationManager locationManager;
     private SharedPreferences songSharedPref;
     private SharedPreferences.Editor songDataEditor;
+    private SharedPreferences idSharedPref;
+    private SharedPreferences.Editor idDataEditor;
     private SharedPreferences albumSharedPref;
     private SharedPreferences.Editor albumDataEditor;
     private SharedPreferences modeSharedPref;
@@ -107,6 +103,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         Context context = this.getApplicationContext();
         String song_data_filename = "com.example.cse110.flashbackmusic.song_data_preferences";
+        String id_data_filename = "com.example.cse110.flashbackmusic.id_data_preferences";
         String album_data_filename = "com.example.cse110.flashbackmusic.album_data_preferences";
         String mode_data_filename = "com.example.cse110.flashbackmusic.saved_mode_pref";
 
@@ -115,6 +112,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         songSharedPref = context.getSharedPreferences(song_data_filename, Context.MODE_PRIVATE);
         songDataEditor = songSharedPref.edit();
+        idSharedPref = context.getSharedPreferences(id_data_filename, Context.MODE_PRIVATE);
+        idDataEditor = idSharedPref.edit();
         albumSharedPref = context.getSharedPreferences(album_data_filename, Context.MODE_PRIVATE);
         albumDataEditor = albumSharedPref.edit();
         modeSharedPref = context.getSharedPreferences(mode_data_filename, Context.MODE_PRIVATE);
@@ -122,11 +121,13 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         if (ERASE_DATA_AT_START) {
             songDataEditor.clear().commit();
+            idDataEditor.clear().commit();
             albumDataEditor.clear().commit();
             modeDataEditor.clear().commit();
         }
 
-        sharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor, albumSharedPref, albumDataEditor);
+        sharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor, albumSharedPref,
+                albumDataEditor, idSharedPref, idDataEditor);
         songs = sharedPrefHelper.createSongList();
         albums = sharedPrefHelper.createAlbums();
 
