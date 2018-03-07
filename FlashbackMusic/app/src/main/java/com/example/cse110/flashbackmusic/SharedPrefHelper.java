@@ -262,16 +262,21 @@ public class SharedPrefHelper {
         Map<String, ?> allIDEntries = idSharedPref.getAll();
         if (allIDEntries.size() > 0) {
             this.all_IDs = new int[allIDEntries.size()];
-            int index = 0;
+            int count = 0;
 
             // Sets all_IDs to stored data
             for (Map.Entry<String, ?> entry : allIDEntries.entrySet()) {
                 int id = Integer.parseInt(entry.getValue().toString());
-                this.all_IDs[index] = id;
-                index++;
+                int index = Integer.parseInt(entry.getKey().toString());
+                if (index < all_IDs.length) {
+                    this.all_IDs[index] = id;
+                    count++;
+                } else {
+                    Log.e("SharedPrefHelper Index Issue", "ID out of bounds!");
+                }
             }
 
-            id_write_index = index;
+            id_write_index = count;
         }
 
         String [] song_data = new String [all_IDs.length];
