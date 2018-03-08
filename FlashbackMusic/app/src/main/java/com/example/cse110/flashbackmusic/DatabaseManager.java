@@ -11,6 +11,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -22,8 +23,6 @@ import java.util.GregorianCalendar;
  */
 
 public class DatabaseManager {
-    // Instance variable needed to get data out of onDataChange listener
-    private ArrayList<PlayInstance> playInstances;
 
     // Call sto store a specific play of a specific song
     public void storePlayInstance (final PlayInstance playInstance, final Song song) {
@@ -42,6 +41,7 @@ public class DatabaseManager {
                     databaseEntry = new DatabaseEntry(song);
                     databaseEntry.addPlayInstance(playInstance);
                     Log.i("Database Manager", "Added " + song.getSongName() + " to database");
+                    addSongToSongList(song); // Adds song's name to list of all song names
                 } else {
                     // If object already created, just add our play to end
                     databaseEntry = DatabaseEntry.decodeJson(codedEntry);
@@ -59,7 +59,7 @@ public class DatabaseManager {
     };
 
     // Returns ALL play instances for a song, by all users
-    public ArrayList<PlayInstance> getPlayInstances (final Song song, final Callback callback) {
+    public void getPlayInstances (final Song song, final Callback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference databaseReference = database.getReference(song.getSongName());
 
@@ -68,6 +68,7 @@ public class DatabaseManager {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String codedEntry = (String) dataSnapshot.getValue();
+                ArrayList<PlayInstance> playInstances;
 
                 if (codedEntry == null || codedEntry == "") {
                     playInstances = new ArrayList<PlayInstance>();
@@ -84,8 +85,71 @@ public class DatabaseManager {
             @Override
             public void onCancelled(DatabaseError databaseError) {}
         });
+    };
 
-        return playInstances;
+    // Adds new Song to Song list
+    private void addSongToSongList (final Song song) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference databaseReference = database.getReference("songs");
+
+        // Retrieves data
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String codedEntry = (String)dataSnapshot.getValue();
+                ArrayList<String> songNames;
+
+                if (codedEntry == null || codedEntry == "") {
+                    // If first time song is played, create new object to store
+                    songNames = new ArrayList<String>();
+                    songNames.add(song.getSongName());
+                    Log.i("Song name array", "Empty song name array added");
+                } else {
+                    // If object already created, just add our play to end
+                    songNames = new Gson().fromJson(codedEntry, new TypeToken<ArrayList<String>>() {}.getType());
+                    songNames.add(song.getSongName());
+                    Log.i("Database Manager", "Stored new play of " + song.getSongName());
+                }
+
+                databaseReference.setValue(new Gson().toJson(songNames));
+            }
+
+            // Not used
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+    }
+
+    // Returns ALL database entries for a song, by all users
+    public void getAllEntries (final Callback callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference databaseReference = database.getReference("songs");
+
+        // Retrieves data
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String codedEntry = (String) dataSnapshot.getValue();
+                ArrayList<String> songNames;
+
+                if (codedEntry == null || codedEntry == "") {
+                    // No songs found, return empty ArrayList
+                    callback.onComplete(new ArrayList<Song>());
+                    Log.i("Database Manager", "No songs found");
+                } else {
+                    // If object already created, just add our play to end
+                    songNames = new Gson().fromJson(codedEntry, new TypeToken<ArrayList<String>>() {}.getType());
+                    ArrayList<Song> songs = new ArrayList<Song>();
+                    for (int i = 0; i < songNames.size(); i++) {
+                        songs.add(new Song(songNames.get(i) + "; n/a; n/a; 0; 0"));
+                    }
+                    callback.onComplete(songs);
+                }
+            }
+            // Not used
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
     };
 
     /* HOW TO USE DATABASE:
