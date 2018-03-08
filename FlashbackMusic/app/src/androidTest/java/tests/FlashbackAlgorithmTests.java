@@ -23,7 +23,7 @@ public class FlashbackAlgorithmTests {
 
     @Before
     public void setup() {
-        firstSong = new Song("Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0; 2131427333");
+        firstSong = new Song("Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0; 2131427333", "");
         playlist = new Playlist(false);
     }
 

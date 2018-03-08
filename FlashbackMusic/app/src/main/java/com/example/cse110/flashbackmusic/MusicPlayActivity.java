@@ -1,16 +1,16 @@
 package com.example.cse110.flashbackmusic;
 
-import android.annotation.SuppressLint;
 import android.media.MediaPlayer;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class MusicPlayActivity extends AppCompatActivity {
 
@@ -33,6 +33,27 @@ public class MusicPlayActivity extends AppCompatActivity {
         musicPlayer.setPlayMode(mode);
         play_mode = musicPlayer.getPlayMode();
 
+        // Link the toggle button to the vibe mode activity
+        ToggleButton toggleVibe = findViewById(R.id.button_toggle);
+        toggleVibe.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Can only toogle to vibe mode in song selection activity
+                if (musicPlayer.getPlayMode() != 1) {
+                    if (isChecked) {
+                        // The toggle is enabled
+                        musicPlayer.setPlayMode("flashback");
+                        MainActivity.updateMode(2);
+                    } else {
+                        // The toggle is disabled
+                        musicPlayer.setPlayMode("song_selection");
+                        MainActivity.updateMode(0);
+                    }
+                    updateButtonImages();
+                    updateUIWithSongInfo();
+                }
+            }
+        });
+
         Log.i("MusicPlayActivity", "set play_mode to " + play_mode);
         if (play_mode == 0) {
             int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
@@ -45,6 +66,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         else if (musicPlayer.getPlayMode() == 2) {
             int curr_id = musicPlayer.getPlaylistSongID();
             musicPlayer.selectSong(curr_id);
+            if (!toggleVibe.isChecked()) { toggleVibe.setChecked(true);}
         }
 
         musicPlayer.getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -71,6 +93,7 @@ public class MusicPlayActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                MainActivity.updateMode(-1);
                 finish();
             }
         });
@@ -88,7 +111,7 @@ public class MusicPlayActivity extends AppCompatActivity {
                         musicPlayer.play();
                     }
                 }
-                updatePlayButtonImage();
+                updateButtonImages();
             }
         });
 
@@ -99,41 +122,7 @@ public class MusicPlayActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.i("MusicPlayActivity Reset Button", "Reset Button is clicked");
                 musicPlayer.reset();
-                updatePlayButtonImage();
-            }
-        });
-
-        // Link the "previous" button with the playPreviousSong() method from the music player
-        ImageButton previousButton = findViewById(R.id.button_previous);
-        previousButton.getBackground().setAlpha(40);
-        if (musicPlayer.getPlayMode() != 0) { previousButton.getBackground().setAlpha(255); }
-        previousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i("MusicPlayActivity Previous Button", "Previous Button is clicked");
-                musicPlayer.goToPreviousSong();
-                updateUIWithSongInfo();
-                updatePlayButtonImage();
-            }
-        });
-
-        // Link the "next" button with the playNextSong() method from the music player
-        ImageButton nextButton = findViewById(R.id.button_next);
-        nextButton.getBackground().setAlpha(40);
-        if (musicPlayer.getPlayMode() != 0) { nextButton.getBackground().setAlpha(255); }
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i("MusicPlayActivity Next Button", "Next Button is clicked");
-                if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
-                        (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
-                    musicPlayer.stop();
-                    finish();
-                }
-                if (testing) { musicPlayer.updateSongInfo(); }
-                musicPlayer.goToNextSong();
-                updateUIWithSongInfo();
-                updatePlayButtonImage();
+                updateButtonImages();
             }
         });
 
@@ -155,10 +144,10 @@ public class MusicPlayActivity extends AppCompatActivity {
         });
 
         updateUIWithSongInfo();
-        updatePlayButtonImage();
+        updateButtonImages();
     }
 
-    private void updatePlayButtonImage() {
+    private void updateButtonImages() {
         if (musicPlayer.isMusicPlaying() || musicPlayer.isLoadingSong()) {
             playButton.setBackgroundResource(R.drawable.pause_button);
             Log.i("MusicPlayActivity", "Displaying the pause button!");
@@ -166,6 +155,43 @@ public class MusicPlayActivity extends AppCompatActivity {
             playButton.setBackgroundResource(R.drawable.play_button);
             Log.i("MusicPlayActivity", "Displaying the play button!");
         }
+
+        // Link the "previous" button with the playPreviousSong() method from the music player
+        ImageButton previousButton = findViewById(R.id.button_previous);
+        previousButton.getBackground().setAlpha(40);
+        if (musicPlayer.getPlayMode() == 1) { previousButton.getBackground().setAlpha(255); }
+        previousButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("MusicPlayActivity Previous Button", "Previous Button is clicked");
+                if (musicPlayer.getPlayMode() == 1) {
+                    musicPlayer.goToPreviousSong();
+                    updateUIWithSongInfo();
+                }
+            }
+        });
+
+        // Link the "next" button with the playNextSong() method from the music player
+        ImageButton nextButton = findViewById(R.id.button_next);
+        nextButton.getBackground().setAlpha(40);
+        if (musicPlayer.getPlayMode() != 0) { nextButton.getBackground().setAlpha(255); }
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("MusicPlayActivity Next Button", "Next Button is clicked");
+                if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
+                        (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
+                    musicPlayer.stop();
+                    finish();
+                }
+                if (testing) { musicPlayer.updateSongInfo(); }
+
+                if (play_mode != 0) {
+                    musicPlayer.goToNextSong();
+                    updateUIWithSongInfo();
+                }
+            }
+        });
     }
 
     public void updateUIWithSongInfo () {
