@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         // Example:
         //final long downloadId = download("https://d1b10bmlvqabco.cloudfront.net/attach/jc2fhqnhbwl4ii/j85f4pwtei5258/jd9a4rp7lp0u/iwillnotbeafraid.zip", "album2.zip");
-        // TODO: REMOVE line below (SEE OTHER COMMMENTS)
+        // TODO: REMOVE line below (SEE OTHER COMMENTS)
         //albumDownloadIds.add(downloadId);
         final File storage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
