@@ -29,6 +29,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MusicPlayActivity" />
         <activity android:name=".AlbumSelectionActivity" />
+        <activity android:name=".DownloadActivity"></activity>
     </application>
 
 </manifest>

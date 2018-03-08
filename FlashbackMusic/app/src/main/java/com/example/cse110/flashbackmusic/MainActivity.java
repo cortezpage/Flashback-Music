@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     private SharedPreferences albumSharedPref;
     private SharedPreferences.Editor albumDataEditor;
     private SharedPreferences modeSharedPref;
-    private SharedPreferences.Editor modeDataEditor;
+    private static SharedPreferences.Editor modeDataEditor;
 
     public static MusicPlayer getMusicPlayer() {
         return musicPlayer;
@@ -135,20 +135,16 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         String mode = modeSharedPref.getString("LAST_PLAYED_MODE", "NOT FOUND");
         Log.i("MODE", mode);
-        if (mode.equals("song_selection")) {
-            launchSongSelection();
-        } else if (mode.equals("album_selection")) {
-            launchAlbumSelection();
-        } else if (mode.equals("flashback")) {
+        if (mode.equals("flashback")) {
             launchFlashbackMode();
         }
 
-        Button toFlashbackMode = (Button) findViewById(R.id.button_to_flashback_mode);
+        Button toDownloadActivity = (Button) findViewById(R.id.button_to_download_mode);
 
-        toFlashbackMode.setOnClickListener(new View.OnClickListener() {
+        toDownloadActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                launchFlashbackMode();
+                launchDownloadActivity();
             }
         });
 
@@ -169,6 +165,12 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
                 launchAlbumSelection();
             }
         });
+    }
+
+    public void launchDownloadActivity () {
+        Log.i("MainAcitivity LaunchDonwloadActivity", "Launching Download activity");
+        Intent intent = new Intent(this, DownloadActivity.class);
+        startActivity(intent);
     }
 
     public void launchFlashbackMode () {
@@ -213,14 +215,16 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         }
     }
 
-    public void updateMode(int app_mode) {
-        String toWrite = "NOT FOUND";
+    public static void updateMode(int app_mode) {
+        String toWrite = "NOT SPECIFIED";
         if (app_mode == 0) {
             toWrite = "song_selection";
         } else if (app_mode == 1) {
             toWrite = "album_selection";
         } else if (app_mode == 2) {
             toWrite = "flashback";
+        } else if (app_mode == -1) {
+            toWrite = "main";
         }
         modeDataEditor.putString("LAST_PLAYED_MODE", "" + toWrite);
         modeDataEditor.apply();

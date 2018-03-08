@@ -23,7 +23,7 @@ public class DatabaseTests {
         Calendar calendar = GregorianCalendar.getInstance();
         PlayInstance playInstance = new PlayInstance(user, location, calendar);
 
-        Song song = new Song("Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0");
+        Song song = new Song("Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0", "");
         DatabaseManager databaseManager = new DatabaseManager();
         databaseManager.storePlayInstance(playInstance, song);
         assert(true);
