@@ -19,6 +19,8 @@ public class MusicPlayer {
     private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
+    private DatabaseManager databaseManager;
+
     private boolean loadingSong;
 
     public MusicPlayer(Resources resources) {
@@ -31,6 +33,7 @@ public class MusicPlayer {
         this.albums = MainActivity.getAlbums();
         this.curr_album = null;
         this.flashback_playlist = new Playlist();
+        this.databaseManager = new DatabaseManager();
         Log.i("MusicPlayer Constructor", "Initialized with parameters play_index " +
         play_index + "\nplay_mode " + play_mode);
     }
@@ -76,6 +79,17 @@ public class MusicPlayer {
             Log.i("MusicPlayer updateSongInfo", "Song " + songs[play_index].getSongName() + " is" +
                     "being updated Location with latitude " + newLatLon.getLatitude() + " and longitude " +
                     newLatLon.getLongitude());
+
+            Log.i("MusicPlayer updateSongInfo", "Calling DatabaseManager to push playinstance" +
+            "to remote database");
+
+            User dummyUser = new User("DummyUser");
+            //TODO if we wanna manipulate the time we should modify here
+            Calendar cal = Calendar.getInstance();
+            PlayInstance curr_instance = new PlayInstance(dummyUser, newLatLon, cal);
+            databaseManager.storePlayInstance(curr_instance, curr_song);
+
+            Log.i("MusicPlayer updateSongInfo", "update completed");
         }
     }
 

@@ -25,6 +25,9 @@ public class Song {
     // the date when the song was last played
     private Calendar lastPlayedCalendar;
 
+    // the user lastly played this song
+    private User lastPlayedUser;
+
     // Recently Played Rank
     private int rank;
 
@@ -51,6 +54,7 @@ public class Song {
         }
         this.lastPlayedLocation = null;
         this.lastPlayedCalendar = null;
+        this.lastPlayedUser = null;
         this.rank = 0;
         Log.i("Song Constructor", "Song " + song_name + " with artist " + artist_name +
             " in album " + album_name + " is created.");
