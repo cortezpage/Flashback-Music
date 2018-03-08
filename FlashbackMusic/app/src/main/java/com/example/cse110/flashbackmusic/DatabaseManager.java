@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 
@@ -59,8 +60,37 @@ public class DatabaseManager {
     };
 
     public void updatePlayInstance (Song song) {
+        ArrayList<PlayInstance> instanceList;
+        PlayInstance lastInstance;
+
         Log.i("DatabaseManager updatePlayInstance", "updating the played history of song " +
         song.getSongName());
+
+        instanceList = getPlayInstances(song, new Callback() {
+            @Override
+            public void onComplete(Object o) {
+            }
+        });
+
+        if (instanceList != null) {
+            System.err.println("This is the instanceList size " + instanceList.size());
+        } else {
+            System.err.println("Song name is " + song.getSongName());
+            System.err.println("we didn't get any data from the database");
+        }
+
+        // check if there is no history stored in the database
+        if (instanceList != null) {
+
+            lastInstance = instanceList.get(instanceList.size() - 1);
+            song.setLastPlayedUser(lastInstance.userId);
+            song.setLastPlayedLocation(new LatLon(lastInstance.latitude, lastInstance.longitude));
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(lastInstance.timeInMillis);
+
+            song.setLastPlayedCalendar(cal);
+        }
     }
 
     // Returns ALL play instances for a song, by all users
