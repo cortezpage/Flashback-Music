@@ -141,6 +141,9 @@ public class MusicPlayer {
             if (this.songs[index].getMediaID() == selected_id) {
                 this.play_index = index;
                 Log.i("MusicPlayer selectSong", "the current song id is " + index);
+
+                // update the song play instances from remote database
+                databaseManager.updatePlayInstance(songs[play_index]);
             }
         }
         this.reset();

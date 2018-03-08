@@ -31,6 +31,8 @@ public class Song {
     // Recently Played Rank
     private int rank;
 
+    //private DatabaseManager databaseManager;
+
     // This constructor builds a song from a string filled with data about the song.
     public Song(String data) {
         String [] substrings = data.split("; ");
@@ -112,6 +114,16 @@ public class Song {
     public LatLon getLastPlayedLocation() { return this.lastPlayedLocation; }
 
     public void setLastPlayedLocation(LatLon newLocation) { this.lastPlayedLocation = newLocation; }
+
+    public User getLastPlayedUser() { return this.lastPlayedUser;}
+
+    public void setLastPlayedUser(String userName) { this.lastPlayedUser = new User(userName); }
+
+    public void resetPlayHistory () {
+        this.lastPlayedUser = null;
+        this.lastPlayedCalendar = null;
+        this.lastPlayedLocation = null;
+    }
 
     public boolean playedAtTimeOfDay(Calendar currTime) {
         if (this.lastPlayedCalendar != null) {

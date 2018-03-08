@@ -58,6 +58,11 @@ public class DatabaseManager {
         });
     };
 
+    public void updatePlayInstance (Song song) {
+        Log.i("DatabaseManager updatePlayInstance", "updating the played history of song " +
+        song.getSongName());
+    }
+
     // Returns ALL play instances for a song, by all users
     public ArrayList<PlayInstance> getPlayInstances (final Song song, final Callback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
