@@ -8,10 +8,10 @@ import java.util.Calendar;
  */
 
 public class PlayInstance {
-    String userId;
-    double latitude;
-    double longitude;
-    long timeInMillis;
+    public String userId;
+    public double latitude;
+    public double longitude;
+    public long timeInMillis;
 
     // Standard constructor
     public PlayInstance (User user, LatLon location, Calendar time) {

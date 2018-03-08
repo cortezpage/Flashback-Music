@@ -82,7 +82,9 @@ public class DatabaseManager {
             }
             // Not used
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onComplete(new ArrayList<PlayInstance>());
+            }
         });
 
         return playInstances;
