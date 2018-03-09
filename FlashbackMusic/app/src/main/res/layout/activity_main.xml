@@ -13,13 +13,13 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/button_to_flashback_mode"
+            android:id="@+id/button_to_download_mode"
             android:layout_width="match_parent"
             android:layout_height="167dp"
             android:background="#FFFFFF"
             android:fontFamily="@font/font_alegreya"
             android:gravity="center"
-            android:text="Flashback Mode"
+            android:text="Download a Song"
             android:textSize="25dp" />
 
         <Button

@@ -1,12 +1,8 @@
 package tests;
 
-import com.example.cse110.flashbackmusic.LatLon;
 import com.example.cse110.flashbackmusic.Song;
 
-import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.Calendar;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -15,9 +11,9 @@ import static junit.framework.Assert.assertEquals;
  */
 
 public class SongTests {
-    Song firstSong = new Song("SongName; Artist; Album; 250; 0; 123");
-    Song secondSong = new Song("Chocolate; Candy; Lollipop; 27; 1; 33445");
-    Song emptySong = new Song(" ");
+    Song firstSong = new Song("SongName; Artist; Album; 250; 0; 123", "");
+    Song secondSong = new Song("Chocolate; Candy; Lollipop; 27; 1; 33445", "");
+    Song emptySong = new Song(" ", "");
 
     @Test
     public void firstsongConstructorTest() {

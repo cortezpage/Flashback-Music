@@ -24,6 +24,7 @@ public class MusicPlayer {
     private boolean loadingSong;
 
     public MusicPlayer(Resources resources) {
+
         this.song_resources = resources;
         this.player = new MediaPlayer();
         this.songs = new Song[3];
@@ -80,7 +81,7 @@ public class MusicPlayer {
                     "being updated Location with latitude " + newLatLon.getLatitude() + " and longitude " +
                     newLatLon.getLongitude());
 
-            Log.i("MusicPlayer updateSongInfo", "Calling DatabaseManager to push playinstance" +
+            Log.i("MusicPlayer updateSongInfo", "Calling DatabaseManager to push play instance" +
             "to remote database");
 
             User dummyUser = new User("DummyUser");
@@ -98,7 +99,7 @@ public class MusicPlayer {
         LatLon currLoc = MainActivity.getLastLatLon();
         if (this.flashback_playlist.shouldSort(currTime, currLoc) || startingFBMode) {
 
-            Log.i("MusicPlayer updatePlaylist", "updating the playlist with curren time "
+            Log.i("MusicPlayer updatePlaylist", "updating the playlist with current time "
                     + currTime.getTime().getTime() + " current location with latitude and longitude: " +
                     currLoc.getLatitude() + " " + currLoc.getLongitude());
 
@@ -141,8 +142,20 @@ public class MusicPlayer {
             if (this.songs[index].getMediaID() == selected_id) {
                 this.play_index = index;
                 Log.i("MusicPlayer selectSong", "the current song id is " + index);
+
                 // update the song play instances from remote database
                 databaseManager.updatePlayInstance(songs[play_index]);
+
+//                Thread updateUIInfo = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        wait(1000);
+//
+//                    }
+//                });
+
+                Log.e("TESTING", "song: " + songs[play_index].getSongName() +
+                " User "  );
             }
         }
         this.reset();

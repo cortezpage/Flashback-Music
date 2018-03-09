@@ -4,6 +4,7 @@ import android.arch.persistence.room.Database;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.Window;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -59,42 +61,43 @@ public class DatabaseManager {
         });
     };
 
-    public void updatePlayInstance (Song song) {
+    public void updatePlayInstance (final Song song) {
         ArrayList<PlayInstance> instanceList;
-        PlayInstance lastInstance;
 
         Log.i("DatabaseManager updatePlayInstance", "updating the played history of song " +
         song.getSongName());
 
-        instanceList = getPlayInstances(song, new Callback() {
+        getPlayInstances(song, new Callback() {
             @Override
             public void onComplete(Object o) {
+                PlayInstance lastInstance;
+                ArrayList<PlayInstance> instanceList = (ArrayList<PlayInstance>)o;
+
+                if (instanceList != null) {
+                    Log.i("DatabaseManager Callback", "InstanceList size " + instanceList.size());
+                } else {
+                    Log.i("DatabaseManager Callback", "No history found on this song.");
+                }
+
+                // check if there is no history stored in the database
+                if (instanceList != null) {
+
+                    lastInstance = instanceList.get(instanceList.size() - 1);
+                    song.setLastPlayedUser(lastInstance.userId);
+                    song.setLastPlayedLocation(new LatLon(lastInstance.latitude, lastInstance.longitude));
+
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(lastInstance.timeInMillis);
+
+                    // TODO somehow to update the UI info
+                }
             }
         });
 
-        if (instanceList != null) {
-            System.err.println("This is the instanceList size " + instanceList.size());
-        } else {
-            System.err.println("Song name is " + song.getSongName());
-            System.err.println("we didn't get any data from the database");
-        }
-
-        // check if there is no history stored in the database
-        if (instanceList != null) {
-
-            lastInstance = instanceList.get(instanceList.size() - 1);
-            song.setLastPlayedUser(lastInstance.userId);
-            song.setLastPlayedLocation(new LatLon(lastInstance.latitude, lastInstance.longitude));
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(lastInstance.timeInMillis);
-
-            song.setLastPlayedCalendar(cal);
-        }
     }
 
     // Returns ALL play instances for a song, by all users
-    public ArrayList<PlayInstance> getPlayInstances (final Song song, final Callback callback) {
+    public void getPlayInstances (final Song song, final Callback callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference databaseReference = database.getReference(song.getSongName());
 
@@ -117,10 +120,10 @@ public class DatabaseManager {
             }
             // Not used
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onComplete(new ArrayList<PlayInstance>());
+            }
         });
-
-        return playInstances;
     };
 
     /* HOW TO USE DATABASE:

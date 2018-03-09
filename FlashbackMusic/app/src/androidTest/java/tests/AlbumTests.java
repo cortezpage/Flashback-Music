@@ -3,11 +3,7 @@ package tests;
 import com.example.cse110.flashbackmusic.Album;
 import com.example.cse110.flashbackmusic.Song;
 
-import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.Calendar;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -43,8 +39,8 @@ public class AlbumTests {
 
     @Test
     public void addSongAndGetSongID() {
-        Song JazzInParis = new Song("");
-        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0");
+        Song JazzInParis = new Song("", "");
+        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0", "");
 
         firstAlbum.addSong(JazzInParis, 0);
         firstAlbum.addSong(AAR, 1);
@@ -58,8 +54,8 @@ public class AlbumTests {
 
     @Test
     public void nextSongOverBound() {
-        Song JazzInParis = new Song("");
-        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0");
+        Song JazzInParis = new Song("", "");
+        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0", "");
 
         firstAlbum.addSong(JazzInParis, 0);
         firstAlbum.addSong(AAR, 1);
@@ -72,8 +68,8 @@ public class AlbumTests {
 
     @Test
     public void addSongAndPreviousSong() {
-        Song JazzInParis = new Song("");
-        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0");
+        Song JazzInParis = new Song("", "");
+        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0", "");
 
         firstAlbum.addSong(JazzInParis, 0);
         firstAlbum.addSong(AAR, 1);
@@ -84,8 +80,8 @@ public class AlbumTests {
 
     @Test
     public void addSongAndPreviousSongOverBound () {
-        Song JazzInParis = new Song("");
-        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0");
+        Song JazzInParis = new Song("", "");
+        Song AAR = new Song("All About Ronnie; Rebecca Sayre; This is Always; 269; 0", "");
 
         firstAlbum.addSong(JazzInParis, 0);
         firstAlbum.addSong(AAR, 1);

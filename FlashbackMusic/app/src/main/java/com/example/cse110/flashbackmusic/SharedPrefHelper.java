@@ -318,7 +318,7 @@ public class SharedPrefHelper {
                     songs[index] = new_song;
                 }
             } else {
-                new_song = new Song(song_data[index]);
+                new_song = new Song(song_data[index], "");
                 songs[index] = new_song;
                 writeSongData("" + new_song.getMediaID(), new_song.toString());
             }

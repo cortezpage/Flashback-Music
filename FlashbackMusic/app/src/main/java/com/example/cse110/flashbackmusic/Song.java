@@ -1,13 +1,11 @@
 package com.example.cse110.flashbackmusic;
 
 import android.util.Log;
+
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-
-import static java.lang.Math.abs;
 
 public class Song {
     private String song_name; // name of the song
@@ -31,10 +29,11 @@ public class Song {
     // Recently Played Rank
     private int rank;
 
-    //private DatabaseManager databaseManager;
+    // Song's url
+    private String song_url;
 
     // This constructor builds a song from a string filled with data about the song.
-    public Song(String data) {
+    public Song(String data, String url) {
         String [] substrings = data.split("; ");
         if (substrings.length < 6) {
             Log.e("Song Constructor", "The song data is invalid!");
@@ -58,8 +57,9 @@ public class Song {
         this.lastPlayedCalendar = null;
         this.lastPlayedUser = null;
         this.rank = 0;
+        this.song_url = url;
         Log.i("Song Constructor", "Song " + song_name + " with artist " + artist_name +
-            " in album " + album_name + " is created.");
+            " in album " + album_name + "URL: " + song_url + " is created.");
     }
 
     public String getSongName() { return this.song_name; }
