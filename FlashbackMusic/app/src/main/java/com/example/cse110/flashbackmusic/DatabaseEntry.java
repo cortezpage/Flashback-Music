@@ -2,6 +2,7 @@ package com.example.cse110.flashbackmusic;
 
 import com.google.gson.Gson;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -27,5 +28,9 @@ public class DatabaseEntry {
 
     public void addPlayInstance (PlayInstance playInstance) {
         playInstances.add(playInstance);
+    }
+
+    public ArrayList<PlayInstance> getPlayInstances () {
+        return playInstances;
     }
 }

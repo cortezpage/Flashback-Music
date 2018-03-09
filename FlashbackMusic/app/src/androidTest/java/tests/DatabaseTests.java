@@ -2,8 +2,8 @@ package tests;
 
 import android.util.Log;
 
-import com.example.cse110.flashbackmusic.Callbacks.Callback;
-import com.example.cse110.flashbackmusic.Callbacks.PlayInstancesCallback;
+import com.example.cse110.flashbackmusic.Callbacks.DatabaseEntryCallback;
+import com.example.cse110.flashbackmusic.DatabaseEntry;
 import com.example.cse110.flashbackmusic.DatabaseManager;
 import com.example.cse110.flashbackmusic.LatLon;
 import com.example.cse110.flashbackmusic.PlayInstance;
@@ -12,7 +12,6 @@ import com.example.cse110.flashbackmusic.User;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -41,14 +40,14 @@ public class DatabaseTests {
         Calendar calendar = GregorianCalendar.getInstance();
         PlayInstance playInstance = new PlayInstance(user, location, calendar);
 
-        Song song = new Song("Fried Rice; Media Right Productions; YouTube Audio Library; 0; 102; 0");
+        Song song = new Song("Fried Rice; Media Right Productions; YouTube Audio Library; 0; 102; 0", "");
         final DatabaseManager databaseManager = new DatabaseManager();
         databaseManager.storePlayInstance(playInstance, song);
 
-        class PrintThing implements PlayInstancesCallback {
-            public void onComplete(ArrayList<PlayInstance> playInstances) {
+        class PrintThing implements DatabaseEntryCallback {
+            public void onComplete(DatabaseEntry databaseEntry) {
                 Log.i("TESTING", "callback b");
-                Log.i("TESTING", "" + playInstances.get(0).getTimeInMillis());
+                Log.i("TESTING", "" + databaseEntry.getPlayInstances().get(0).getTimeInMillis());
             }
         }
 

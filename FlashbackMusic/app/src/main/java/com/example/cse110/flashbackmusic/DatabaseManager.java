@@ -2,6 +2,7 @@ package com.example.cse110.flashbackmusic;
 
 import android.util.Log;
 
+import com.example.cse110.flashbackmusic.Callbacks.DatabaseEntryCallback;
 import com.example.cse110.flashbackmusic.Callbacks.PlayInstancesCallback;
 import com.example.cse110.flashbackmusic.Callbacks.SongNamesCallback;
 import com.google.firebase.database.DataSnapshot;
@@ -80,8 +81,33 @@ public class DatabaseManager {
             }
             // Not used
             @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+    };
+
+    // Runs callback on any DatabaseEntry found for a songName
+    // If no entry found, runs callback with a null object
+    public void getDatabaseEntry (final String songName, final DatabaseEntryCallback databaseEntryCallback) {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference databaseReference = database.getReference(songName);
+
+        // Retrieves data
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String codedEntry = (String) dataSnapshot.getValue();
+
+                if (codedEntry == null || codedEntry == "") {
+                    Log.i("Database Manager", "No plays found for " + songName);
+                    databaseEntryCallback.onComplete(null);
+                } else {
+                    // If object already created, just add our play to end
+                    databaseEntryCallback.onComplete(DatabaseEntry.decodeJson(codedEntry));
+                }
+            }
+            // Not used
+            @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(new ArrayList<PlayInstance>());
             }
         });
     };
@@ -120,15 +146,15 @@ public class DatabaseManager {
     }
 
     // Does what is in callback to ALL playInstances
-    public void getAllEntries (final PlayInstancesCallback playInstancesCallback) {
+    public void getAllEntries (final DatabaseEntryCallback databaseEntryCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference databaseReference = database.getReference("songs");
 
         class GetAllSongsCallback implements SongNamesCallback {
             public void onComplete(ArrayList<String> names) {
-                Log.d("TESTING", "callback a, " + names.size());
+                Log.d("Database Manager", "Getting all " + names.size() + " database entries");
                 for (int i = 0; i < names.size(); i++) {
-                    getPlayInstances(names.get(i), playInstancesCallback);
+                    getDatabaseEntry(names.get(i), databaseEntryCallback);
                 }
             }
         }
