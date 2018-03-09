@@ -1,10 +1,9 @@
 package com.example.cse110.flashbackmusic;
 
-import android.arch.persistence.room.Database;
-import android.provider.ContactsContract;
 import android.util.Log;
-import android.view.Window;
 
+import com.example.cse110.flashbackmusic.Callbacks.PlayInstancesCallback;
+import com.example.cse110.flashbackmusic.Callbacks.SongNamesCallback;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -13,9 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 
 
 /**
@@ -59,9 +56,9 @@ public class DatabaseManager {
     };
 
     // Returns ALL play instances for a song, by all users
-    public void getPlayInstances (final Song song, final Callback callback) {
+    public void getPlayInstances (final String songName, final PlayInstancesCallback playInstancesCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference databaseReference = database.getReference(song.getSongName());
+        final DatabaseReference databaseReference = database.getReference(songName);
 
         // Retrieves data
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -72,14 +69,14 @@ public class DatabaseManager {
 
                 if (codedEntry == null || codedEntry == "") {
                     playInstances = new ArrayList<PlayInstance>();
-                    Log.i("Database Manager", "No plays found for " + song.getSongName());
+                    Log.i("Database Manager", "No plays found for " + songName);
                 } else {
                     // If object already created, just add our play to end
                     DatabaseEntry databaseEntry = DatabaseEntry.decodeJson(codedEntry);
                     playInstances = databaseEntry.playInstances;
                 }
 
-                callback.onComplete(playInstances);
+                playInstancesCallback.onComplete(playInstances);
             }
             // Not used
             @Override
@@ -120,10 +117,19 @@ public class DatabaseManager {
         });
     }
 
-    // Returns ALL database entries for a song, by all users
-    public void getAllEntries (final Callback callback) {
+    // Does what is in callback to ALL playInstances
+    public void getAllEntries (final PlayInstancesCallback playInstancesCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference databaseReference = database.getReference("songs");
+
+        class GetAllSongsCallback implements SongNamesCallback {
+            public void onComplete(ArrayList<String> names) {
+                Log.d("TESTING", "callback a, " + names.size());
+                for (int i = 0; i < names.size(); i++) {
+                    getPlayInstances(names.get(i), playInstancesCallback);
+                }
+            }
+        }
 
         // Retrieves data
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -134,16 +140,13 @@ public class DatabaseManager {
 
                 if (codedEntry == null || codedEntry == "") {
                     // No songs found, return empty ArrayList
-                    callback.onComplete(new ArrayList<Song>());
+                    new GetAllSongsCallback().onComplete(new ArrayList<String>());
                     Log.i("Database Manager", "No songs found");
                 } else {
                     // If object already created, just add our play to end
                     songNames = new Gson().fromJson(codedEntry, new TypeToken<ArrayList<String>>() {}.getType());
-                    ArrayList<Song> songs = new ArrayList<Song>();
-                    for (int i = 0; i < songNames.size(); i++) {
-                        songs.add(new Song(songNames.get(i) + "; n/a; n/a; 0; 0"));
-                    }
-                    callback.onComplete(songs);
+
+                    new GetAllSongsCallback().onComplete(songNames);
                 }
             }
             // Not used
