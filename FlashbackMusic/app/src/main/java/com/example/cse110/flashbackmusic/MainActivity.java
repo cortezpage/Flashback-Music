@@ -14,6 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -107,7 +110,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         String album_data_filename = "com.example.cse110.flashbackmusic.album_data_preferences";
         String mode_data_filename = "com.example.cse110.flashbackmusic.saved_mode_pref";
 
-        Log.i("MainAcitivty init", "Initializing song shared preference and album shared" +
+        Log.i("MainActivty init", "Initializing song shared preference and album shared" +
                 "preference");
 
         songSharedPref = context.getSharedPreferences(song_data_filename, Context.MODE_PRIVATE);

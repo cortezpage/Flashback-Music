@@ -20,4 +20,20 @@ public class PlayInstance {
         this.longitude = location.getLongitude();
         this.timeInMillis = time.getTimeInMillis();
     }
+
+    public String getUserId () {
+        return userId;
+    }
+
+    public double getLatitude () {
+        return latitude;
+    }
+
+    public double getLongitude () {
+        return longitude;
+    }
+
+    public double getTimeInMillis () {
+        return timeInMillis;
+    }
 }
