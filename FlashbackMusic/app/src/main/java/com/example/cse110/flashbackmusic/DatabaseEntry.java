@@ -33,4 +33,8 @@ public class DatabaseEntry {
     public ArrayList<PlayInstance> getPlayInstances () {
         return playInstances;
     }
+
+    public Song getSong () {
+        return song;
+    }
 }
