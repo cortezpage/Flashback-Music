@@ -85,7 +85,8 @@ public class MusicPlayer {
             "to remote database");
 
             User dummyUser = new User("DummyUser");
-            //TODO if we wanna manipulate the time we should modify here
+            //TODO if we wanna manipulate the time we should modify here & grab the User
+
             Calendar cal = Calendar.getInstance();
             PlayInstance curr_instance = new PlayInstance(dummyUser, newLatLon, cal);
             databaseManager.storePlayInstance(curr_instance, curr_song);

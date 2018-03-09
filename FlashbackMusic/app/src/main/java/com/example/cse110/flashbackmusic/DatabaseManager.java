@@ -89,7 +89,7 @@ public class DatabaseManager {
                     Calendar cal = Calendar.getInstance();
                     cal.setTimeInMillis(lastInstance.timeInMillis);
 
-                    // TODO somehow to update the UI info
+                    //TODO update the UI with the info.
                 }
             }
         });
