@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 
 public class MusicPlayActivity extends AppCompatActivity {
 
-    public static MusicPlayActivity musicPlayActivity;
     private MusicPlayer musicPlayer;
     private SharedPrefHelper sharedPrefHelper;
     private ImageButton playButton;
@@ -24,7 +23,6 @@ public class MusicPlayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this.musicPlayActivity = this;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_play);
