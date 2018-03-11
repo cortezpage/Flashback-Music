@@ -19,9 +19,12 @@ public class MusicPlayer {
     private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
+    private DatabaseManager databaseManager;
+
     private boolean loadingSong;
 
     public MusicPlayer(Resources resources) {
+
         this.song_resources = resources;
         this.player = new MediaPlayer();
         this.songs = new Song[3];
@@ -31,6 +34,7 @@ public class MusicPlayer {
         this.albums = MainActivity.getAlbums();
         this.curr_album = null;
         this.flashback_playlist = new Playlist();
+        this.databaseManager = new DatabaseManager();
         Log.i("MusicPlayer Constructor", "Initialized with parameters play_index " +
         play_index + "\nplay_mode " + play_mode);
     }
@@ -76,6 +80,18 @@ public class MusicPlayer {
             Log.i("MusicPlayer updateSongInfo", "Song " + songs[play_index].getSongName() + " is" +
                     "being updated Location with latitude " + newLatLon.getLatitude() + " and longitude " +
                     newLatLon.getLongitude());
+
+            Log.i("MusicPlayer updateSongInfo", "Calling DatabaseManager to push play instance" +
+            "to remote database");
+
+            User dummyUser = new User("DummyUser");
+            //TODO if we wanna manipulate the time we should modify here & grab the User
+
+            Calendar cal = Calendar.getInstance();
+            PlayInstance curr_instance = new PlayInstance(dummyUser, newLatLon, cal);
+            databaseManager.storePlayInstance(curr_instance, curr_song);
+
+            Log.i("MusicPlayer updateSongInfo", "update completed");
         }
     }
 
@@ -84,7 +100,7 @@ public class MusicPlayer {
         LatLon currLoc = MainActivity.getLastLatLon();
         if (this.flashback_playlist.shouldSort(currTime, currLoc) || startingFBMode) {
 
-            Log.i("MusicPlayer updatePlaylist", "updating the playlist with curren time "
+            Log.i("MusicPlayer updatePlaylist", "updating the playlist with current time "
                     + currTime.getTime().getTime() + " current location with latitude and longitude: " +
                     currLoc.getLatitude() + " " + currLoc.getLongitude());
 
@@ -127,6 +143,20 @@ public class MusicPlayer {
             if (this.songs[index].getMediaID() == selected_id) {
                 this.play_index = index;
                 Log.i("MusicPlayer selectSong", "the current song id is " + index);
+
+                // update the song play instances from remote database
+                databaseManager.updatePlayInstance(songs[play_index]);
+
+//                Thread updateUIInfo = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        wait(1000);
+//
+//                    }
+//                });
+
+                Log.e("TESTING", "song: " + songs[play_index].getSongName() +
+                " User "  );
             }
         }
         this.reset();

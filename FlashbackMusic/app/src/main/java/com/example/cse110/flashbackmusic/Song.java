@@ -23,6 +23,9 @@ public class Song {
     // the date when the song was last played
     private Calendar lastPlayedCalendar;
 
+    // the user lastly played this song
+    private User lastPlayedUser;
+
     // Recently Played Rank
     private int rank;
 
@@ -52,6 +55,7 @@ public class Song {
         }
         this.lastPlayedLocation = null;
         this.lastPlayedCalendar = null;
+        this.lastPlayedUser = null;
         this.rank = 0;
         this.song_url = url;
         Log.i("Song Constructor", "Song " + song_name + " with artist " + artist_name +
@@ -110,6 +114,16 @@ public class Song {
     public LatLon getLastPlayedLocation() { return this.lastPlayedLocation; }
 
     public void setLastPlayedLocation(LatLon newLocation) { this.lastPlayedLocation = newLocation; }
+
+    public User getLastPlayedUser() { return this.lastPlayedUser;}
+
+    public void setLastPlayedUser(String userName) { this.lastPlayedUser = new User(userName); }
+
+    public void resetPlayHistory () {
+        this.lastPlayedUser = null;
+        this.lastPlayedCalendar = null;
+        this.lastPlayedLocation = null;
+    }
 
     public boolean playedAtTimeOfDay(Calendar currTime) {
         if (this.lastPlayedCalendar != null) {

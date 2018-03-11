@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 /**
@@ -56,6 +57,46 @@ public class DatabaseManager {
         });
     };
 
+    public void updatePlayInstance (final Song song) {
+        ArrayList<PlayInstance> instanceList;
+
+        Log.i("DatabaseManager updatePlayInstance", "updating the played history of song " +
+        song.getSongName());
+
+        getPlayInstances(song.getSongName(), new PlayInstancesCallback() {
+            @Override
+            public void onComplete(ArrayList<PlayInstance> instanceList) {
+                PlayInstance lastInstance;
+                //ArrayList<PlayInstance> instanceList = (ArrayList<PlayInstance>)o;
+
+                if (instanceList != null) {
+                    Log.i("DatabaseManager Callback", "InstanceList size " + instanceList.size());
+                } else {
+                    Log.i("DatabaseManager Callback", "No history found on this song.");
+                }
+
+                // check if there is no history stored in the database
+                if (instanceList != null) {
+
+                    if (instanceList.size() != 0) {
+
+                        lastInstance = instanceList.get(instanceList.size() - 1);
+                        song.setLastPlayedUser(lastInstance.userId);
+                        song.setLastPlayedLocation(new LatLon(lastInstance.latitude, lastInstance.longitude));
+
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTimeInMillis(lastInstance.timeInMillis);
+
+                        Log.i("DatabaseManager", "Retrieved the data from firebase");
+
+                        //TODO update the UI with the info.
+                    }
+                }
+            }
+        });
+
+    }
+
     // Returns ALL play instances for a song, by all users
     public void getPlayInstances (final String songName, final PlayInstancesCallback playInstancesCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -81,7 +122,9 @@ public class DatabaseManager {
             }
             // Not used
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+                playInstancesCallback.onComplete(new ArrayList<PlayInstance>());
+            }
         });
     };
 
