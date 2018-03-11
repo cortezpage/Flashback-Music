@@ -81,11 +81,12 @@ public class DatabaseManager {
                     if (instanceList.size() != 0) {
 
                         lastInstance = instanceList.get(instanceList.size() - 1);
-                        song.setLastPlayedUser(lastInstance.userId);
-                        song.setLastPlayedLocation(new LatLon(lastInstance.latitude, lastInstance.longitude));
 
                         Calendar cal = Calendar.getInstance();
                         cal.setTimeInMillis(lastInstance.timeInMillis);
+
+                        song.setLastPlayedAll(lastInstance.userId, new LatLon(lastInstance.latitude,
+                                lastInstance.longitude), cal);
 
                         Log.i("DatabaseManager", "Retrieved the data from firebase");
 
