@@ -82,14 +82,17 @@ public class DatabaseManager {
                 // check if there is no history stored in the database
                 if (instanceList != null) {
 
-                    lastInstance = instanceList.get(instanceList.size() - 1);
-                    song.setLastPlayedUser(lastInstance.userId);
-                    song.setLastPlayedLocation(new LatLon(lastInstance.latitude, lastInstance.longitude));
+                    if (instanceList.size() != 0) {
 
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(lastInstance.timeInMillis);
+                        lastInstance = instanceList.get(instanceList.size() - 1);
+                        song.setLastPlayedUser(lastInstance.userId);
+                        song.setLastPlayedLocation(new LatLon(lastInstance.latitude, lastInstance.longitude));
 
-                    //TODO update the UI with the info.
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTimeInMillis(lastInstance.timeInMillis);
+
+                        //TODO update the UI with the info.
+                    }
                 }
             }
         });
