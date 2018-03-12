@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
+
 public class AlbumSelectionActivity extends AppCompatActivity {
 
     private Button[] album_buttons;
@@ -20,9 +22,9 @@ public class AlbumSelectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_selection);
 
-        Album [] albums = MainActivity.getAlbums();
+        ArrayList<Album> albums = MainActivity.getAlbums();
 
-        album_buttons = new Button [albums.length];
+        album_buttons = new Button [albums.size()];
         Album curr_album;
         Button new_button;
         for (int index = 0; index < album_buttons.length; index++) {
@@ -31,7 +33,7 @@ public class AlbumSelectionActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            curr_album = albums[index];
+            curr_album = albums.get(index);
             final int curr_id = index;
             new_button = new Button(this);
             new_button.setText(curr_album.getAlbumName());
