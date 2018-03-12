@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 public class SongSelectionActivity extends AppCompatActivity {
 
@@ -53,6 +55,13 @@ public class SongSelectionActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        // Drop down lists
+        Spinner spinner = (Spinner) findViewById(R.id.drop_down);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.sorting_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
 
     public void launchMusicPlay (String songID) {
@@ -61,5 +70,7 @@ public class SongSelectionActivity extends AppCompatActivity {
         intent.putExtra("MODE", "song_selection");
         startActivity(intent);
     }
+
+
 
 }
