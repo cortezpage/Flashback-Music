@@ -22,10 +22,10 @@ public class SharedPrefHelper {
     private int [] all_IDs;
 
     private int [] testing_IDs = {
-            R.raw.all_about_ronnie,
             R.raw.america_religious,
             R.raw.at_midnight,
             R.raw.back_east,
+            R.raw.all_about_ronnie,
             R.raw.dead_dove_do_not_eat,
             R.raw.dreamatorium,
             R.raw.everything_i_love,
@@ -44,10 +44,10 @@ public class SharedPrefHelper {
 
     // format: song name, artist name, album name, duration in seconds, and like status
     private String [] testing_songs = {
-            "All About Ronnie; Rebecca Sayre; This is Always; 269; 0; " + testing_IDs[0],
             "America Religious; Caroline Rose; I Will Not Be Afraid; 253; 0; " + testing_IDs[1],
             "At Midnight; Caroline Rose; I Will Not Be Afraid; 198; 0; " + testing_IDs[2],
             "Back East; Caroline Rose; I Will Not Be Afraid; 190; 0; " + testing_IDs[3],
+            "All About Ronnie; Rebecca Sayre; This is Always; 269; 0; " + testing_IDs[0],
             "Dead Dove Do Not Eat; Forum; Take Yourself Too Seriously; 288; 0; " + testing_IDs[4],
             "Dreamatorium; Forum; Take Yourself Too Seriously; 256; 0; " + testing_IDs[5],
             "Everything I Love; Rebecca Sayre; This is Always; 303; 0; " + testing_IDs[6],

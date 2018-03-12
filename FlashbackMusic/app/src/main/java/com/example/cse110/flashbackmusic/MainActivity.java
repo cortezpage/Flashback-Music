@@ -14,15 +14,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
 
-    private final boolean START_WITH_SONGS = false; // set to true if you want to start with some songs loaded
+    private final boolean START_WITH_SONGS = true; // set to true if you want to start with some songs loaded
 
     private final int LOCATION_PERMISSION_REQUEST_CODE = 0; // arbitrary number chosen
 
