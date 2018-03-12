@@ -1,6 +1,8 @@
 package com.example.cse110.flashbackmusic;
 
 import android.util.Log;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -14,7 +16,7 @@ public class Playlist {
 
     private final int TIME_OF_DAY_DIVISION = 4;
 
-    private Song [] songs;
+    private ArrayList<Song> songs;
     private int play_index;
     private Queue<Song> songPQ;
 
@@ -48,19 +50,19 @@ public class Playlist {
 
     private void addSongToList () {
         // calculate the score for each song and then put them into the priority queue
-        for (int k = 0; k < songs.length; k++) {
-            calculateRank(songs[k]);
+        for (int k = 0; k < songs.size(); k++) {
+            calculateRank(songs.get(k));
             Log.i("Playlist addSongToList", "Calculating the rank of "
-                    + songs[k].getSongName());
+                    + songs.get(k).getSongName());
         }
 
-        for (int i = 0; i < songs.length; i++) {
+        for (int i = 0; i < songs.size(); i++) {
             // skipping over disliked songs
-            if (songs[i].getLikeStatus() == 2) {
+            if (songs.get(i).getLikeStatus() == 2) {
                 continue;
             }
-            songPQ.add(songs[i]);
-            Log.i("Playlist addSongToList", "Adding the song " + songs[i].getSongName() +
+            songPQ.add(songs.get(i));
+            Log.i("Playlist addSongToList", "Adding the song " + songs.get(i).getSongName() +
                     " to the priority queue");
         }
 

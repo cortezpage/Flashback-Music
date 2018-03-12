@@ -11,6 +11,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import java.util.ArrayList;
+
 public class SongSelectionActivity extends AppCompatActivity {
 
     private Button [] song_buttons;
@@ -20,9 +22,9 @@ public class SongSelectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_selection);
 
-        Song [] songs = MainActivity.getSongs();
+        ArrayList<Song> songs = MainActivity.getSongs();
 
-        song_buttons = new Button [songs.length];
+        song_buttons = new Button [songs.size()];
         Song curr_song;
         Button new_button;
         for (int index = 0; index < song_buttons.length; index++) {
@@ -31,7 +33,7 @@ public class SongSelectionActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            curr_song = songs[index];
+            curr_song = songs.get(index);
             final int curr_id = curr_song.getMediaID();
             new_button = new Button(this);
             new_button.setText(curr_song.getSongName());

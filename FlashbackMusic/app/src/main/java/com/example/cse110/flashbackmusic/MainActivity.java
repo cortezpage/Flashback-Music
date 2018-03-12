@@ -15,8 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -28,8 +26,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
     private static MusicPlayer musicPlayer = null;
     private static SharedPrefHelper sharedPrefHelper;
-    private static Song [] songs;
-    private static Album [] albums;
+    private static ArrayList<Song> songs;
+    private static ArrayList<Album> albums;
     private static LocationManager locationManager;
     private SharedPreferences songSharedPref;
     private SharedPreferences.Editor songDataEditor;
@@ -48,11 +46,11 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         return sharedPrefHelper;
     }
 
-    public static Song [] getSongs() {
+    public static ArrayList<Song> getSongs() {
         return songs;
     }
 
-    public static Album [] getAlbums() {
+    public static ArrayList<Album> getAlbums() {
         return albums;
     }
 
@@ -204,8 +202,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
     public void updateSongData() {
         Song curr_song;
-        for (int index = 0; index < songs.length; index++) {
-            curr_song = songs[index];
+        for (int index = 0; index < songs.size(); index++) {
+            curr_song = songs.get(index);
             sharedPrefHelper.writeSongData("" + curr_song.getMediaID(), curr_song.toString());
             sharedPrefHelper.writeIDData("" + index, "" + curr_song.getMediaID());
             Log.i("MainActivity updateSongData", "updating Song: " + curr_song.getSongName()
@@ -215,10 +213,10 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
     public void updateAlbumData() {
         Album curr_album;
-        for (int index = 0; index < albums.length; index++) {
-            curr_album = albums[index];
+        for (int index = 0; index < albums.size(); index++) {
+            curr_album = albums.get(index);
             sharedPrefHelper.writeAlbumData(curr_album.getID(), curr_album.toString());
-            sharedPrefHelper.writeAlbumData("NUM_ALBUMS", "" + albums.length);
+            sharedPrefHelper.writeAlbumData("NUM_ALBUMS", "" + albums.size());
             Log.i("MainActivity updateAlbumData", "updating Album: " + curr_album.getAlbumName()
                     + " data into shared preference");
         }
