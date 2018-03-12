@@ -27,6 +27,7 @@ public class MusicPlayer {
 
         this.song_resources = resources;
         this.player = new MediaPlayer();
+
         this.play_index = -1;
         this.play_mode = 0;
         this.songs = MainActivity.getSongs();

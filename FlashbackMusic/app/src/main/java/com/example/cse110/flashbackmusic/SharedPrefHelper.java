@@ -17,268 +17,138 @@ public class SharedPrefHelper {
     private SharedPreferences idSharedPref;
     private SharedPreferences.Editor idSharedEditor;
 
-    // format: album name, artist name, number of tracks, and album id number
-    private String [] all_albums = {
-            "I Will Not Be Afraid; Caroline Rose; 7; ALBUM_0",
-            "Love Is Everywhere; Stacy Jones; 11; ALBUM_1",
-            "New & Best of Keaton Simons; Keaton Simons; 10; ALBUM_2",
-            "Origins - The Best of Terry Oldfield; Terry Oldfield; 11; ALBUM_3",
-            "Take Yourself Too Seriously; Forum; 6; ALBUM_4",
-            "This is Always; Rebecca Sayre; 12; ALBUM_5",
-            "YouTube Audio Library; Media Right Productions; 1; ALBUM_6"
-    };
+    private boolean use_test_data;
 
-    // format: song name, artist name, album name, duration in seconds, and like status
-    private String [] all_songs = {
-            //"123 Go; Keaton Simons; New & Best of Keaton Simons; 209; 0",
-            "After the Storm; Terry Oldfield; Origins - The Best of Terry Oldfield; 318; 0",
-            "All About Ronnie; Rebecca Sayre; This is Always; 269; 0",
-            "America Religious; Caroline Rose; I Will Not Be Afraid; 253; 0",
-            "At Midnight; Caroline Rose; I Will Not Be Afraid; 198; 0",
-            "Back East; Caroline Rose; I Will Not Be Afraid; 190; 0",
-            /*"Beautiful Pain; Keaton Simons; New & Best of Keaton Simons; 277; 0",
-            "Blood On Your Bootheels; Caroline Rose; I Will Not Be Afraid; 195; 0",
-            "Can't Find Love; Stacy Jones; Love Is Everywhere; 208; 0",
-            "Can't You Be Mine; Stacy Jones; Love Is Everywhere; 311; 0",
-            "Crane City; Keaton Simons; New & Best of Keaton Simons; 231; 0",
-            "Currently; Keaton Simons; New & Best of Keaton Simons; 189; 0",
-            "Dead Dove Do Not Eat; Forum; Take Yourself Too Seriously; 288; 0",
-            "Dreamatorium; Forum; Take Yourself Too Seriously; 256; 0",
-            "Everything I Love; Rebecca Sayre; This is Always; 303; 0",
-            "Flight of the Eagle; Terry Oldfield; Origins - The Best of Terry Oldfield; 355; 0",
-            "Gotta Get Over You; Stacy Jones; Love Is Everywhere; 154; 0",
-            "Hero Hell; Keaton Simons; New & Best of Keaton Simons; 285; 0",
-            "Hey There; Rebecca Sayre; This is Always; 162; 0",
-            "I Fell In Love; Stacy Jones; Love Is Everywhere; 211; 0",
-            "I Get a Kick Out of You; Rebecca Sayre; This is Always; 155; 0",
-            "I Just Want To Tell You Both Good Luck; Forum; Take Yourself Too Seriously; 353; 0",
-            "I Will Not Be Afraid; Caroline Rose; I Will Not Be Afraid; 146; 0",
-            "I'll Be On My Way; Stacy Jones; Love Is Everywhere; 227; 0",
-            "In the Still of the Night; Rebecca Sayre; This is Always; 226; 0",
-            "Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0",
-            "Just in Time; Rebecca Sayre; This is Always; 254; 0",
-            "Just This Side of Insane; Keaton Simons; New & Best of Keaton Simons; 234; 0",
-            "Lift Me Up; Keaton Simons; New & Best of Keaton Simons; 195; 0",
-            "Love Is Everywhere; Stacy Jones; Love Is Everywhere; 286; 0",
-            "Mangalam; Terry Oldfield; Origins - The Best of Terry Oldfield; 448; 0",
-            "Mojo Potion; Stacy Jones; Love Is Everywhere; 256; 0",
-            "Om Namo Bhavagate; Terry Oldfield; Origins - The Best of Terry Oldfield; 434; 0",
-            "One Stop Light; Stacy Jones; Love Is Everywhere; 192; 0",
-            "Origin; Terry Oldfield; Origins - The Best of Terry Oldfield; 290; 0",
-            "Other Side; Keaton Simons; New & Best of Keaton Simons; 220; 0",
-            "Out of this World; Rebecca Sayre; This is Always; 331; 0",
-            "Perdido; Rebecca Sayre; This is Always; 182; 0",
-            "Reach Out; Terry Oldfield; Origins - The Best of Terry Oldfield; 335; 0",
-            "Set Me Free; Terry Oldfield; Origins - The Best of Terry Oldfield; 354; 0",
-            "Sisters of the Sun; Forum; Take Yourself Too Seriously; 277; 0",
-            "Sky Dancer; Terry Oldfield; Origins - The Best of Terry Oldfield; 259; 0",
-            "Sky Full of Ghosts; Forum; Take Yourself Too Seriously; 331; 0",
-            "Stomp Jump Boogie; Stacy Jones; Love Is Everywhere; 226; 0",
-            "Sweet Sue, Just You; Rebecca Sayre; This is Always; 178; 0",
-            "The Writing On The Wall; Terry Oldfield; Origins - The Best of Terry Oldfield; 323; 0",
-            "This Is Always; Rebecca Sayre; This is Always; 274; 0",
-            "Tightrope Walker; Caroline Rose; I Will Not Be Afraid; 212; 0",
-            "Tough Girls Never Cry; Stacy Jones; Love Is Everywhere; 199; 0",
-            "Unstoppable; Keaton Simons; New & Best of Keaton Simons; 225; 0",
-            "Wait For Heaven; Stacy Jones; Love Is Everywhere; 290; 0",
-            "Waves; Terry Oldfield; Origins - The Best of Terry Oldfield; 363; 0",
-            "What's Your Story, Morning Glory; Rebecca Sayre; This is Always; 401; 0",
-            "When I Go; Keaton Simons; New & Best of Keaton Simons; 205; 0",
-            "When You Go; Caroline Rose; I Will Not Be Afraid; 224; 0",
-            "Who Cares?; Rebecca Sayre; This is Always; 196; 0",
-            "Wilderness; Terry Oldfield; Origins - The Best of Terry Oldfield; 362; 0",
-            "Windows are the Eyes to the House; Forum; Take Yourself Too Seriously; 246; 0"*/
-    };
+    private int [] all_IDs;
 
-    private int [] all_IDs = {
-            //R.raw.one_two_three_go,
-            R.raw.after_the_storm,
+    private int [] testing_IDs = {
             R.raw.all_about_ronnie,
             R.raw.america_religious,
             R.raw.at_midnight,
             R.raw.back_east,
-            /*R.raw.beautiful_pain,
-            R.raw.blood_on_your_bootheels,
-            R.raw.cant_find_love,
-            R.raw.cant_you_be_mine,
-            R.raw.crane_city,
-            R.raw.currently,
             R.raw.dead_dove_do_not_eat,
             R.raw.dreamatorium,
             R.raw.everything_i_love,
-            R.raw.flight_of_the_eagle,
-            R.raw.gotta_get_over_you,
-            R.raw.hero_hell,
-            R.raw.hey_there,
-            R.raw.i_fell_in_love,
             R.raw.i_get_a_kick_out_of_you,
-            R.raw.i_just_want_to_tell_you_both_good_luck,
-            R.raw.i_will_not_be_afraid,
-            R.raw.ill_be_on_my_way,
-            R.raw.in_the_still_of_the_night,
             R.raw.jazz_in_paris,
-            R.raw.just_in_time,
-            R.raw.just_this_side_of_insane,
-            R.raw.lift_me_up,
-            R.raw.love_is_everywhere_1,
-            R.raw.mangalam,
-            R.raw.mojo_potion_61_49,
-            R.raw.om_namo_bhavagate,
-            R.raw.one_stop_light,
-            R.raw.origin,
-            R.raw.other_side,
-            R.raw.out_of_this_world,
-            R.raw.perdido,
-            R.raw.reach_out,
-            R.raw.set_me_free,
-            R.raw.sisters_of_the_sun,
-            R.raw.sky_dancer,
-            R.raw.sky_full_of_ghosts,
-            R.raw.stomp_jump_boogie,
-            R.raw.sweet_sue_just_you,
-            R.raw.the_writing_on_the_wall,
-            R.raw.this_is_always,
-            R.raw.tightrope_walker,
-            R.raw.tough_girls_never_cry,
-            R.raw.unstoppable,
-            R.raw.wait_for_heaven,
-            R.raw.waves,
-            R.raw.whats_your_story_morning_glory,
-            R.raw.when_i_go,
-            R.raw.when_you_go,
-            R.raw.who_cares_,
-            R.raw.wilderness,
-            R.raw.windows_are_the_eyes_to_the_house*/
+            R.raw.windows_are_the_eyes_to_the_house
     };
 
-    private String [] initial_song_data;
-    private int id_write_index;
+    // format: album name, artist name, number of tracks, and album id number
+    private String [] testing_albums = {
+            "I Will Not Be Afraid; Caroline Rose; 3; ALBUM_0",
+            "Take Yourself Too Seriously; Forum; 3; ALBUM_1",
+            "This is Always; Rebecca Sayre; 3; ALBUM_2",
+            "YouTube Audio Library; Media Right Productions; 1; ALBUM_3"
+    };
+
+    // format: song name, artist name, album name, duration in seconds, and like status
+    private String [] testing_songs = {
+            "All About Ronnie; Rebecca Sayre; This is Always; 269; 0; " + testing_IDs[0],
+            "America Religious; Caroline Rose; I Will Not Be Afraid; 253; 0; " + testing_IDs[1],
+            "At Midnight; Caroline Rose; I Will Not Be Afraid; 198; 0; " + testing_IDs[2],
+            "Back East; Caroline Rose; I Will Not Be Afraid; 190; 0; " + testing_IDs[3],
+            "Dead Dove Do Not Eat; Forum; Take Yourself Too Seriously; 288; 0; " + testing_IDs[4],
+            "Dreamatorium; Forum; Take Yourself Too Seriously; 256; 0; " + testing_IDs[5],
+            "Everything I Love; Rebecca Sayre; This is Always; 303; 0; " + testing_IDs[6],
+            "I Get a Kick Out of You; Rebecca Sayre; This is Always; 155; 0; " + testing_IDs[7],
+            "Jazz in Paris; Media Right Productions; YouTube Audio Library; 102; 0; " + testing_IDs[8],
+            "Windows are the Eyes to the House; Forum; Take Yourself Too Seriously; 246; 0; " + testing_IDs[9]
+    };
 
     public SharedPrefHelper (SharedPreferences songPrefs, SharedPreferences.Editor songEditor,
                              SharedPreferences albumPrefs, SharedPreferences.Editor albumEditor,
-                             SharedPreferences idPrefs, SharedPreferences.Editor idEditor) {
+                             SharedPreferences idPrefs, SharedPreferences.Editor idEditor, boolean testing) {
         this.songSharedPref = songPrefs;
         this.songSharedEditor = songEditor;
         this.albumSharedPref = albumPrefs;
         this.albumSharedEditor = albumEditor;
         this.idSharedPref = idPrefs;
         this.idSharedEditor = idEditor;
-
-        this.initial_song_data = new String[this.all_songs.length];
-        for (int index = 0; index < this.initial_song_data.length; index++) {
-            this.initial_song_data[index] = this.all_songs[index] + "; " + this.all_IDs[index];
-        }
-
-        Log.i("SharedPrefHelper Constructor", "sharedPrefHelper is created with " +
-            all_IDs.length + " songs");
+        this.use_test_data = testing;
     }
 
-    public boolean hasPreviousAlbumData() {
-        String hasData = this.albumSharedPref.getString("ALBUM_DATA_EXISTENCE_STATUS", "NONEXISTENT");
-        if (hasData.equals("EXISTS")) {
-            return true;
+    public String [] getAlbumData() {
+        if (use_test_data) {
+            return this.testing_albums;
         }
-        return false;
-    }
-
-    public String [] getInitialAlbumData() { return this.all_albums; }
-
-    public String [] getStoredAlbumData() {
-        String curr_data;
-        String [] album_data = new String [all_albums.length];
-        for (int index = 0; index < all_albums.length; index++) {
-            curr_data = albumSharedPref.getString("ALBUM_" + index, "NOT FOUND");
-            if (!(curr_data.equals("NOT FOUND"))) {
-                album_data[index] = curr_data;
+        String currData;
+        String albumCount = albumSharedPref.getString("NUM_ALBUMS", "NOT FOUND");
+        if (!albumCount.equals("NOT FOUND")) {
+            int numAlbums = Integer.parseInt(albumCount);
+            String [] album_data = new String [numAlbums];
+            for (int index = 0; index < numAlbums; index++) {
+                currData = albumSharedPref.getString("ALBUM_" + index, "NOT FOUND");
+                if (!(currData.equals("NOT FOUND"))) {
+                    album_data[index] = currData;
+                }
             }
+            return album_data;
         }
-        return album_data;
+        return new String [0];
     }
 
     public Album [] createAlbums () {
-        String [] album_data;
+        String [] albumData;
         Album [] albums;
-        Song [] songs;
+        Album newAlbum = null;
+        albumData = this.getAlbumData();
+        albums = new Album[albumData.length];
 
-        boolean hasStoredData = this.hasPreviousAlbumData();
-        if (!hasStoredData) {
-            album_data = this.getInitialAlbumData();
-        } else {
-            album_data = this.getStoredAlbumData();
-        }
-
-        albums = new Album[album_data.length];
-        songs = MainActivity.getSongs();
+        Song [] songs = MainActivity.getSongs();
         Gson gson = new Gson();
-        Album new_album;
-        for (int index = 0; index < album_data.length; index++) {
-            if (hasStoredData) {
-                String json = albumSharedPref.getString("ALBUM_" + index, "NOT FOUND");
-                if (!(json.equals("NOT FOUND"))) {
-                    new_album = gson.fromJson(json, Album.class);
-                    albums[index] = new_album;
-                }
-            } else {
-                new_album = new Album(album_data[index]);
-                albums[index] = new_album;
-                int song_count = 0;
-                for (int song_index = 0; song_index < songs.length && song_count < new_album.getNumTracks(); song_index++) {
-                    if (songs[song_index].getAlbumName().equals(new_album.getAlbumName())) {
-                        new_album.addSong(songs[song_index], song_count);
 
-                        Log.i("SharedPrefHelper createAlbums", "Trying to add song " +
-                                songs[song_index].getSongName() + " into the album " + new_album.getAlbumName());
+        for (int index = 0; index < albums.length; index++) {
+            if (use_test_data) {
+                newAlbum = new Album(albumData[index]);
+                int songCount = 0;
+                for (int song_index = 0; song_index < songs.length && songCount < newAlbum.getNumTracks(); song_index++) {
+                    if (songs[song_index].getAlbumName().equals(newAlbum.getAlbumName())) {
+                        newAlbum.addSong(songs[song_index], songCount);
 
-                        song_count++;
+                        Log.i("SharedPrefHelper createAlbums", "Adding the song " +
+                                songs[song_index].getSongName() + " into the album " + newAlbum.getAlbumName());
+
+                        songCount++;
                     }
                 }
-                writeAlbumData("" + new_album.getID(), new_album.toString());
+            } else {
+                String json = albumSharedPref.getString("ALBUM_" + index, "NOT FOUND");
+                if (!(json.equals("NOT FOUND"))) {
+                    newAlbum = gson.fromJson(json, Album.class);
+                    albums[index] = newAlbum;
+                }
             }
+            albums[index] = newAlbum;
+            writeAlbumData(newAlbum.getID(), newAlbum.toString());
         }
-
-        if (!hasStoredData) {
-            this.writeAlbumData("ALBUM_DATA_EXISTENCE_STATUS", "EXISTS");
-        }
-
+        writeAlbumData("NUM_ALBUMS", "" + albums.length);
         return albums;
     }
 
-    public boolean hasPreviousSongData() {
-        String hasData = this.songSharedPref.getString("SONG_DATA_EXISTENCE_STATUS", "NONEXISTENT");
-        if (hasData.equals("EXISTS")) {
-            return true;
-        }
-        return false;
-    }
-
-    public String [] getInitialSongData() {
-        return initial_song_data;
-    }
-
-    public String [] getStoredSongData() {
-        String curr_data;
-
-        // Grabs all id entries from the ID shared preferences file
-        Map<String, ?> allIDEntries = idSharedPref.getAll();
-        if (allIDEntries.size() > 0) {
+    public void setAllIDs() {
+        if (use_test_data) {
+            this.all_IDs = this.testing_IDs;
+        } else {
+            Map<String, ?> allIDEntries = idSharedPref.getAll();
             this.all_IDs = new int[allIDEntries.size()];
-            int count = 0;
-
-            // Sets all_IDs to stored data
             for (Map.Entry<String, ?> entry : allIDEntries.entrySet()) {
                 int id = Integer.parseInt(entry.getValue().toString());
                 int index = Integer.parseInt(entry.getKey().toString());
                 if (index < all_IDs.length) {
                     this.all_IDs[index] = id;
-                    count++;
                 } else {
                     Log.e("SharedPrefHelper Index Issue", "ID out of bounds!");
                 }
             }
-
-            id_write_index = count;
         }
+    }
 
+    public String [] getSongData() {
+        if (use_test_data) {
+            return this.testing_songs;
+        }
+        String curr_data;
         String [] song_data = new String [all_IDs.length];
         for (int index = 0; index < all_IDs.length; index++) {
             curr_data = songSharedPref.getString("" + all_IDs[index], "NOT FOUND");
@@ -291,43 +161,34 @@ public class SharedPrefHelper {
 
     public Song [] createSongList () {
         Song [] songs;
-        String [] song_data;
-
-        boolean hasStoredData = this.hasPreviousSongData();
-
-        // Sets initial song and id data
-        if (!hasStoredData) {
-            song_data = this.getInitialSongData();
-            this.writeSongData("SONG_DATA_EXISTENCE_STATUS", "EXISTS");
-
-            for (int index = 0; index < all_IDs.length; index++) {
-                this.writeIDData("" + index, "" + all_IDs[index]);
-            }
-        } else {
-            song_data = this.getStoredSongData();
-        }
-
-        songs = new Song[song_data.length];
+        Song newSong;
+        String [] songData;
         Gson gson = new Gson();
-        Song new_song;
-        for (int index = 0; index < song_data.length && index < all_IDs.length; index++) {
-            if (hasStoredData) {
-                String json = songSharedPref.getString("" + all_IDs[index], "NOT FOUND");
-                if (!(json.equals("NOT FOUND"))) {
-                    new_song = gson.fromJson(json, Song.class);
-                    songs[index] = new_song;
-                }
-            } else {
-                new_song = new Song(song_data[index], "");
-                songs[index] = new_song;
-                writeSongData("" + new_song.getMediaID(), new_song.toString());
-            }
+
+        this.setAllIDs();
+        songData = this.getSongData();
+        songs = new Song[songData.length];
+
+        String unknownSong = "Unknown Name; Unknown Artist; Unknown Album; 0; 0; ";
+
+        for (int index = 0; index < songData.length && index < all_IDs.length; index++) {
+           if (use_test_data) {
+               newSong = new Song(songData[index], "");
+           } else {
+               String json = songSharedPref.getString("" + all_IDs[index], "NOT FOUND");
+               if (!(json.equals("NOT FOUND"))) {
+                   newSong = gson.fromJson(json, Song.class);
+               } else {
+                   newSong = new Song(unknownSong + all_IDs[index], "");
+               }
+           }
+           songs[index] = newSong;
+           writeSongData("" + newSong.getMediaID(), newSong.toString());
+           writeIDData("" + index, "" + newSong.getMediaID());
         }
 
         return songs;
     }
-
-    public int getIdWriteIndex() {return id_write_index++;}
 
     public void writeAlbumData(String id, String data) {
         Log.i("SharedPrefHelper", "Writing updates to Album data");

@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
     private final boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
 
+    private final boolean START_WITH_SONGS = false; // set to true if you want to start with some songs loaded
+
     private final int LOCATION_PERMISSION_REQUEST_CODE = 0; // arbitrary number chosen
 
     private static MusicPlayer musicPlayer = null;
@@ -129,8 +131,10 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
             modeDataEditor.clear().commit();
         }
 
+        Log.i("MainActivity: starting with hardcoded songs?", "" + START_WITH_SONGS);
+
         sharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor, albumSharedPref,
-                albumDataEditor, idSharedPref, idDataEditor);
+                albumDataEditor, idSharedPref, idDataEditor, START_WITH_SONGS);
         songs = sharedPrefHelper.createSongList();
         albums = sharedPrefHelper.createAlbums();
 
@@ -203,7 +207,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         for (int index = 0; index < songs.length; index++) {
             curr_song = songs[index];
             sharedPrefHelper.writeSongData("" + curr_song.getMediaID(), curr_song.toString());
-            Log.i("MainAcitivity updateSongData", "updating Song: " + curr_song.getSongName()
+            sharedPrefHelper.writeIDData("" + index, "" + curr_song.getMediaID());
+            Log.i("MainActivity updateSongData", "updating Song: " + curr_song.getSongName()
                     + " data into shared preference");
         }
     }
@@ -213,7 +218,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         for (int index = 0; index < albums.length; index++) {
             curr_album = albums[index];
             sharedPrefHelper.writeAlbumData(curr_album.getID(), curr_album.toString());
-            Log.i("MainAcitivity updateAlbumData", "updating Album: " + curr_album.getAlbumName()
+            sharedPrefHelper.writeAlbumData("NUM_ALBUMS", "" + albums.length);
+            Log.i("MainActivity updateAlbumData", "updating Album: " + curr_album.getAlbumName()
                     + " data into shared preference");
         }
     }
