@@ -27,7 +27,6 @@ public class MusicPlayer {
 
         this.song_resources = resources;
         this.player = new MediaPlayer();
-        this.songs = new Song[3];
         this.play_index = -1;
         this.play_mode = 0;
         this.songs = MainActivity.getSongs();
@@ -142,7 +141,7 @@ public class MusicPlayer {
         for (int index = 0; index < this.songs.length; index++) {
             if (this.songs[index].getMediaID() == selected_id) {
                 this.play_index = index;
-                Log.i("MusicPlayer selectSong", "the current song id is " + index);
+                Log.e("MusicPlayer selectSong", "the current song id is " + index);
 
                 // update the song play instances from remote database
                 databaseManager.updatePlayInstance(songs[play_index]);
@@ -214,6 +213,8 @@ public class MusicPlayer {
      * This method allows us to load a song's data into the media player.
      */
     public void loadSong(int resourceId) {
+
+        Log.e ("loadSong", "loading song ID: " + resourceId);
 
         AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
         try {
