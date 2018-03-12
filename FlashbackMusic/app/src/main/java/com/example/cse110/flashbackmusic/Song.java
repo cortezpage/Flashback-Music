@@ -1,9 +1,11 @@
 package com.example.cse110.flashbackmusic;
 
+import android.location.Location;
 import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -118,6 +120,14 @@ public class Song {
     public User getLastPlayedUser() { return this.lastPlayedUser;}
 
     public void setLastPlayedUser(String userName) { this.lastPlayedUser = new User(userName); }
+
+    public void setLastPlayedAll (String userId, LatLon location, Calendar calendar) {
+        this.setLastPlayedUser(userId);
+        this.setLastPlayedLocation(location);
+        this.setLastPlayedCalendar(calendar);
+
+        LastPlayedController.getInstance().callListeners(this);
+    }
 
     public void resetPlayHistory () {
         this.lastPlayedUser = null;

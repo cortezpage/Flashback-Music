@@ -12,7 +12,7 @@ import android.widget.ToggleButton;
 
 import java.text.SimpleDateFormat;
 
-public class MusicPlayActivity extends AppCompatActivity {
+public class MusicPlayActivity extends AppCompatActivity implements LastPlayedObserver {
 
     private MusicPlayer musicPlayer;
     private SharedPrefHelper sharedPrefHelper;
@@ -23,6 +23,7 @@ public class MusicPlayActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LastPlayedController.getInstance().addListener(this);
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_play);
@@ -228,5 +229,17 @@ public class MusicPlayActivity extends AppCompatActivity {
         } else if (musicPlayer.getCurrentLikeStatus() == 2) {
             likeButton.setBackgroundResource(R.drawable.dislike_button);
         }
+    }
+
+    public void lastPlayedUpdate (Song song) {
+        Song currentSong = musicPlayer.getCurrentSong();
+        if (song.getSongName().equals(currentSong.getSongName())) {
+            updateUIWithSongInfo();
+        }
+    }
+
+    public void onDestroy () {
+        super.onDestroy();
+        LastPlayedController.getInstance().removeListener(this);
     }
 }
