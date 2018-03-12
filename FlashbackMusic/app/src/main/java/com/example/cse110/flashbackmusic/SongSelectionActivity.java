@@ -56,7 +56,7 @@ public class SongSelectionActivity extends AppCompatActivity {
                         sortByArtist(songs, songs.length);
                         break;
                     case "Album":
-                        sortByAlbum();
+                        sortByAlbum(songs, songs.length);
                         break;
                     case "Favorited":
                         sortByFavorite();
@@ -140,8 +140,25 @@ public class SongSelectionActivity extends AppCompatActivity {
         createButtons(songs);
     }
 
-    public void sortByAlbum () {
+    public void sortByAlbum (Song [] songs, int size) {
+        Song currSong;
+        String currAlbum;
+        int index;
 
+        for (int i = 1; i < size; i++) {
+            currSong = songs[i];
+            currAlbum = currSong.getAlbumName();
+            index = i - 1;
+
+            while (index >= 0 && (songs[index].getAlbumName().compareTo(currAlbum)) > 0) {
+                songs[index + 1] = songs[index];
+                index--;
+            }
+            songs[index + 1] = currSong;
+        }
+        LinearLayout view = (LinearLayout)findViewById(R.id.all_songs_list);
+        view.removeAllViews();
+        createButtons(songs);
     }
 
     public void sortByFavorite () {
