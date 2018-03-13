@@ -125,15 +125,15 @@ public class SongSelectionActivity extends AppCompatActivity {
         int index;
 
         for (int i = 1; i < size; i++) {
-            currSong = songs[i];
+            currSong = songs.get(i);
             currArtist = currSong.getArtistName();
             index = i - 1;
 
-            while (index >= 0 && (songs[index].getArtistName().compareTo(currArtist)) > 0) {
-                songs[index + 1] = songs[index];
+            while (index >= 0 && (songs.get(index).getArtistName().compareTo(currArtist)) > 0) {
+                songs.get(index + 1) = songs.get(index);
                 index--;
             }
-            songs[index + 1] = currSong;
+            songs.get(index + 1) = currSong;
         }
         LinearLayout view = (LinearLayout)findViewById(R.id.all_songs_list);
         view.removeAllViews();
@@ -146,15 +146,15 @@ public class SongSelectionActivity extends AppCompatActivity {
         int index;
 
         for (int i = 1; i < size; i++) {
-            currSong = songs[i];
+            currSong = songs.get(i);
             currAlbum = currSong.getAlbumName();
             index = i - 1;
 
-            while (index >= 0 && (songs[index].getAlbumName().compareTo(currAlbum)) > 0) {
-                songs[index + 1] = songs[index];
+            while (index >= 0 && (songs.get(index).getAlbumName().compareTo(currAlbum)) > 0) {
+                songs.get(index + 1) = songs.get(index);
                 index--;
             }
-            songs[index + 1] = currSong;
+            songs.get(index + 1) = currSong;
         }
         LinearLayout view = (LinearLayout)findViewById(R.id.all_songs_list);
         view.removeAllViews();
@@ -168,11 +168,11 @@ public class SongSelectionActivity extends AppCompatActivity {
         Song currSong;
 
         while (mid <= high) {
-            switch (songs[mid].getLikeStatus()) {
+            switch (songs.get(mid).getLikeStatus()) {
                 case 1: {
-                    currSong = songs[low];
-                    songs[low] = songs[mid];
-                    songs[mid] = currSong;
+                    currSong = songs.get(low);
+                    songs.get(low) = songs.get(mid);
+                    songs.get(mid) = currSong;
                     low++;
                     mid++;
                     break;
@@ -181,9 +181,9 @@ public class SongSelectionActivity extends AppCompatActivity {
                     mid++;
                     break;
                 case 2: {
-                    currSong = songs[mid];
-                    songs[mid] = songs[high];
-                    songs[high] = currSong;
+                    currSong = songs.get(mid);
+                    songs.get(mid) = songs.get(high);
+                    songs.get(high) = currSong;
                     high--;
                     break;
                 }
