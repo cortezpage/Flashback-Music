@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -88,26 +89,28 @@ public class SharedPrefHelper {
         return new String [0];
     }
 
-    public Album [] createAlbums () {
+    public ArrayList<Album> createAlbums () {
         String [] albumData;
-        Album [] albums;
+        ArrayList<Album> albums;
         Album newAlbum = null;
         albumData = this.getAlbumData();
-        albums = new Album[albumData.length];
+        albums = new ArrayList<Album> (albumData.length);
 
-        Song [] songs = MainActivity.getSongs();
+        Log.e("ALBUM DATA", "" + albumData.length);
+
+        ArrayList<Song> songs = MainActivity.getSongs();
         Gson gson = new Gson();
 
-        for (int index = 0; index < albums.length; index++) {
+        for (int index = 0; index < albumData.length; index++) {
             if (use_test_data) {
                 newAlbum = new Album(albumData[index]);
                 int songCount = 0;
-                for (int song_index = 0; song_index < songs.length && songCount < newAlbum.getNumTracks(); song_index++) {
-                    if (songs[song_index].getAlbumName().equals(newAlbum.getAlbumName())) {
-                        newAlbum.addSong(songs[song_index], songCount);
+                for (int song_index = 0; song_index < songs.size() && songCount < newAlbum.getNumTracks(); song_index++) {
+                    if (songs.get(song_index).getAlbumName().equals(newAlbum.getAlbumName())) {
+                        newAlbum.addSong(songs.get(song_index), songCount);
 
                         Log.i("SharedPrefHelper createAlbums", "Adding the song " +
-                                songs[song_index].getSongName() + " into the album " + newAlbum.getAlbumName());
+                                songs.get(song_index).getSongName() + " into the album " + newAlbum.getAlbumName());
 
                         songCount++;
                     }
@@ -116,13 +119,12 @@ public class SharedPrefHelper {
                 String json = albumSharedPref.getString("ALBUM_" + index, "NOT FOUND");
                 if (!(json.equals("NOT FOUND"))) {
                     newAlbum = gson.fromJson(json, Album.class);
-                    albums[index] = newAlbum;
                 }
             }
-            albums[index] = newAlbum;
+            albums.add(index, newAlbum);
             writeAlbumData(newAlbum.getID(), newAlbum.toString());
         }
-        writeAlbumData("NUM_ALBUMS", "" + albums.length);
+        writeAlbumData("NUM_ALBUMS", "" + albums.size());
         return albums;
     }
 
@@ -159,15 +161,15 @@ public class SharedPrefHelper {
         return song_data;
     }
 
-    public Song [] createSongList () {
-        Song [] songs;
+    public ArrayList<Song> createSongList () {
+        ArrayList<Song> songs;
         Song newSong;
         String [] songData;
         Gson gson = new Gson();
 
         this.setAllIDs();
         songData = this.getSongData();
-        songs = new Song[songData.length];
+        songs = new ArrayList<Song> (songData.length);
 
         String unknownSong = "Unknown Name; Unknown Artist; Unknown Album; 0; 0; ";
 
@@ -182,7 +184,7 @@ public class SharedPrefHelper {
                    newSong = new Song(unknownSong + all_IDs[index], "");
                }
            }
-           songs[index] = newSong;
+           songs.add(index, newSong);
            writeSongData("" + newSong.getMediaID(), newSong.toString());
            writeIDData("" + index, "" + newSong.getMediaID());
         }

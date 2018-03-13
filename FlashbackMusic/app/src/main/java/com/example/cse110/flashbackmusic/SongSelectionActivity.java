@@ -11,8 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class SongSelectionActivity extends AppCompatActivity {
 
@@ -24,7 +23,7 @@ public class SongSelectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_selection);
 
-        final Song [] songs = MainActivity.getSongs();
+        final ArrayList<Song> songs = MainActivity.getSongs();
         createButtons(songs);
 
         ImageButton back = findViewById(R.id.button_exit_song_selection);
@@ -54,13 +53,13 @@ public class SongSelectionActivity extends AppCompatActivity {
                         break;
                     case "Artist":
                         Log.e ("select item", "selected artist");
-                        sortByArtist(songs, songs.length);
+                        sortByArtist(songs, songs.size());
                         break;
                     case "Album":
-                        sortByAlbum(songs, songs.length);
+                        sortByAlbum(songs, songs.size());
                         break;
                     case "Favorited":
-                        sortByFavorite(songs, songs.length);
+                        sortByFavorite(songs, songs.size());
                         break;
                 }
 
@@ -73,8 +72,8 @@ public class SongSelectionActivity extends AppCompatActivity {
         });
     }
 
-    public void createButtons (Song[] songs) {
-        song_buttons = new Button [songs.length];
+    public void createButtons (ArrayList<Song> songs) {
+        song_buttons = new Button [songs.size()];
         Song curr_song;
         Button new_button;
         for (int index = 0; index < song_buttons.length; index++) {
@@ -83,7 +82,7 @@ public class SongSelectionActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
-            curr_song = songs[index];
+            curr_song = songs.get(index);
             final int curr_id = curr_song.getMediaID();
             new_button = new Button(this);
             new_button.setText(curr_song.getSongName());
@@ -120,7 +119,7 @@ public class SongSelectionActivity extends AppCompatActivity {
         }
     }
 
-    public void sortByArtist (Song [] songs, int size) {
+    public void sortByArtist (ArrayList<Song> songs, int size) {
         Song currSong;
         String currArtist;
         int index;
@@ -141,7 +140,7 @@ public class SongSelectionActivity extends AppCompatActivity {
         createButtons(songs);
     }
 
-    public void sortByAlbum (Song [] songs, int size) {
+    public void sortByAlbum (ArrayList<Song> songs, int size) {
         Song currSong;
         String currAlbum;
         int index;
@@ -162,7 +161,7 @@ public class SongSelectionActivity extends AppCompatActivity {
         createButtons(songs);
     }
 
-    public void sortByFavorite (Song [] songs, int size) {
+    public void sortByFavorite (ArrayList<Song> songs, int size) {
         int low = 0;
         int mid = 0;
         int high = size - 1;
