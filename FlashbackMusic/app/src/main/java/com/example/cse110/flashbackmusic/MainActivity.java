@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
     private final boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
 
-    private final boolean START_WITH_SONGS = false; // set to true if you want to start with some songs loaded
+    private final boolean START_WITH_SONGS = true; // set to true if you want to start with some songs loaded
 
     private final int LOCATION_PERMISSION_REQUEST_CODE = 0; // arbitrary number chosen
 
