@@ -12,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SongSelectionActivity extends AppCompatActivity {
 
@@ -130,10 +131,10 @@ public class SongSelectionActivity extends AppCompatActivity {
             index = i - 1;
 
             while (index >= 0 && (songs.get(index).getArtistName().compareTo(currArtist)) > 0) {
-                songs.get(index + 1) = songs.get(index);
+                songs.set(index + 1, songs.get(index));
                 index--;
             }
-            songs.get(index + 1) = currSong;
+            songs.set(index + 1, currSong);
         }
         LinearLayout view = (LinearLayout)findViewById(R.id.all_songs_list);
         view.removeAllViews();
@@ -151,10 +152,10 @@ public class SongSelectionActivity extends AppCompatActivity {
             index = i - 1;
 
             while (index >= 0 && (songs.get(index).getAlbumName().compareTo(currAlbum)) > 0) {
-                songs.get(index + 1) = songs.get(index);
+                songs.set(index + 1, songs.get(index));
                 index--;
             }
-            songs.get(index + 1) = currSong;
+            songs.set(index + 1, currSong);
         }
         LinearLayout view = (LinearLayout)findViewById(R.id.all_songs_list);
         view.removeAllViews();
@@ -171,8 +172,8 @@ public class SongSelectionActivity extends AppCompatActivity {
             switch (songs.get(mid).getLikeStatus()) {
                 case 1: {
                     currSong = songs.get(low);
-                    songs.get(low) = songs.get(mid);
-                    songs.get(mid) = currSong;
+                    songs.set(low, songs.get(mid));
+                    songs.set(mid, currSong);
                     low++;
                     mid++;
                     break;
@@ -182,8 +183,8 @@ public class SongSelectionActivity extends AppCompatActivity {
                     break;
                 case 2: {
                     currSong = songs.get(mid);
-                    songs.get(mid) = songs.get(high);
-                    songs.get(high) = currSong;
+                    songs.set(mid, songs.get(high));
+                    songs.set(high, currSong);
                     high--;
                     break;
                 }
