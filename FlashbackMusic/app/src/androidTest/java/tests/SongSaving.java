@@ -1,13 +1,9 @@
 package tests;
 
-import android.arch.persistence.room.Database;
-import android.content.res.Resources;
-import android.media.MediaPlayer;
-import android.support.v7.widget.VectorEnabledTintResources;
-import android.telecom.Call;
 import android.util.Log;
 
-import com.example.cse110.flashbackmusic.Callback;
+import com.example.cse110.flashbackmusic.Callbacks.Callback;
+import com.example.cse110.flashbackmusic.Callbacks.PlayInstancesCallback;
 import com.example.cse110.flashbackmusic.DatabaseManager;
 import com.example.cse110.flashbackmusic.LatLon;
 
@@ -53,7 +49,7 @@ public class SongSaving {
         databaseManager.storePlayInstance(playInstance1, song);
         databaseManager.storePlayInstance(playInstance2, song);
         //Retrieve the song's data from the database
-        songPlayInstances = databaseManager.getPlayInstances(song, new callItBack());
+        databaseManager.getPlayInstances(song.getSongName(), new callItBack());
     }
 
     /**
@@ -64,11 +60,11 @@ public class SongSaving {
     public void accessUserId() {
         databaseManager.storePlayInstance(playInstance1, song);
         databaseManager.storePlayInstance(playInstance2, song);
-        songPlayInstances = databaseManager.getPlayInstances(song, new callLastPlayInstance());
+        databaseManager.getPlayInstances(song.getSongName(), new callLastPlayInstance());
     }
 
 
-    class callItBack implements Callback {
+    class callItBack implements PlayInstancesCallback {
 
         //Set up dummy data to test song's data
         User user = new User("John");
@@ -77,10 +73,7 @@ public class SongSaving {
         PlayInstance playInstance = new PlayInstance(user, location, calendar);
 
         @Override
-        public void onComplete(Object o) {
-
-            Log.d("oSize", "" + ((ArrayList<PlayInstance>) o).size());
-            ArrayList<PlayInstance> playInstances = (ArrayList<PlayInstance>) o;
+        public void onComplete(ArrayList<PlayInstance> playInstances) {
             Log.d("test", "PLAYINSTANCE SIZE " + playInstances.size());
 
             if (playInstances != null) {
@@ -93,12 +86,11 @@ public class SongSaving {
     }
 
     //Call and print last playInstance info of a song
-    class callLastPlayInstance implements Callback {
+    class callLastPlayInstance implements PlayInstancesCallback {
         int i = 0;
 
         @Override
-        public void onComplete(Object o) {
-            ArrayList<PlayInstance> playInstances = (ArrayList<PlayInstance>) o;
+        public void onComplete(ArrayList<PlayInstance> playInstances) {
 
             if(playInstances != null) {
                 i = playInstances.size() - 1;
