@@ -48,6 +48,12 @@ public class NameGeneratorTests {
     }
 
     @Test
+    public void testAnastasia () {
+        String name = User.nameGenerator("aglucas");
+        assertEquals("CuddlySparkle6944", name);
+    }
+
+    @Test
     public void testNull () {
         String name = User.nameGenerator("");
         assertEquals("Nully", name);
