@@ -49,6 +49,8 @@ public class SongSelectionActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView adapter, View v, int position, long lng) {
                 selecteditem = adapter.getItemAtPosition(position).toString();
                 switch (selecteditem) {
+                    case "Sort by":
+                        break;
                     case "Title":
                         sortByTitle(song_buttons);
                         break;
