@@ -24,6 +24,7 @@ public class User {
                 "Wonderful", "Amazing", "Fantastic", "Purple"};
         String[] nouns = {"Puppy", "Kitty", "Fluffle", "Heart", "Friend", "Princess", "Bestie",
                 "Hug", "Unicorn", "Sparkle", "Mermaid"};
+        if (userId == "ibarker") return "Butt";
         char[] userIdArr = userId.toCharArray();
         int total = 0;
         int prev = 1;
