@@ -11,8 +11,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class SongSelectionActivity extends AppCompatActivity {
 
@@ -52,7 +52,7 @@ public class SongSelectionActivity extends AppCompatActivity {
                     case "Sort by":
                         break;
                     case "Title":
-                        sortByTitle(song_buttons);
+                        sortByTitle(songs, songs.size());
                         break;
                     case "Artist":
                         Log.e ("select item", "selected artist");
@@ -109,17 +109,25 @@ public class SongSelectionActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void sortByTitle (Button [] song_buttons) {
-        String [] titles = new String [song_buttons.length];
-        for (int index = 0; index < song_buttons.length; index++) {
-            String currSong = song_buttons[index].getText().toString();
-            titles[index] = currSong;
-        }
-        Arrays.sort(titles);
+    public void sortByTitle (ArrayList<Song> songs, int size) {
+        Song currSong;
+        String currSongName;
+        int index;
 
-        for (int index = 0; index < song_buttons.length; index++) {
-            song_buttons[index].setText(titles[index]);
+        for (int i = 1; i < size; i++) {
+            currSong = songs.get(i);
+            currSongName = currSong.getSongName();
+            index = i - 1;
+
+            while (index >= 0 && (songs.get(index).getSongName().compareTo(currSongName)) > 0) {
+                songs.set(index + 1, songs.get(index));
+                index--;
+            }
+            songs.set(index + 1, currSong);
         }
+        LinearLayout view = (LinearLayout)findViewById(R.id.all_songs_list);
+        view.removeAllViews();
+        createButtons(songs);
     }
 
     public void sortByArtist (ArrayList<Song> songs, int size) {
