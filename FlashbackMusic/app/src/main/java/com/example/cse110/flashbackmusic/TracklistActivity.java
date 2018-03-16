@@ -38,7 +38,7 @@ public class TracklistActivity extends AppCompatActivity {
         Song curr_song;
         Button new_button;
         for (int index = 0; index < song_buttons.length; index++) {
-            LinearLayout layout = (LinearLayout) findViewById(R.id.all_songs_list);
+            LinearLayout layout = (LinearLayout) findViewById(R.id.tracklist_container);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
