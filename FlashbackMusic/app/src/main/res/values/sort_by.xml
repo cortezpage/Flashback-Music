@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prompt">Sort by</string>
+    <string-array name="sorting_array">
+        <item>Sort By</item>
+        <item>Title</item>
+        <item>Artist</item>
+        <item>Album</item>
+        <item>Favorited</item>
+    </string-array>
+</resources>

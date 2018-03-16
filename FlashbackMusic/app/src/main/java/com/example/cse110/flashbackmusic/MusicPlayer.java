@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /* TO-DO: SAVE THE PLAY MODE IN SHARED PREFERENCES */
@@ -12,25 +13,29 @@ import java.util.Calendar;
 public class MusicPlayer {
     private Resources song_resources;
     private MediaPlayer player;
-    private Song [] songs;
-    private Album [] albums;
+    private ArrayList<Song> songs;
+    private ArrayList<Album> albums;
     private Album curr_album;
     private Playlist flashback_playlist;
     private int play_index; // only used for album play and flashback mode
     private int play_mode; // 0 = song selection, 1 = album play, 2 = flashback
 
+    private DatabaseManager databaseManager;
+
     private boolean loadingSong;
 
     public MusicPlayer(Resources resources) {
+
         this.song_resources = resources;
         this.player = new MediaPlayer();
-        this.songs = new Song[3];
+
         this.play_index = -1;
         this.play_mode = 0;
         this.songs = MainActivity.getSongs();
         this.albums = MainActivity.getAlbums();
         this.curr_album = null;
         this.flashback_playlist = new Playlist();
+        this.databaseManager = new DatabaseManager();
         Log.i("MusicPlayer Constructor", "Initialized with parameters play_index " +
         play_index + "\nplay_mode " + play_mode);
     }
@@ -52,9 +57,9 @@ public class MusicPlayer {
 
     public void reset() {
         this.player.reset();
-        loadSong(songs[play_index].getMediaID());
+        loadSong(songs.get(play_index).getMediaID());
         Log.i("MusicPlayer reset", "Reseting current song and loading song " +
-                songs[play_index].getMediaID());
+                songs.get(play_index).getMediaID());
     }
 
     public void stop() {
@@ -66,16 +71,28 @@ public class MusicPlayer {
     }
 
     public void updateSongInfo() {
-        Song curr_song = songs[play_index];
+        Song curr_song = songs.get(play_index);
         curr_song.setLastPlayedCalendar(Calendar.getInstance());
         LatLon newLatLon = MainActivity.getLastLatLon();
         if (newLatLon != null) {
-            songs[play_index].setLastPlayedLocation(newLatLon);
+            songs.get(play_index).setLastPlayedLocation(newLatLon);
             MainActivity.getSongSharedPrefHelper().writeSongData("" + curr_song.getMediaID(), curr_song.toString());
 
-            Log.i("MusicPlayer updateSongInfo", "Song " + songs[play_index].getSongName() + " is" +
+            Log.i("MusicPlayer updateSongInfo", "Song " + songs.get(play_index).getSongName() + " is" +
                     "being updated Location with latitude " + newLatLon.getLatitude() + " and longitude " +
                     newLatLon.getLongitude());
+
+            Log.i("MusicPlayer updateSongInfo", "Calling DatabaseManager to push play instance" +
+            "to remote database");
+
+            User dummyUser = new User("DummyUser");
+            //TODO if we wanna manipulate the time we should modify here & grab the User
+
+            Calendar cal = Calendar.getInstance();
+            PlayInstance curr_instance = new PlayInstance(dummyUser, newLatLon, cal);
+            databaseManager.storePlayInstance(curr_instance, curr_song);
+
+            Log.i("MusicPlayer updateSongInfo", "update completed");
         }
     }
 
@@ -84,7 +101,7 @@ public class MusicPlayer {
         LatLon currLoc = MainActivity.getLastLatLon();
         if (this.flashback_playlist.shouldSort(currTime, currLoc) || startingFBMode) {
 
-            Log.i("MusicPlayer updatePlaylist", "updating the playlist with curren time "
+            Log.i("MusicPlayer updatePlaylist", "updating the playlist with current time "
                     + currTime.getTime().getTime() + " current location with latitude and longitude: " +
                     currLoc.getLatitude() + " " + currLoc.getLongitude());
 
@@ -122,18 +139,32 @@ public class MusicPlayer {
 
     public void selectSong(int selected_id) {
         // preventing a reload of the song if the currently-playing song is selected again
-        if (play_index != -1 && songs[play_index].getMediaID() == selected_id) {return;}
-        for (int index = 0; index < this.songs.length; index++) {
-            if (this.songs[index].getMediaID() == selected_id) {
+        if (play_index != -1 && songs.get(play_index).getMediaID() == selected_id) {return;}
+        for (int index = 0; index < this.songs.size(); index++) {
+            if (this.songs.get(index).getMediaID() == selected_id) {
                 this.play_index = index;
-                Log.i("MusicPlayer selectSong", "the current song id is " + index);
+                Log.e("MusicPlayer selectSong", "the current song id is " + index);
+
+                // update the song play instances from remote database
+                databaseManager.updatePlayInstance(songs.get(play_index));
+
+//                Thread updateUIInfo = new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        wait(1000);
+//
+//                    }
+//                });
+
+                Log.e("TESTING", "song: " + songs.get(play_index).getSongName() +
+                " User "  );
             }
         }
         this.reset();
     }
 
     public void selectAlbum(int selected_index) {
-        this.curr_album = this.albums[selected_index];
+        this.curr_album = this.albums.get(selected_index);
         this.selectSong(curr_album.getCurrSongID());
         Log.i("MusicPlayer selectAlbum", "the current album id is " + curr_album);
 
@@ -144,26 +175,26 @@ public class MusicPlayer {
     }
 
     public void changeCurrentLikeStatus() {
-        this.songs[play_index].incrementLikeStatus();
+        this.songs.get(play_index).incrementLikeStatus();
     }
 
     public Song getCurrentSong() {
-        return this.songs[play_index];
+        return this.songs.get(play_index);
     }
 
     public int getCurrentLikeStatus() {
-        return this.songs[play_index].getLikeStatus();
+        return this.songs.get(play_index).getLikeStatus();
     }
 
-    public int getCurrentMediaID() { return this.songs[play_index].getMediaID(); }
+    public int getCurrentMediaID() { return this.songs.get(play_index).getMediaID(); }
 
-    public String getCurrentString() { return this.songs[play_index].toString(); }
+    public String getCurrentString() { return this.songs.get(play_index).toString(); }
 
-    public String getCurrentSongName() { return this.songs[play_index].getSongName(); }
+    public String getCurrentSongName() { return this.songs.get(play_index).getSongName(); }
 
-    public String getCurrentSongArtist() { return this.songs[play_index].getArtistName(); }
+    public String getCurrentSongArtist() { return this.songs.get(play_index).getArtistName(); }
 
-    public String getCurrentSongAlbum() { return this.songs[play_index].getAlbumName(); }
+    public String getCurrentSongAlbum() { return this.songs.get(play_index).getAlbumName(); }
 
     public int getPlayMode() { return this.play_mode; }
 
@@ -184,6 +215,8 @@ public class MusicPlayer {
      * This method allows us to load a song's data into the media player.
      */
     public void loadSong(int resourceId) {
+
+        Log.e ("loadSong", "loading song ID: " + resourceId);
 
         AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
         try {

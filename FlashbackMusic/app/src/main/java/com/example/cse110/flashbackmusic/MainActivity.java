@@ -39,18 +39,20 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private final boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
 
+    private final boolean START_WITH_SONGS = true; // set to true if you want to start with some songs loaded
+    
     private static MusicPlayer musicPlayer = null;
     private static SharedPrefHelper sharedPrefHelper;
-    private static Song [] songs;
-    private static Album [] albums;
+    private static ArrayList<Song> songs;
+    private static ArrayList<Album> albums;
     private static LocationManager locationManager;
     private SharedPreferences songSharedPref;
     private SharedPreferences.Editor songDataEditor;
@@ -74,11 +76,11 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         return sharedPrefHelper;
     }
 
-    public static Song [] getSongs() {
+    public static ArrayList<Song> getSongs() {
         return songs;
     }
 
-    public static Album [] getAlbums() {
+    public static ArrayList<Album> getAlbums() {
         return albums;
     }
 
@@ -148,7 +150,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         String album_data_filename = "com.example.cse110.flashbackmusic.album_data_preferences";
         String mode_data_filename = "com.example.cse110.flashbackmusic.saved_mode_pref";
 
-        Log.i("MainAcitivty init", "Initializing song shared preference and album shared" +
+        Log.i("MainActivty init", "Initializing song shared preference and album shared" +
                 "preference");
 
         songSharedPref = context.getSharedPreferences(song_data_filename, Context.MODE_PRIVATE);
@@ -167,8 +169,10 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
             modeDataEditor.clear().commit();
         }
 
+        Log.i("MainActivity: starting with hardcoded songs?", "" + START_WITH_SONGS);
+
         sharedPrefHelper = new SharedPrefHelper(songSharedPref, songDataEditor, albumSharedPref,
-                albumDataEditor, idSharedPref, idDataEditor);
+                albumDataEditor, idSharedPref, idDataEditor, START_WITH_SONGS);
         songs = sharedPrefHelper.createSongList();
         albums = sharedPrefHelper.createAlbums();
 
@@ -344,20 +348,22 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
     public void updateSongData() {
         Song curr_song;
-        for (int index = 0; index < songs.length; index++) {
-            curr_song = songs[index];
+        for (int index = 0; index < songs.size(); index++) {
+            curr_song = songs.get(index);
             sharedPrefHelper.writeSongData("" + curr_song.getMediaID(), curr_song.toString());
-            Log.i("MainAcitivity updateSongData", "updating Song: " + curr_song.getSongName()
+            sharedPrefHelper.writeIDData("" + index, "" + curr_song.getMediaID());
+            Log.i("MainActivity updateSongData", "updating Song: " + curr_song.getSongName()
                     + " data into shared preference");
         }
     }
 
     public void updateAlbumData() {
         Album curr_album;
-        for (int index = 0; index < albums.length; index++) {
-            curr_album = albums[index];
+        for (int index = 0; index < albums.size(); index++) {
+            curr_album = albums.get(index);
             sharedPrefHelper.writeAlbumData(curr_album.getID(), curr_album.toString());
-            Log.i("MainAcitivity updateAlbumData", "updating Album: " + curr_album.getAlbumName()
+            sharedPrefHelper.writeAlbumData("NUM_ALBUMS", "" + albums.size());
+            Log.i("MainActivity updateAlbumData", "updating Album: " + curr_album.getAlbumName()
                     + " data into shared preference");
         }
     }
