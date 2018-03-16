@@ -2,6 +2,7 @@
 <resources>
     <string name="prompt">Sort by</string>
     <string-array name="sorting_array">
+        <item>Sort by</item>
         <item>Title</item>
         <item>Artist</item>
         <item>Album</item>
