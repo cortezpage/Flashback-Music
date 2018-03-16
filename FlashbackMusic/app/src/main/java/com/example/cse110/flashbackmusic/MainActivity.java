@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void SetUpPeopleAPI() throws IOException {
+    /*public void SetUpPeopleAPI() throws IOException {
         HttpTransport httpTransport = new NetHttpTransport();
         JacksonFactory jsonFactory = new JacksonFactory();
 
@@ -260,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPersonFields("names,emailAddresses")
                 .execute();
         List<Person> connections = response.getConnections();
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
