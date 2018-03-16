@@ -2,6 +2,9 @@ package com.example.cse110.flashbackmusic;
 
 import android.util.Log;
 
+import com.example.cse110.flashbackmusic.Callbacks.Callback;
+import com.example.cse110.flashbackmusic.Callbacks.PlayInstancesCallback;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -73,9 +76,10 @@ public class Playlist {
         // calculate the score for the song
         LatLon latlon = MainActivity.getLastLatLon();
         Date currDate = Calendar.getInstance().getTime();
+        /* TODO make work =P
         int rank = findRank(song, latlon, currDate);
         Log.i("Playlist calculateRank", "rank of current song is " + rank);
-        song.setRank(rank);
+        song.setRank(rank);*/
     }
 
     public int getCurrSongID() {
@@ -156,60 +160,56 @@ public class Playlist {
     /*
      * Sets the rank of a song, as well as returns said rank
      *
-     * FAVORITED: +303
+     * FAVORITED: doesn't matter :\
      * DISLIKED: rank set to -1, no other factors are counted
      *
-     * WITHIN 200M: +301
-     * WITHIN 400M: +201
-     * WITHIN 600M: +101
+     * WITHIN 314M: +102
      *
-     * SAME DAY OF WEEK: +202
+     * PLAYED WITHIN A WEEK: +101
      *
-     * SAME HOUR/1 HOUR APART: +300
-     * 2 HOURS APART: +200
-     * 1 HOUR APART: +100
+     * PLAYED BY FRIEND: +100
      *
-     * Testing for this file at `FlashbackMusic/app/src/androidTest/java/tests/FlashbackAlgorithmTests.java`
+     * Testing for this file at `FlashbackMusic/app/src/androidTest/java/tests/VibeAlgorithmTests.java`
      * Please run tests after making any changes to this function, and update values as needed
      */
-    public int findRank (Song song, LatLon currentLatLon, Date now) {
+    public int findRank (final Song song, final LatLon currentLatLon, final Date now,
+                          final ArrayList<User> friends, ArrayList<PlayInstance> playInstances) {
         int rank = 0;
         if (song.isDisliked()) {
-            rank = -1;
-            song.setRank(rank);
-            return rank;
-        } else if (song.isFavorited()) {
-            rank += 303;
+            song.setRank(-1);
+            return -1;
+        }
+        if (playInstances.size() == 0) {
+            song.setRank(0);
+            return 0;
         }
 
-        // If song not played before, has a rank of 0
-        if (!song.wasPlayedPreviously()) {
-            rank = 0;
-            song.setRank(rank);
-            return rank;
-        }
+        boolean playedNear = false;
+        boolean playedLastWeek = false;
+        boolean playedFriend = false;
 
-        LatLon songLatLon = song.getLastPlayedLocation();
-        // Distance in meters between current loc and previously played loc
-        float locDiff = abs(songLatLon.findDistance(currentLatLon));
-        if (locDiff < 200.0) {
-            rank += 301;
-        } else if (locDiff < 400.0) {
-            rank += 201;
-        } else if (locDiff < 600.0) {
-            rank += 101;
-        }
+        for (int i = 0; i < playInstances.size(); i++) {
+            PlayInstance thisPlayInstance = playInstances.get(i);
 
-        Calendar nowCalendar = new GregorianCalendar();
-        nowCalendar.setTime(now);
-        if (song.playedOnDayOfTheWeek(nowCalendar)) {
-            rank += 202;
-        }
+            LatLon songLoc = new LatLon(thisPlayInstance.latitude, thisPlayInstance.longitude);
+            if (!playedNear && abs(songLoc.findDistance(currentLatLon)) < Math.PI * 100) {
+                playedNear = true;
+                rank += 102;
+            }
 
-        if (song.playedAtTimeOfDay(nowCalendar)) {
-            rank += 300;
-        }
+            // Check to see if the now time is less than a week's worth of milliseconds from the time it was played
+            if (!playedLastWeek && now.getTime() - thisPlayInstance.getTimeInMillis() <= 604800000) {
+                playedLastWeek = true;
+                rank += 101;
+            }
 
+            for (int j = 0; j < friends.size() && !playedFriend; j++) {
+                if (thisPlayInstance.getUserId().equals(friends.get(j).getUserId())) {
+                    playedFriend = true;
+                    rank += 100;
+                }
+            }
+        }
         song.setRank(rank);
         return rank;
     }
