@@ -1,11 +1,13 @@
 package com.example.cse110.flashbackmusic;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -44,11 +46,13 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
                 if (musicPlayer.getPlayMode() != 1) {
                     if (isChecked) {
                         // The toggle is enabled
+                        updateTracklistButton(true);
                         musicPlayer.setPlayMode("flashback");
                         MainActivity.updateMode(2);
                         updateButtonImages();
                     } else {
                         // The toggle is disabled
+                        updateTracklistButton(false);
                         musicPlayer.setPlayMode("song_selection");
                         MainActivity.updateMode(0);
                         musicPlayer.stop();
@@ -63,14 +67,18 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
             int selected_id = Integer.parseInt(getIntent().getStringExtra("SELECTED_ID"));
             musicPlayer.selectSong(selected_id);
         }
-        else if (play_mode == 1) {
-            int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
-            musicPlayer.selectAlbum(selected_index);
-        }
-        else if (musicPlayer.getPlayMode() == 2) {
-            int curr_id = musicPlayer.getPlaylistSongID();
-            musicPlayer.selectSong(curr_id);
-            if (!toggleVibe.isChecked()) { toggleVibe.setChecked(true);}
+        else {
+            updateTracklistButton(true);
+            if (play_mode == 1) {
+                int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
+                musicPlayer.selectAlbum(selected_index);
+            } else if (musicPlayer.getPlayMode() == 2) {
+                int curr_id = musicPlayer.getPlaylistSongID();
+                musicPlayer.selectSong(curr_id);
+                if (!toggleVibe.isChecked()) {
+                    toggleVibe.setChecked(true);
+                }
+            }
         }
 
         musicPlayer.getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -99,6 +107,14 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
             public void onClick(View view){
                 MainActivity.updateMode(-1);
                 finish();
+            }
+        });
+
+        Button showTracklist = findViewById(R.id.show_tracklist);
+        showTracklist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchTracklistActivity();
             }
         });
 
@@ -151,6 +167,12 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
         updateButtonImages();
     }
 
+    private void launchTracklistActivity() {
+        Log.i("MusicPlayActivity LaunchTracklistSelection", "Launching Tracklist Display");
+        Intent intent = new Intent(this, TracklistActivity.class);
+        startActivity(intent);
+    }
+
     private void updateButtonImages() {
         if (musicPlayer.isMusicPlaying() || musicPlayer.isLoadingSong()) {
             playButton.setBackgroundResource(R.drawable.pause_button);
@@ -197,6 +219,15 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
                 }
             }
         });
+    }
+
+    public void updateTracklistButton (boolean visible) {
+        Button showTracklist = findViewById(R.id.show_tracklist);
+        if (visible) {
+            showTracklist.setVisibility(View.VISIBLE);
+        } else {
+            showTracklist.setVisibility(View.INVISIBLE);
+        }
     }
 
     public void updateUIWithSongInfo () {
