@@ -22,7 +22,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleBrowserClientRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.HttpTransport;
@@ -33,11 +32,21 @@ import com.google.api.services.people.v1.PeopleServiceScopes;
 import com.google.api.services.people.v1.model.ListConnectionsResponse;
 import com.google.api.services.people.v1.model.Person;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.net.Uri;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -69,6 +78,15 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences.Editor albumDataEditor;
     private SharedPreferences modeSharedPref;
     private static SharedPreferences.Editor modeDataEditor;
+    private static File storage;
+
+    private static DownloadManager downloadManager;
+    private static BroadcastReceiver broadcastReceiver;
+
+    public static File getStorageFile()
+    {
+        return storage;
+    }
 
     public static Intent getGoogleSignInIntent() { return googleSignInClient.getSignInIntent(); }
 
@@ -94,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         updateSongData();
         updateAlbumData();
         musicPlayer.destroy();
+        unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
 
@@ -104,27 +123,36 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("HERE","");
 
-        if (!hasLocationPermission(this)) {
-            Log.i("MainActivity Permission", "Missing permission to access the location");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        if (!hasPermission(this)) {
+            Log.i("MainActivity Permission", "Missing permission");
+            requestPermissions();
             return;
         }
-
         init();
+    }
+
+    private void requestPermissions()
+    {
+        ActivityCompat.requestPermissions(this, new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            Log.i("MainActivity Request Permission Result", "Permission granted");
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                init();}
-            else {
+        for (int grantResult : grantResults)
+        {
+            if (grantResult != PackageManager.PERMISSION_GRANTED)
+            {
                 Log.i("MainActivity Request Permission Result", "Permission denied, asking again");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);}
+                requestPermissions();
+                return;
+            }
         }
+        Log.i("MainActivity Request Permission Result", "Permission granted");
+        init();
     }
 
     @SuppressWarnings({"MissingPermission"})
@@ -210,6 +238,164 @@ public class MainActivity extends AppCompatActivity {
                 launchAlbumSelection();
             }
         });
+
+        downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+
+
+        storage = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "FBMusic");
+        broadcastReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                Log.d(getClass().getName(), "Download complete");
+
+                long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+                for (Song song : songs)
+                {
+                    if(song.downloadId == downloadId)
+                    {
+                        song.downloaded = true;
+                        updateSongData();
+                        Log.d("getClass().getName()", "Song downloaded." + song.getSongName() + song.getArtistName());
+                        return;
+                    }
+                }
+                for (Album album : albums)
+                {
+                    if(album.downloadId == downloadId)
+                    {
+                        album.downloaded = true;
+                        updateAlbumData();
+                        new UnzipTask(new File(storage, album.getAlbumName() + ".zip"),
+                            new File(storage, album.getAlbumName()),
+                            album).execute();
+                        Log.d(getClass().getName() + ", Broadcast Receiver onReceive", "Started unzip task");
+                        return;
+                    }
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    // Source (used for info), 3/7/18:
+    // Android Download Manager Tutorial: How to Download Files using Download Manager from Internet
+    // https://www.codeproject.com/Articles/1112730/Android-Download-Manager-Tutorial-How-to-Download
+    // Returns download id
+    public static long download(String url, String name)
+    {
+        Uri uri = Uri.parse(url);
+
+        try
+        {
+            Log.d("MainActivity download", "in download try");
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setTitle("Download song/album");
+            request.setDescription("Downloading from " + url);
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+            request.setAllowedOverRoaming(false);
+            request.setVisibleInDownloadsUi(true);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/FBMusic/" + name);
+            long downloadId = downloadManager.enqueue(request);
+            return downloadId;
+        }
+        catch (IllegalArgumentException e)
+        {
+            return -1;
+        }
+    }
+
+    private class UnzipTask extends AsyncTask<Void, Void, Void>
+    {
+        File zipFile;
+        File targetDir;
+        Album album;
+
+        UnzipTask(File zipFile, File targetDir, Album album)
+        {
+            this.zipFile = zipFile;
+            this.targetDir = targetDir;
+            this.album = album;
+        }
+
+        protected Void doInBackground(Void... params)
+        {
+            unzip(zipFile, targetDir);
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            File[] files = new File(storage, album.getAlbumName()).listFiles();
+            album.num_tracks = files.length;
+
+            Log.d(getClass().getName(), "Unzip task complete, Album " + album.getAlbumName() +
+                " { num_tracks:  " + album.num_tracks + " }");
+
+            for (File file : files)
+            {
+                String songName = file.getName();
+                songName = songName.substring(0, songName.length() - 4); // removes .mp3 from song name
+                songName = songName.replace('.', ' '); // for firebase
+                songName = songName.replace('$', ' ');
+                songName = songName.replace('#', ' ');
+                songName = songName.replace('[', ' ');
+                songName = songName.replace(']', ' ');
+                String songData = songName + "; " + album.artist_name + "; " + album.getAlbumName() + "; 0; 0; -1";
+                Song newSong = new Song(songData, album.getID());
+                newSong.inAlbum = true;
+                newSong.downloaded = true;
+                newSong.storedInRaw = false;
+                newSong.fileName = file.getName();
+                MainActivity.getSongs().add(newSong);
+                Log.d(getClass().getName(), newSong.getSongName() + " added");
+            }
+            updateSongData();
+        }
+    }
+
+    // Source (used for info), 3/6/18:
+    // How to unzip files programmatically in Android?
+    // https://stackoverflow.com/questions/3382996/how-to-unzip-files-programmatically-in-android
+    public static void unzip(File zipFile, File targetDir)
+    {
+        Log.d("Unzip", "Starting unzip of " + zipFile.getAbsolutePath() + " to " + targetDir.getAbsolutePath());
+        final int BUF_SIZE = 8192;
+        //ZipInputStream zipInputStream;
+        try (ZipInputStream zipInputStream = new ZipInputStream(
+            new BufferedInputStream(new FileInputStream(zipFile))))
+        {
+            try
+            {
+                byte[] buf = new byte[BUF_SIZE];
+                ZipEntry zipEntry;
+                while ((zipEntry = zipInputStream.getNextEntry()) != null)
+                {
+                    File file = new File(targetDir, zipEntry.getName());
+                    File dir = zipEntry.isDirectory() ? file : file.getParentFile();
+                    if (!(dir.isDirectory() || dir.mkdirs()))
+                    {
+                        throw new FileNotFoundException("Error with directories");
+                    }
+                    if (!zipEntry.isDirectory())
+                    {
+                        FileOutputStream fileOutputStream = new FileOutputStream(file);
+                        int numBytesRead;
+                        while ((numBytesRead = zipInputStream.read(buf)) != -1)
+                        {
+                            fileOutputStream.write(buf, 0, numBytesRead);
+                        }
+                        fileOutputStream.close();
+                    }
+                    Log.d("Unzip", "Unzipped a file...");
+                }
+            }
+            catch (IOException e) { e.printStackTrace(); return; }
+        }
+        catch (FileNotFoundException e) { e.printStackTrace(); }
+        catch (IOException e1){e1.printStackTrace(); }
+        Log.d("Unzip", "Finished unzip");
     }
 
     public void GoogleAuthentication() {
@@ -366,10 +552,11 @@ public class MainActivity extends AppCompatActivity {
         modeDataEditor.apply();
     }
 
-    public static boolean hasLocationPermission(Context context)
+    public static boolean hasPermission(Context context)
     {
-        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED  &&
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED  &&
+            ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     @SuppressWarnings({"MissingPermission"})
