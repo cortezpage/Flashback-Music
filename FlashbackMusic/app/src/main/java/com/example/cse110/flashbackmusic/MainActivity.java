@@ -328,11 +328,12 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(Void param) {
             File[] files = new File(storage, album.getAlbumName()).listFiles();
-            album.num_tracks = files.length;
+            album.setNumTracks(files.length);
 
             Log.d(getClass().getName(), "Unzip task complete, Album " + album.getAlbumName() +
                 " { num_tracks:  " + album.num_tracks + " }");
 
+            int songCount=0;
             for (File file : files)
             {
                 String songName = file.getName();
@@ -349,6 +350,8 @@ public class MainActivity extends AppCompatActivity {
                 newSong.storedInRaw = false;
                 newSong.fileName = file.getName();
                 MainActivity.getSongs().add(newSong);
+                album.addSong(newSong, songCount);
+                songCount++;
                 Log.d(getClass().getName(), newSong.getSongName() + " added");
             }
             updateSongData();

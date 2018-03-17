@@ -38,6 +38,12 @@ public class Album {
         this.url = url;
     }
 
+    public void setNumTracks(int numTracks)
+    {
+        num_tracks=numTracks;
+        songs = new Song[num_tracks];
+    }
+
     public Album (String album_data, String url, long downloadId) {
         this(album_data, url);
         this.downloadId = downloadId;

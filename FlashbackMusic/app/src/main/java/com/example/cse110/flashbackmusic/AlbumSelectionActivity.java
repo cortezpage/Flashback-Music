@@ -32,6 +32,7 @@ public class AlbumSelectionActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
             curr_album = albums.get(index);
+            if (!(curr_album.storedInRaw || curr_album.downloaded)) continue;
             final int curr_id = index;
             new_button = new Button(this);
             new_button.setText(curr_album.getAlbumName());

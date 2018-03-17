@@ -98,6 +98,7 @@ public class SongSelectionActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT
             );
             curr_song = songs.get(index);
+            if (!(curr_song.storedInRaw || curr_song.downloaded)) continue;
             final int curr_id = curr_song.getMediaID();
             new_button = new Button(this);
             new_button.setText(curr_song.getSongName());
