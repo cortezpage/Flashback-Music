@@ -70,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences modeSharedPref;
     private static SharedPreferences.Editor modeDataEditor;
 
+    public static Playlist getPlaylist () {return musicPlayer.getPlaylist(); }
+
+    public static int getPlayMode () {return musicPlayer.getPlayMode();}
+
     public static Intent getGoogleSignInIntent() { return googleSignInClient.getSignInIntent(); }
 
     public static MusicPlayer getMusicPlayer() {
