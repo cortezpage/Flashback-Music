@@ -14,21 +14,50 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleBrowserClientRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.people.v1.PeopleService;
+import com.google.api.services.people.v1.model.ListConnectionsResponse;
+import com.google.api.services.people.v1.model.Person;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
+public class MainActivity extends AppCompatActivity {
 
-    private final boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
+    private final boolean ERASE_DATA_AT_START = true; // for testing (set to false for release)
 
     private final boolean START_WITH_SONGS = true; // set to true if you want to start with some songs loaded
 
     private final int LOCATION_PERMISSION_REQUEST_CODE = 0; // arbitrary number chosen
+
+    private final String CLIENT_AUTH = "787403082568-fgl6qfqr64ed5jsd0uk8a7a4jmoo996m.apps.googleusercontent.com";
+
+    private final String CLIENT_SECRET = "-i7_U5cbS3Eybh0Wuq7IQmmY";
+
+    private final int LOGIN_SUCCESS_RESULT_CODE = 178900;
 
     private static MusicPlayer musicPlayer = null;
     private static SharedPrefHelper sharedPrefHelper;
     private static ArrayList<Song> songs;
     private static ArrayList<Album> albums;
     private static LocationManager locationManager;
+    private static GoogleSignInAccount googleAccount;
+    private static GoogleSignInClient googleSignInClient;
     private SharedPreferences songSharedPref;
     private SharedPreferences.Editor songDataEditor;
     private SharedPreferences idSharedPref;
@@ -37,6 +66,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     private SharedPreferences.Editor albumDataEditor;
     private SharedPreferences modeSharedPref;
     private static SharedPreferences.Editor modeDataEditor;
+
+    public static Intent getGoogleSignInIntent() { return googleSignInClient.getSignInIntent(); }
 
     public static MusicPlayer getMusicPlayer() {
         return musicPlayer;
@@ -138,9 +169,12 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         musicPlayer = new MusicPlayer (this.getResources());
 
+        GoogleAuthentication();
+
         String mode = modeSharedPref.getString("LAST_PLAYED_MODE", "NOT FOUND");
         Log.i("MODE", mode);
-        if (mode.equals("flashback")) {
+        // if the previous mode was flashback mode AND the sign in activity was not already launched
+        if ((!(googleAccount == null)) && mode.equals("flashback")) {
             launchFlashbackMode();
         }
 
@@ -170,6 +204,93 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
                 launchAlbumSelection();
             }
         });
+    }
+
+    public void GoogleAuthentication() {
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestServerAuthCode(CLIENT_AUTH)
+                .requestEmail()
+                .build();
+        // Build a GoogleSignInClient with the options specified by gso.
+        googleSignInClient = GoogleSignIn.getClient(this.getApplicationContext(), gso);
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        googleAccount = GoogleSignIn.getLastSignedInAccount(this.getApplicationContext());
+        if (googleAccount == null) {
+            launchSignInActivity();
+        } else {
+            Log.i("SIGN IN SKIPPED", "ACCOUNT: " + googleAccount.getEmail());
+            try {
+                SetUpPeopleAPI();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void SetUpPeopleAPI() throws IOException {
+
+        HttpTransport httpTransport = new NetHttpTransport();
+        JacksonFactory jsonFactory = new JacksonFactory();
+        String code = googleAccount.getServerAuthCode();
+        String redirectUrl = "https://vibemode-2b73b.firebaseapp.com/__/auth/handler";
+
+        if (code == null) { Log.e("AUTH CODE RETRIEVED", "NULL"); }
+        else {
+            Log.i("AUTH CODE RETRIEVED", "SUCCESS");
+
+            GoogleTokenResponse tokenResponse =
+                    new GoogleAuthorizationCodeTokenRequest(
+                            httpTransport, jsonFactory, CLIENT_AUTH, CLIENT_SECRET, code, redirectUrl)
+                            .execute();
+
+            GoogleCredential credential = new GoogleCredential.Builder()
+                    .setTransport(httpTransport)
+                    .setJsonFactory(jsonFactory)
+                    .setClientSecrets(CLIENT_AUTH, CLIENT_SECRET)
+                    .build()
+                    .setFromTokenResponse(tokenResponse);
+
+            PeopleService peopleService =
+                    new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
+
+            try {
+                ListConnectionsResponse friends = peopleService.people().
+                        connections()
+                        .list("people/me")
+                        .setPersonFields("names, emailAddresses")
+                        .execute();
+                List<Person> friendList = friends.getConnections();
+                Log.i("NUM FRIENDS", "" + friendList.size());
+                for (int index = 0; index < friendList.size(); index++) {
+                    Log.e("FRIEND LIST", "" + friendList.get(index).getNames());
+                }
+            } catch (Exception e) {
+                Log.e("PEOPLE ERROR", e.getMessage());
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // if the login activity just finished and the login was successful, update the googleAccount field
+        if (resultCode == LOGIN_SUCCESS_RESULT_CODE) {
+            googleAccount = GoogleSignIn.getLastSignedInAccount(this.getApplicationContext());
+            Log.i("LOGIN SUCCESSFUL", "USER: " + googleAccount.getDisplayName());
+            try {
+                SetUpPeopleAPI();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void launchSignInActivity () {
+        Log.i("MainActivity LaunchSignInActivity", "Launching Sign In Activity");
+        Intent intent = new Intent(this, SignInActivity.class);
+        startActivity(intent);
     }
 
     public void launchDownloadActivity () {
