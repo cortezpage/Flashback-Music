@@ -3,6 +3,7 @@ package com.example.cse110.flashbackmusic;
 import android.util.Log;
 
 import com.example.cse110.flashbackmusic.Callbacks.Callback;
+import com.example.cse110.flashbackmusic.Callbacks.DatabaseEntryCallback;
 import com.example.cse110.flashbackmusic.Callbacks.PlayInstancesCallback;
 
 import java.util.ArrayList;
@@ -14,12 +15,12 @@ import java.util.Queue;
 import java.util.Date;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.max;
 
 public class Playlist {
 
     private final int TIME_OF_DAY_DIVISION = 4;
 
-    private ArrayList<Song> songs;
     private int play_index;
     private Queue<Song> songPQ;
 
@@ -38,48 +39,63 @@ public class Playlist {
     private LatLon lastSortedLoc;
 
     public Playlist () {
-        this.songs = MainActivity.getSongs();
+        Log.i("Playlist", "Creating new Playlist");
         this.play_index = 0;
         this.lastSortedCal = null;
         this.lastSortedLoc = null;
         this.songPQ = new PriorityQueue<>(100, rankComp);
-        addSongToList();
-        Log.i("Playlist Constructor", "Created a playlist with play_index" + play_index);
+        setPlaylist();
     }
 
     // FAKE CONSTRUCTOR FOR TESTING
     public Playlist (boolean fake) {}
     // FAKE CONSTRUCTOR FOR TESTING
 
-    private void addSongToList () {
-        // calculate the score for each song and then put them into the priority queue
-        for (int k = 0; k < songs.size(); k++) {
-            calculateRank(songs.get(k));
-            Log.i("Playlist addSongToList", "Calculating the rank of "
-                    + songs.get(k).getSongName());
-        }
+    private int maxSongs;
+    private int foundSongs;
+    private void setPlaylist () {
+        foundSongs = 0;
+        maxSongs = -1;
+        final DatabaseManager databaseManager = new DatabaseManager();
 
-        for (int i = 0; i < songs.size(); i++) {
-            // skipping over disliked songs
-            if (songs.get(i).getLikeStatus() == 2) {
-                continue;
+        Log.i("Playlist", "Creating playlist");
+        databaseManager.getAllEntries(new DatabaseEntryCallback() {
+            @Override
+            public void onComplete(DatabaseEntry databaseEntry) {
+                LatLon latLon = MainActivity.getLastLatLon();
+                Date date = Calendar.getInstance().getTime();
+
+                Song song = databaseEntry.getSong();
+                ArrayList<PlayInstance> playInstances = databaseEntry.playInstances;
+                ArrayList<User> users = new ArrayList<>();
+                users.add(new User("Bob"));
+                int rank = findRank(song, latLon, date, users, playInstances);
+                Log.i("Playlist", "Rank of " + song.getSongName() + " calculated at " + rank);
+
+                songPQ.add(song);
+                Log.i("Playlist", song.getSongName() + " added to database");
+
+                foundSongs++;
+                if (maxSongs == -1) {
+                    maxSongs = databaseManager.getNumSongs();
+                    Log.i("Playlist", maxSongs + " songs in database");
+                }
+
+                if (maxSongs != -1 && foundSongs >= maxSongs) {
+                    Log.i("Playlist", "All songs added");
+                    startVibeMode();
+                }
             }
-            songPQ.add(songs.get(i));
-            Log.i("Playlist addSongToList", "Adding the song " + songs.get(i).getSongName() +
-                    " to the priority queue");
-        }
-
-        Log.i("Playlist addSongToList", "The size of priority queue is " + songPQ.size());
+        });
     }
 
-    private void calculateRank (Song song) {
-        // calculate the score for the song
-        LatLon latlon = MainActivity.getLastLatLon();
-        Date currDate = Calendar.getInstance().getTime();
-        /* TODO make work =P
-        int rank = findRank(song, latlon, currDate);
-        Log.i("Playlist calculateRank", "rank of current song is " + rank);
-        song.setRank(rank);*/
+    private void startVibeMode () {
+        Log.i("Playlist", "Entering Vibe Mode");
+
+        MusicPlayer musicPlayer = MainActivity.getMusicPlayer();
+        musicPlayer.goToNextSong();
+        musicPlayer.reset();
+        musicPlayer.play();
     }
 
     public int getCurrSongID() {
@@ -123,14 +139,6 @@ public class Playlist {
         return false;
     }
 
-    public void sortPlaylist(Calendar currTime, LatLon currLoc) {
-        Log.i("Playlist sortPlaylist", "Playlist is being resorted by current location and time");
-        lastSortedLoc = currLoc;
-        lastSortedCal = currTime;
-        songPQ.clear();
-        addSongToList();
-    }
-
     //0 - neutral; 1 - favorite; 2 - dislike
     public static int breakTieWithLike (Song song1, Song song2){
         int songStatus1 = song1.getLikeStatus();
@@ -138,7 +146,7 @@ public class Playlist {
 
         //If the like statuses are the same, break the tie based on mostly recently played
         if(songStatus1 == songStatus2) {
-            return breakTieWithRecentPlay(song1, song2);
+            return 1;
         }
         else if ((songStatus1 == 1) || (songStatus1 == 0 && songStatus2 == 2)){
             return -1;
@@ -146,17 +154,6 @@ public class Playlist {
         return 1;
     }
 
-    public static int breakTieWithRecentPlay (Song songOne, Song songTwo) {
-        if (songOne.getLastPlayedDate() == null || songTwo.getLastPlayedDate() == null) {
-            return -1;
-        }
-        if(songOne.getLastPlayedDate().compareTo(songTwo.getLastPlayedDate()) < 0) {
-            return -1;
-        }
-        else {
-            return 1;
-        }
-    }
     /*
      * Sets the rank of a song, as well as returns said rank
      *

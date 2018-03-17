@@ -34,7 +34,6 @@ public class MusicPlayer {
         this.songs = MainActivity.getSongs();
         this.albums = MainActivity.getAlbums();
         this.curr_album = null;
-        this.flashback_playlist = new Playlist();
         this.databaseManager = new DatabaseManager();
         Log.i("MusicPlayer Constructor", "Initialized with parameters play_index " +
         play_index + "\nplay_mode " + play_mode);
@@ -97,8 +96,12 @@ public class MusicPlayer {
     }
 
     public void updatePlaylist(boolean startingFBMode) {
+        return;/*
         Calendar currTime = Calendar.getInstance();
         LatLon currLoc = MainActivity.getLastLatLon();
+        if (flashback_playlist == null) {
+            return;
+        }
         if (this.flashback_playlist.shouldSort(currTime, currLoc) || startingFBMode) {
 
             Log.i("MusicPlayer updatePlaylist", "updating the playlist with current time "
@@ -106,7 +109,7 @@ public class MusicPlayer {
                     currLoc.getLatitude() + " " + currLoc.getLongitude());
 
             this.flashback_playlist.sortPlaylist(currTime, currLoc);
-        }
+        }*/
     }
 
     // only available in album play and flashback mode
@@ -125,6 +128,7 @@ public class MusicPlayer {
             this.curr_album.toNextSong();
             selectSong(this.curr_album.getCurrSongID());
         } else if (this.play_mode == 2 && !this.flashback_playlist.atEnd()) {
+            Log.i("MusicPlayer", "Playing next song");
             selectSong(this.flashback_playlist.getCurrSongID());
         }
     }
@@ -201,13 +205,16 @@ public class MusicPlayer {
     public void setPlayMode(String mode) {
         if (mode.equals("album_selection")) {
             this.play_mode = 1;
+            flashback_playlist = null;
         } else if (mode.equals("flashback")) {
             this.play_mode = 2;
             this.curr_album = null;
-            this.updatePlaylist(true);
+            Log.i("MusicPlayer", "Starting Vibe Mode");
+            flashback_playlist = new Playlist();
         } else { // default case
             this.play_mode = 0;
             this.curr_album = null;
+            flashback_playlist = null;
         }
     }
 

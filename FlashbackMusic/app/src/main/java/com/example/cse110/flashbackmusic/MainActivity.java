@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         GoogleAuthentication();
 
         String mode = modeSharedPref.getString("LAST_PLAYED_MODE", "NOT FOUND");
+        mode = "default"; // TODO remove this line
         Log.i("MODE", mode);
         // if the previous mode was flashback mode AND the sign in activity was not already launched
         if ((!(googleAccount == null)) && mode.equals("flashback")) {

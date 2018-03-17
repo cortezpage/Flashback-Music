@@ -1,5 +1,7 @@
 package com.example.cse110.flashbackmusic;
 
+import android.arch.persistence.room.Database;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.example.cse110.flashbackmusic.Callbacks.DatabaseEntryCallback;
@@ -22,6 +24,11 @@ import java.util.Calendar;
  */
 
 public class DatabaseManager {
+    private int numSongs;
+
+    public DatabaseManager () {
+        numSongs = -1;
+    }
 
     // Call sto store a specific play of a specific song
     public void storePlayInstance (final PlayInstance playInstance, final Song song) {
@@ -216,16 +223,24 @@ public class DatabaseManager {
                     Log.i("Database Manager", "No songs found");
                 } else {
                     // If object already created, just add our play to end
-                    songNames = new Gson().fromJson(codedEntry, new TypeToken<ArrayList<String>>() {}.getType());
+                    songNames = new Gson().fromJson(codedEntry, new TypeToken<ArrayList<String>>() {
+                    }.getType());
+                    numSongs = songNames.size();
 
                     new GetAllSongsCallback().onComplete(songNames);
                 }
             }
+
             // Not used
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
-    };
+    }
+
+    public int getNumSongs () {
+        return numSongs;
+    }
 
     /* HOW TO USE DATABASE:
      *   A) check if song played near current location:
