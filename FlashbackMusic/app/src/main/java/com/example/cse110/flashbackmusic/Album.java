@@ -6,20 +6,25 @@ import com.google.gson.Gson;
 
 public class Album {
     private String album_name;
-    private String artist_name;
-    private int num_tracks;
+    public String artist_name;
+    public int num_tracks;
     private String id;
     private Song [] songs;
     private int play_index;
 
-    public Album (String album_data) {
+    private String url;
+    public long downloadId;
+    public boolean downloaded;
+    public boolean storedInRaw = true; // default
+
+    public Album (String album_data, String url) {
         String [] data = album_data.split("; ");
         if (data.length != 4) {
             Log.e("Album Constructor", "Data String does not satisfy the format");
             this.album_name = "YouTube Audio Library";
             this.artist_name = "Media Right Productions";
             this.num_tracks = 1;
-            this.id = "ALBUM_6";
+            this.id = "ALBUM_-1";
             this.songs = new Song[this.num_tracks];
             this.play_index = 0;
         } else {
@@ -30,6 +35,14 @@ public class Album {
             this.songs = new Song[this.num_tracks];
             this.play_index = 0;
         }
+        this.url = url;
+    }
+
+    public Album (String album_data, String url, long downloadId) {
+        this(album_data, url);
+        this.downloadId = downloadId;
+        downloaded = false;
+        storedInRaw = false;
     }
 
     public String getAlbumName() { return this.album_name; }
@@ -37,7 +50,7 @@ public class Album {
     public int getNumTracks() { return this.num_tracks; }
 
     public String getID() {
-        return this.id;
+        return storedInRaw ? id : url;
     }
 
     public String toString() { return new Gson().toJson(this); }

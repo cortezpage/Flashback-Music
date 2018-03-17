@@ -103,7 +103,7 @@ public class SharedPrefHelper {
 
         for (int index = 0; index < albumData.length; index++) {
             if (use_test_data) {
-                newAlbum = new Album(albumData[index]);
+                newAlbum = new Album(albumData[index], "");
                 int songCount = 0;
                 for (int song_index = 0; song_index < songs.size() && songCount < newAlbum.getNumTracks(); song_index++) {
                     if (songs.get(song_index).getAlbumName().equals(newAlbum.getAlbumName())) {

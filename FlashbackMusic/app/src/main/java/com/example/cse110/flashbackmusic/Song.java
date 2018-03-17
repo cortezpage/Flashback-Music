@@ -15,7 +15,8 @@ public class Song {
     private String album_name; // name of the album to which the song belongs
     private int duration;
     private int like_status; // 0 = neutral, 1 = favorited, and 2 = disliked
-    private int media_id;
+    public int media_id;
+    public String fileName;
 
     private final int TIME_OF_DAY_DIVISION = 4;
 
@@ -33,7 +34,11 @@ public class Song {
 
     // Song's url
     private String song_url;
+    public long downloadId;
+    public boolean downloaded;
 
+    public boolean storedInRaw = true; // default
+    public boolean inAlbum = true; // default
     // This constructor builds a song from a string filled with data about the song.
     public Song(String data, String url) {
         String [] substrings = data.split("; ");
@@ -64,6 +69,14 @@ public class Song {
             " in album " + album_name + "URL: " + song_url + " is created.");
     }
 
+    public Song(String data, String url, long downloadId) {
+        this(data, url);
+        this.downloadId = downloadId;
+        downloaded = false;
+        storedInRaw = false;
+        fileName = song_name + ".mp3";
+    }
+
     public String getSongName() { return this.song_name; }
 
     public String getArtistName() {
@@ -74,7 +87,7 @@ public class Song {
         return this.album_name;
     }
 
-    public int getMediaID() { return this.media_id; }
+    public int getMediaID() { return storedInRaw ? media_id : (song_url + song_name).hashCode(); }
 
     public int getLikeStatus() { return this.like_status; }
 

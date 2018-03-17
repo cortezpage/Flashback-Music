@@ -57,7 +57,7 @@ public class MusicPlayer {
 
     public void reset() {
         this.player.reset();
-        loadSong(songs.get(play_index).getMediaID());
+        loadSong(songs.get(play_index));
         Log.i("MusicPlayer reset", "Reseting current song and loading song " +
                 songs.get(play_index).getMediaID());
     }
@@ -214,26 +214,34 @@ public class MusicPlayer {
     /* loadSong is based on the loadMedia method from Lab 4.
      * This method allows us to load a song's data into the media player.
      */
-    public void loadSong(int resourceId) {
+    public void loadSong(Song song) {
 
-        Log.e ("loadSong", "loading song ID: " + resourceId);
+        if (song.storedInRaw)
+        {
+            int resourceId = song.getMediaID();
+            Log.e ("loadSong", "loading song ID: " + resourceId);
+            AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
+            try {this.player.setDataSource(songFD);}
+            catch (Exception e) {System.err.println(e.toString());}
+        }
+        else
+        {
+            String songPath = MainActivity.getStorageFile().getAbsolutePath()  + "/"+
+                (song.inAlbum ? song.getAlbumName() + "/" : "") + song.fileName;
+            Log.e(getClass().getName(), songPath);
+            try {this.player.setDataSource(songPath);}
+            catch (Exception e) {System.err.println(e.toString());}
+        }
+        this.player.prepareAsync();
+        loadingSong = true;
+        this.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer player) {
+                player.start();
+                loadingSong = false;
+            }
+        });
 
-        AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
-        try {
-            this.player.setDataSource(songFD);
-            this.player.prepareAsync();
-
-            loadingSong = true;
-
-            this.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer player) {
-                    player.start();
-                    loadingSong = false;
-                }
-            });
-
-        } catch (Exception e) {System.err.println(e.toString());}
     }
 
     public boolean isLoadingSong() {

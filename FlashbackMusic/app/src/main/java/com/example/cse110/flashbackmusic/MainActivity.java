@@ -45,10 +45,10 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {//implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    private final boolean ERASE_DATA_AT_START = false; // for testing (set to false for release)
+    private final boolean ERASE_DATA_AT_START = true; // for testing (set to false for release)
 
     private final boolean START_WITH_SONGS = true; // set to true if you want to start with some songs loaded
-    
+
     private static MusicPlayer musicPlayer = null;
     private static SharedPrefHelper sharedPrefHelper;
     private static ArrayList<Song> songs;
@@ -62,11 +62,15 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     private SharedPreferences.Editor albumDataEditor;
     private SharedPreferences modeSharedPref;
     private static SharedPreferences.Editor modeDataEditor;
+    private static File storage;
 
-    private DownloadManager downloadManager;
-    private BroadcastReceiver broadcastReceiver;
-    // TODO: REMOVE (SEE OTHER COMMMENTS)
-    private ArrayList<Long> albumDownloadIds = new ArrayList<Long>();
+    private static DownloadManager downloadManager;
+    private static BroadcastReceiver broadcastReceiver;
+
+    public static File getStorageFile()
+    {
+        return storage;
+    }
 
     public static MusicPlayer getMusicPlayer() {
         return musicPlayer;
@@ -213,12 +217,8 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
 
         downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
 
-        // Example:
-        //final long downloadId = download("https://d1b10bmlvqabco.cloudfront.net/attach/jc2fhqnhbwl4ii/j85f4pwtei5258/jd9a4rp7lp0u/iwillnotbeafraid.zip", "album2.zip");
-        // TODO: REMOVE line below (SEE OTHER COMMENTS)
-        //albumDownloadIds.add(downloadId);
-        final File storage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
+        storage = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "FBMusic");
         broadcastReceiver = new BroadcastReceiver()
         {
             @Override
@@ -227,14 +227,28 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
                 Log.d(getClass().getName(), "Download complete");
 
                 long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-                // TODO: CHECK WHETHER THIS ID IS FOR SONG OR ALBUM // Right now I just have an array list of download IDs for albums
-                // TODO: GET SONG OR ALBUM OBJECT FROM DOWNLOAD ID
-                // TODO: UPDATE THE SONG OR ALBUM OBJECT TO SAY IT'S DONE DOWNLOADING
-                if (albumDownloadIds.contains(downloadId))
+                for (Song song : songs)
                 {
-                    // TODO: GET ALBUM NAME FROM ALBUM OBJECT // Right now I just use a sample name
-                    new UnzipTask().execute(new File( storage + "/FBMusic/" + "album2.zip"), new File(storage + "/FBMusic/" + "album2"));
-                    Log.d(getClass().getName() + ", Broadcast Receiver onReceive", "Started unzip task");
+                    if(song.downloadId == downloadId)
+                    {
+                        song.downloaded = true;
+                        updateSongData();
+                        Log.d("getClass().getName()", "Song downloaded." + song.getSongName() + song.getArtistName());
+                        return;
+                    }
+                }
+                for (Album album : albums)
+                {
+                    if(album.downloadId == downloadId)
+                    {
+                        album.downloaded = true;
+                        updateAlbumData();
+                        new UnzipTask(new File(storage, album.getAlbumName() + ".zip"),
+                            new File(storage, album.getAlbumName()),
+                            album).execute();
+                        Log.d(getClass().getName() + ", Broadcast Receiver onReceive", "Started unzip task");
+                        return;
+                    }
                 }
             }
         };
@@ -246,33 +260,75 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
     // Android Download Manager Tutorial: How to Download Files using Download Manager from Internet
     // https://www.codeproject.com/Articles/1112730/Android-Download-Manager-Tutorial-How-to-Download
     // Returns download id
-    private long download(String url, String name)
+    public static long download(String url, String name)
     {
         Uri uri = Uri.parse(url);
 
-        DownloadManager.Request request = new DownloadManager.Request(uri);
-        request.setTitle("Download song/album");
-        request.setDescription("Downloading from " + url);
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-        request.setAllowedOverRoaming(false);
-        request.setVisibleInDownloadsUi(true);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/FBMusic/" + name);
-        long downloadId = downloadManager.enqueue(request);
-        //TODO: ATTACH THIS ID TO A SONG OR ALBUM OBJECT
-        return downloadId;
+        try
+        {
+            Log.d("MainActivity download", "in download try");
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setTitle("Download song/album");
+            request.setDescription("Downloading from " + url);
+            request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+            request.setAllowedOverRoaming(false);
+            request.setVisibleInDownloadsUi(true);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/FBMusic/" + name);
+            long downloadId = downloadManager.enqueue(request);
+            return downloadId;
+        }
+        catch (IllegalArgumentException e)
+        {
+            return -1;
+        }
     }
 
-    private class UnzipTask extends AsyncTask<File, Void, Void>
+    private class UnzipTask extends AsyncTask<Void, Void, Void>
     {
-        protected Void doInBackground(File... files)
+        File zipFile;
+        File targetDir;
+        Album album;
+
+        UnzipTask(File zipFile, File targetDir, Album album)
         {
-            unzip(files[0], files[1]);
-            return null;
-        }
-        protected void onPostExecute(Void v) {
-            Log.d(getClass().getName(), "Unzip task complete");
+            this.zipFile = zipFile;
+            this.targetDir = targetDir;
+            this.album = album;
         }
 
+        protected Void doInBackground(Void... params)
+        {
+            unzip(zipFile, targetDir);
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            File[] files = new File(storage, album.getAlbumName()).listFiles();
+            album.num_tracks = files.length;
+
+            Log.d(getClass().getName(), "Unzip task complete, Album " + album.getAlbumName() +
+                " { num_tracks:  " + album.num_tracks + " }");
+
+            for (File file : files)
+            {
+                String songName = file.getName();
+                songName = songName.substring(0, songName.length() - 4); // removes .mp3 from song name
+                songName = songName.replace('.', ' '); // for firebase
+                songName = songName.replace('$', ' ');
+                songName = songName.replace('#', ' ');
+                songName = songName.replace('[', ' ');
+                songName = songName.replace(']', ' ');
+                String songData = songName + "; " + album.artist_name + "; " + album.getAlbumName() + "; 0; 0; -1";
+                Song newSong = new Song(songData, album.getID());
+                newSong.inAlbum = true;
+                newSong.downloaded = true;
+                newSong.storedInRaw = false;
+                newSong.fileName = file.getName();
+                MainActivity.getSongs().add(newSong);
+                Log.d(getClass().getName(), newSong.getSongName() + " added");
+            }
+            updateSongData();
+        }
     }
 
     // Source (used for info), 3/6/18:
