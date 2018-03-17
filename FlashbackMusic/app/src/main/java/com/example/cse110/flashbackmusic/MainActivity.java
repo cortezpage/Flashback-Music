@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d("HERE","");
+
         if (!hasLocationPermission(this)) {
             Log.i("MainActivity Permission", "Missing permission to access the location");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);

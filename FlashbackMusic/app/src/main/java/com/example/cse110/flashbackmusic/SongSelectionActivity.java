@@ -16,15 +16,15 @@ import java.util.ArrayList;
 
 public class SongSelectionActivity extends AppCompatActivity {
 
-    private Button [] song_buttons;
+    public static Button [] song_buttons;
     private String selecteditem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_selection);
-
         final ArrayList<Song> songs = MainActivity.getSongs();
+        Log.d ("songs in song selection activity", "songs" + songs);
         createButtons(songs);
 
         ImageButton back = findViewById(R.id.button_exit_song_selection);
@@ -57,12 +57,24 @@ public class SongSelectionActivity extends AppCompatActivity {
                     case "Artist":
                         Log.e ("select item", "selected artist");
                         sortByArtist(songs, songs.size());
+                        Log.d("ORDER: BY ARTIST", "SUCCESSFUL");
+                        for (int i = 0; i < 10; i++) {
+                            Log.d("SORTED BY ARTIST",""+i+" "+song_buttons[i].getText().toString());
+                        }
                         break;
                     case "Album":
                         sortByAlbum(songs, songs.size());
+                        Log.d("ORDER: BY ALBUM", "SUCCESSFUL");
+                        for (int i = 0; i < 10; i++) {
+                            Log.d("SORTED BY ALBUM",""+i+" "+song_buttons[i].getText().toString());
+                        }
                         break;
                     case "Favorited":
                         sortByFavorite(songs, songs.size());
+                        Log.d("ORDER: BY FAVORITE", "SUCCESSFUL");
+                        for (int i = 0; i < 10; i++) {
+                            Log.d("SORTED BY FAVORITE",""+i+" "+song_buttons[i].getText().toString());
+                        }
                         break;
                 }
 
@@ -203,5 +215,12 @@ public class SongSelectionActivity extends AppCompatActivity {
         LinearLayout view = (LinearLayout)findViewById(R.id.all_songs_list);
         view.removeAllViews();
         createButtons(songs);
+    }
+
+    public Button[] getOriginalSongButtons() {
+        for (int i = 0; i < 10; i++) {
+            Log.d("UNSORTED SONGS",""+i+" "+song_buttons[i].getText().toString());
+        }
+        return song_buttons;
     }
 }
