@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class TracklistActivity extends AppCompatActivity {
 
     private Button [] song_buttons;
+    private ArrayList<Song> songs_toshowlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +30,16 @@ public class TracklistActivity extends AppCompatActivity {
             }
         });
 
-        final ArrayList<Song> songs = MainActivity.getSongs();
-        createDisplayButtons(songs);
+//        final ArrayList<Song> songs = MainActivity.getSongs();
+
+        Song [] temp_songs = MusicPlayActivity.songs_toshow;
+        songs_toshowlist = new ArrayList<>();
+        for (int i = 0; i < temp_songs.length; i++) {
+            songs_toshowlist.add(temp_songs[i]);
+        }
+        Log.e("TESTING", "there is " + songs_toshowlist.size() + " songs to show");
+
+        createDisplayButtons(songs_toshowlist);
     }
 
     public void createDisplayButtons (ArrayList<Song> songs) {

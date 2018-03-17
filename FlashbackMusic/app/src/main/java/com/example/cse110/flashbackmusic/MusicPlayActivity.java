@@ -14,13 +14,16 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class MusicPlayActivity extends AppCompatActivity implements LastPlayedObserver {
 
     private MusicPlayer musicPlayer;
     private SharedPrefHelper sharedPrefHelper;
     private ImageButton playButton;
+    private Album album;
     private int play_mode;
+    public static Song[] songs_toshow;
 
     final boolean testing = true;
 
@@ -33,6 +36,13 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
 
         musicPlayer = MainActivity.getMusicPlayer();
         sharedPrefHelper = MainActivity.getSongSharedPrefHelper();
+
+        // get the album we selected
+        ArrayList<Album> albumList = MainActivity.getAlbums();
+        //int album_index = savedInstanceState.getInt("SELECTED_INDEX");
+        int album_index = getIntent().getIntExtra("SELECTED_INDEX", 0);
+        //Log.e("MUSICPLAY ACITIVITY ONCREATE", "album index " + album_index);
+        final Album curr_album = albumList.get(album_index);
 
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
@@ -114,6 +124,13 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
         showTracklist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // for album mode
+                if (play_mode == 1) {
+                    songs_toshow = curr_album.getSongs();
+                } else if (play_mode == 2) { // for vibe mode
+//                    songs_toshow = ;
+                }
+
                 launchTracklistActivity();
             }
         });
@@ -170,6 +187,13 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
     private void launchTracklistActivity() {
         Log.i("MusicPlayActivity LaunchTracklistSelection", "Launching Tracklist Display");
         Intent intent = new Intent(this, TracklistActivity.class);
+//        ArrayList<Song> songs_toshow_arrayList = new ArrayList<>();
+//        for (int i = 0; i < songs_toshow.length; i++) {
+//            songs_toshow_arrayList.add(songs_toshow[i]);
+//        }
+//        Log.e("TESTING", "there is " + songs_toshow_arrayList.size() + " songs to show");
+
+//        intent.putExtra("SONG_ARRAY_LIST", songs_toshow_arrayList);
         startActivity(intent);
     }
 

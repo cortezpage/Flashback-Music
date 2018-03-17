@@ -32,6 +32,8 @@ public class Album {
         }
     }
 
+    public Song [] getSongs() {return songs;}
+
     public String getAlbumName() { return this.album_name; }
 
     public int getNumTracks() { return this.num_tracks; }
