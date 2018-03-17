@@ -36,7 +36,9 @@
         <activity android:name=".AlbumSelectionActivity" />
         <activity android:name=".DownloadActivity" />
         <activity android:name=".SignInActivity" />
-        <activity android:name=".TracklistActivity"></activity>
+        <activity android:name=".TracklistActivity" />
+        <activity android:name=".TimeChangeActivity" />
+        <activity android:name=".DateChangeActivity" />
     </application>
 
 </manifest>

@@ -13,9 +13,19 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/button_to_change_time"
+            android:layout_width="match_parent"
+            android:layout_height="125dp"
+            android:background="#FFFFFF"
+            android:fontFamily="@font/font_alegreya"
+            android:gravity="center"
+            android:text="Change App Time"
+            android:textSize="25dp" />
+
+        <Button
             android:id="@+id/button_to_download_mode"
             android:layout_width="match_parent"
-            android:layout_height="167dp"
+            android:layout_height="125dp"
             android:background="#FFFFFF"
             android:fontFamily="@font/font_alegreya"
             android:gravity="center"
@@ -25,7 +35,7 @@
         <Button
             android:id="@+id/button_to_song_selection"
             android:layout_width="match_parent"
-            android:layout_height="166dp"
+            android:layout_height="125dp"
             android:background="#FFFFFF"
             android:fontFamily="@font/font_alegreya"
             android:gravity="center"
@@ -35,7 +45,7 @@
         <Button
             android:id="@+id/button_to_album_selection"
             android:layout_width="match_parent"
-            android:layout_height="166dp"
+            android:layout_height="125dp"
             android:background="#FFFFFF"
             android:fontFamily="@font/font_alegreya"
             android:gravity="center"

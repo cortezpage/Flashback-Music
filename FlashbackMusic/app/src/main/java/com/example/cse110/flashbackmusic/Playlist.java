@@ -24,6 +24,10 @@ public class Playlist {
     private int play_index;
     private Queue<Song> songPQ;
 
+    public Queue<Song> getSongPQ () {
+        return songPQ;
+    }
+
     public static Comparator<Song> rankComp = new Comparator<Song>() {
         @Override
         public int compare(Song s1, Song s2) {
@@ -63,7 +67,7 @@ public class Playlist {
             @Override
             public void onComplete(DatabaseEntry databaseEntry) {
                 LatLon latLon = MainActivity.getLastLatLon();
-                Date date = Calendar.getInstance().getTime();
+                Date date = OurCal.getCalendar().getTime();
 
                 Song song = databaseEntry.getSong();
                 ArrayList<PlayInstance> playInstances = databaseEntry.playInstances;
@@ -91,6 +95,8 @@ public class Playlist {
 
     private void startVibeMode () {
         Log.i("Playlist", "Entering Vibe Mode");
+
+        MainActivity.getMusicPlayer().setPlayMode("flashback");
 
         MusicPlayer musicPlayer = MainActivity.getMusicPlayer();
         musicPlayer.goToNextSong();

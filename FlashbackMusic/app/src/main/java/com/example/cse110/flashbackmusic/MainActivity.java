@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +48,8 @@ import java.io.FileOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -63,13 +66,19 @@ public class MainActivity extends AppCompatActivity {
 
     private final int LOGIN_SUCCESS_RESULT_CODE = 178900;
 
+    private final int SIGN_IN_REQ_CODE = 1;
+
     private static MusicPlayer musicPlayer = null;
     private static SharedPrefHelper sharedPrefHelper;
     private static ArrayList<Song> songs;
     private static ArrayList<Album> albums;
     private static LocationManager locationManager;
+    private static ArrayList<User> friends;
     private static GoogleSignInAccount googleAccount;
     private static GoogleSignInClient googleSignInClient;
+    private HttpTransport httpTransport;
+    private JacksonFactory jsonFactory;
+    private GoogleTokenResponse tokenResponse;
     private SharedPreferences songSharedPref;
     private SharedPreferences.Editor songDataEditor;
     private SharedPreferences idSharedPref;
@@ -88,6 +97,10 @@ public class MainActivity extends AppCompatActivity {
         return storage;
     }
 
+    public static Playlist getPlaylist () {return musicPlayer.getPlaylist(); }
+
+    public static int getPlayMode () {return musicPlayer.getPlayMode();}
+
     public static Intent getGoogleSignInIntent() { return googleSignInClient.getSignInIntent(); }
 
     public static MusicPlayer getMusicPlayer() {
@@ -104,6 +117,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static ArrayList<Album> getAlbums() {
         return albums;
+    }
+
+    public static ArrayList<User> getFriends() {
+        return friends;
     }
 
     @Override
@@ -201,6 +218,10 @@ public class MainActivity extends AppCompatActivity {
         albums = sharedPrefHelper.createAlbums();
 
         musicPlayer = new MusicPlayer (this.getResources());
+
+        httpTransport = new NetHttpTransport();
+        jsonFactory = new JacksonFactory();
+        tokenResponse = null;
 
         GoogleAuthentication();
 
@@ -399,6 +420,14 @@ public class MainActivity extends AppCompatActivity {
         catch (FileNotFoundException e) { e.printStackTrace(); }
         catch (IOException e1){e1.printStackTrace(); }
         Log.d("Unzip", "Finished unzip");
+
+        Button toTimeChangeActivity = findViewById(R.id.button_to_change_time);
+        toTimeChangeActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchTimeChangeActivity();
+            }
+        });
     }
 
     public void GoogleAuthentication() {
@@ -415,59 +444,7 @@ public class MainActivity extends AppCompatActivity {
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         googleAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (googleAccount == null) {
-            launchSignInActivity();
-        } else {
-            Log.i("SIGN IN SKIPPED", "ACCOUNT: " + googleAccount.getEmail());
-            try {
-                SetUpPeopleAPI();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void SetUpPeopleAPI() throws IOException {
-
-        HttpTransport httpTransport = new NetHttpTransport();
-        JacksonFactory jsonFactory = new JacksonFactory();
-        String code = googleAccount.getServerAuthCode();
-        String redirectUrl = "https://vibemode-2b73b.firebaseapp.com/__/auth/handler";
-
-        if (code == null) { Log.e("AUTH CODE RETRIEVED", "NULL"); }
-        else {
-            Log.i("AUTH CODE RETRIEVED", "SUCCESS");
-
-            GoogleTokenResponse tokenResponse =
-                    new GoogleAuthorizationCodeTokenRequest(
-                            httpTransport, jsonFactory, CLIENT_AUTH, CLIENT_SECRET, code, redirectUrl)
-                            .execute();
-
-            GoogleCredential credential = new GoogleCredential.Builder()
-                    .setTransport(httpTransport)
-                    .setJsonFactory(jsonFactory)
-                    .setClientSecrets(CLIENT_AUTH, CLIENT_SECRET)
-                    .build()
-                    .setFromTokenResponse(tokenResponse);
-
-            PeopleService peopleService =
-                    new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
-
-            try {
-                ListConnectionsResponse friends = peopleService.people().
-                        connections()
-                        .list("people/me")
-                        .setPersonFields("names, emailAddresses")
-                        .execute();
-                List<Person> friendList = friends.getConnections();
-                Log.i("NUM FRIENDS", "" + friendList.size());
-                for (int index = 0; index < friendList.size(); index++) {
-                    Log.e("FRIEND LIST", "" + friendList.get(index).getNames());
-                }
-            } catch (Exception e) {
-                Log.e("PEOPLE ERROR", e.getMessage());
-            }
-        }
+        launchSignInActivity();
     }
 
     @Override
@@ -475,20 +452,15 @@ public class MainActivity extends AppCompatActivity {
         // if the login activity just finished and the login was successful, update the googleAccount field
         if (resultCode == LOGIN_SUCCESS_RESULT_CODE) {
             googleAccount = GoogleSignIn.getLastSignedInAccount(this.getApplicationContext());
-            Log.i("LOGIN SUCCESSFUL", "USER: " + googleAccount.getDisplayName());
-            try {
-                SetUpPeopleAPI();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Log.i("LOGIN SUCCESSFUL", "USER: " + googleAccount.getEmail());
+            new SetUpPeopleAPITask().execute();
         }
     }
 
     public void launchSignInActivity () {
         Log.i("MainActivity LaunchSignInActivity", "Launching Sign In Activity");
         Intent intent = new Intent(this, SignInActivity.class);
-        startActivity(intent);
-    }
+        startActivityForResult(intent, SIGN_IN_REQ_CODE);    }
 
     public void launchDownloadActivity () {
         Log.i("MainAcitivity LaunchDonwloadActivity", "Launching Download activity");
@@ -515,6 +487,12 @@ public class MainActivity extends AppCompatActivity {
         updateMode(1);
         Log.i("MainAcitivity LaunchAlbumSelection", "Launching Album Selection Mode");
         Intent intent = new Intent(this, AlbumSelectionActivity.class);
+        startActivity(intent);
+    }
+
+    public void launchTimeChangeActivity () {
+        Log.i("MainActivity", "Launching TimeChangeActivity");
+        Intent intent = new Intent(this, DateChangeActivity.class);
         startActivity(intent);
     }
 
@@ -575,6 +553,80 @@ public class MainActivity extends AppCompatActivity {
         // Return the CSE Building if the location manager fails
         Log.e("MainActivity getLastLatLon", "location access failed, returning default location");
         return new LatLon(32.881801, -117.233523);
+    }
+
+    private class SetUpPeopleAPITask extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void ... params) {
+            String code = googleAccount.getServerAuthCode();
+            String redirectUrl = "https://vibemode-2b73b.firebaseapp.com/__/auth/handler";
+
+            if (code == null) { Log.e("AUTH CODE RETRIEVED", "NULL"); }
+            else {
+                Log.i("AUTH CODE RETRIEVED", "SUCCESS");
+                try {
+                    tokenResponse =
+                            new GoogleAuthorizationCodeTokenRequest(
+                                    httpTransport, jsonFactory, CLIENT_AUTH, CLIENT_SECRET, code, redirectUrl)
+                                    .execute();
+                } catch (IOException e) {
+                    Log.e("ASYNC TASK ERROR", e.getMessage());
+                }
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            new GetFriendsTask().execute();
+        }
+    }
+
+    private class GetFriendsTask extends AsyncTask<Void, Void, Void> {
+
+        protected Void doInBackground(Void ... params) {
+
+            if (tokenResponse != null) {
+                GoogleCredential credential = new GoogleCredential.Builder()
+                        .setTransport(httpTransport)
+                        .setJsonFactory(jsonFactory)
+                        .setClientSecrets(CLIENT_AUTH, CLIENT_SECRET)
+                        .build()
+                        .setFromTokenResponse(tokenResponse);
+
+                PeopleService peopleService =
+                        new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
+
+                try {
+                    ListConnectionsResponse connections = peopleService.people().
+                            connections()
+                            .list("people/me")
+                            .setPersonFields("names,emailAddresses")
+                            .execute();
+                        List<Person> friendList = connections.getConnections();
+                    if (friendList != null) {
+                        Log.i("NUM FRIENDS", "" + friendList.size());
+                        friends = new ArrayList<User> (friendList.size());
+                        String currID;
+                        int substringIndex = 8; // cutting of "people/c"
+                        for (int index = 0; index < friendList.size(); index++) {
+                            currID = friendList.get(index).getResourceName().substring(substringIndex);
+                            friends.add(new User(currID));
+                        }
+                    } else {
+                        Log.i("FRIEND LIST CREATION", "NO FRIENDS FOUND");
+                    }
+                } catch (IOException e) {
+                    Log.e("PEOPLE ERROR", e.getMessage());
+                }
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Void param) {
+            for (int index = 0; index < friends.size(); index++) {
+                Log.i("FRIEND LIST CREATION", "" + friends.get(index).getUserId());
+            }
+        }
     }
 
 }

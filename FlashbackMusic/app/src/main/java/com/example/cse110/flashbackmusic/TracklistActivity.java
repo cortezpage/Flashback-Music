@@ -9,10 +9,42 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
 import java.util.ArrayList;
+import java.util.Queue;
 
 public class TracklistActivity extends AppCompatActivity {
 
     private Button [] song_buttons;
+    private ArrayList<Song> songs_toshowlist;
+    private int play_mode;
+
+    private void updateSongsToShow () {
+        play_mode = MainActivity.getPlayMode();
+        Log.i("Tracklist", "Play Mode is " + play_mode);
+
+        songs_toshowlist = new ArrayList<>();
+        Song[] temp_songs;
+        Playlist playlist = MainActivity.getPlaylist();
+        Queue<Song> temp_songs_pq = null;
+        if (playlist != null) {
+            temp_songs_pq = playlist.getSongPQ();
+        }
+
+        if (play_mode == 1) {
+            temp_songs = MusicPlayActivity.songs_toshow;
+            for (int i = 0; i < temp_songs.length; i++) {
+                songs_toshowlist.add(temp_songs[i]);
+            }
+        } else if (play_mode == 2) {
+            // get the temp_songs from playlist
+            if (temp_songs_pq != null) {
+                for (Song item : temp_songs_pq) {
+                    songs_toshowlist.add(item);
+                }
+            }
+        }
+
+        Log.i("TrackList", "size of songs to show on the list is " + songs_toshowlist.size());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +61,9 @@ public class TracklistActivity extends AppCompatActivity {
             }
         });
 
-        final ArrayList<Song> songs = MainActivity.getSongs();
-        createDisplayButtons(songs);
+        updateSongsToShow();
+
+        createDisplayButtons(songs_toshowlist);
     }
 
     public void createDisplayButtons (ArrayList<Song> songs) {

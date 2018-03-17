@@ -14,13 +14,17 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class MusicPlayActivity extends AppCompatActivity implements LastPlayedObserver {
 
     private MusicPlayer musicPlayer;
     private SharedPrefHelper sharedPrefHelper;
     private ImageButton playButton;
+    private Album curr_album;
     private int play_mode;
+    private int curr_album_index;
+    public static Song[] songs_toshow;
 
     final boolean testing = true;
 
@@ -33,6 +37,11 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
 
         musicPlayer = MainActivity.getMusicPlayer();
         sharedPrefHelper = MainActivity.getSongSharedPrefHelper();
+
+        // get the album we selected
+        final ArrayList<Album> albumList = MainActivity.getAlbums();
+        curr_album_index = getIntent().getIntExtra("SELECTED_INDEX", 0);
+        curr_album = albumList.get(curr_album_index);
 
         String mode = getIntent().getStringExtra("MODE");
         musicPlayer.setPlayMode(mode);
@@ -70,8 +79,8 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
         else {
             updateTracklistButton(true);
             if (play_mode == 1) {
-                int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
-                musicPlayer.selectAlbum(selected_index);
+//                int selected_index = Integer.parseInt(getIntent().getStringExtra("SELECTED_INDEX"));
+                musicPlayer.selectAlbum(curr_album_index);
             } else if (musicPlayer.getPlayMode() == 2) {
                 int curr_id = musicPlayer.getPlaylistSongID();
                 musicPlayer.selectSong(curr_id);
@@ -109,6 +118,9 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
                 finish();
             }
         });
+
+        curr_album = albumList.get(curr_album_index);
+        songs_toshow = curr_album.getSongs();
 
         Button showTracklist = findViewById(R.id.show_tracklist);
         showTracklist.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +182,7 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
     private void launchTracklistActivity() {
         Log.i("MusicPlayActivity LaunchTracklistSelection", "Launching Tracklist Display");
         Intent intent = new Intent(this, TracklistActivity.class);
+        intent.putExtra("PLAY_MODE", play_mode);
         startActivity(intent);
     }
 

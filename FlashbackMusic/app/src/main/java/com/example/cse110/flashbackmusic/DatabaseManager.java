@@ -89,7 +89,7 @@ public class DatabaseManager {
 
                         lastInstance = instanceList.get(instanceList.size() - 1);
 
-                        Calendar cal = Calendar.getInstance();
+                        Calendar cal = OurCal.getCalendar();
                         cal.setTimeInMillis(lastInstance.timeInMillis);
 
                         song.setLastPlayedAll(lastInstance.userId, new LatLon(lastInstance.latitude,
