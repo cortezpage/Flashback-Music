@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private static ArrayList<Song> songs;
     private static ArrayList<Album> albums;
     private static LocationManager locationManager;
-    private static ArrayList<Person> friends;
+    private static ArrayList<User> friends;
     private static GoogleSignInAccount googleAccount;
     private static GoogleSignInClient googleSignInClient;
     private HttpTransport httpTransport;
@@ -93,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static ArrayList<Album> getAlbums() {
         return albums;
+    }
+
+    public static ArrayList<User> getFriends() {
+        return friends;
     }
 
     @Override
@@ -389,9 +393,12 @@ public class MainActivity extends AppCompatActivity {
                         List<Person> friendList = connections.getConnections();
                     if (friendList != null) {
                         Log.i("NUM FRIENDS", "" + friendList.size());
-                        friends = new ArrayList<Person> (friendList.size());
+                        friends = new ArrayList<User> (friendList.size());
+                        String currID;
+                        int substringIndex = 8; // cutting of "people/c"
                         for (int index = 0; index < friendList.size(); index++) {
-                            friends.add(friendList.get(index));
+                            currID = friendList.get(index).getResourceName().substring(substringIndex);
+                            friends.add(new User(currID));
                         }
                     } else {
                         Log.i("FRIEND LIST CREATION", "NO FRIENDS FOUND");
@@ -405,7 +412,7 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(Void param) {
             for (int index = 0; index < friends.size(); index++) {
-                Log.i("FRIEND LIST CREATION", "" + friends.get(index).getResourceName());
+                Log.i("FRIEND LIST CREATION", "" + friends.get(index).getUserId());
             }
         }
     }
