@@ -53,26 +53,30 @@ public class SongSelectionActivity extends AppCompatActivity {
                         break;
                     case "Title":
                         sortByTitle(songs, songs.size());
+                        Log.d("ORDER: BY TITLE", "SUCCESSFUL");
+                        for (int i = 0; i < song_buttons.length; i++) {
+                            Log.d("SORTED BY TITLE", "" + i + " " + song_buttons[i].getText().toString());
+                        }
                         break;
                     case "Artist":
                         Log.e ("select item", "selected artist");
                         sortByArtist(songs, songs.size());
                         Log.d("ORDER: BY ARTIST", "SUCCESSFUL");
-                        for (int i = 0; i < 10; i++) {
+                        for (int i = 0; i < song_buttons.length; i++) {
                             Log.d("SORTED BY ARTIST",""+i+" "+song_buttons[i].getText().toString());
                         }
                         break;
                     case "Album":
                         sortByAlbum(songs, songs.size());
                         Log.d("ORDER: BY ALBUM", "SUCCESSFUL");
-                        for (int i = 0; i < 10; i++) {
+                        for (int i = 0; i < song_buttons.length; i++) {
                             Log.d("SORTED BY ALBUM",""+i+" "+song_buttons[i].getText().toString());
                         }
                         break;
                     case "Favorited":
                         sortByFavorite(songs, songs.size());
                         Log.d("ORDER: BY FAVORITE", "SUCCESSFUL");
-                        for (int i = 0; i < 10; i++) {
+                        for (int i = 0; i < song_buttons.length; i++) {
                             Log.d("SORTED BY FAVORITE",""+i+" "+song_buttons[i].getText().toString());
                         }
                         break;
@@ -218,8 +222,8 @@ public class SongSelectionActivity extends AppCompatActivity {
     }
 
     public Button[] getOriginalSongButtons() {
-        for (int i = 0; i < 10; i++) {
-            Log.d("UNSORTED SONGS",""+i+" "+song_buttons[i].getText().toString());
+        for (int i = 0; i < song_buttons.length; i++) {
+            Log.d("UNSORTED SONGS","" + i + " " + song_buttons[i].getText().toString());
         }
         return song_buttons;
     }
