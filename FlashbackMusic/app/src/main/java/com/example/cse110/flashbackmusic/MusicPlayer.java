@@ -24,6 +24,8 @@ public class MusicPlayer {
 
     private boolean loadingSong;
 
+    public Playlist getPlaylist () { return flashback_playlist; }
+
     public MusicPlayer(Resources resources) {
 
         this.song_resources = resources;
@@ -223,7 +225,7 @@ public class MusicPlayer {
      */
     public void loadSong(int resourceId) {
 
-        Log.e ("loadSong", "loading song ID: " + resourceId);
+        Log.i ("loadSong", "loading song ID: " + resourceId);
 
         AssetFileDescriptor songFD = this.song_resources.openRawResourceFd(resourceId);
         try {

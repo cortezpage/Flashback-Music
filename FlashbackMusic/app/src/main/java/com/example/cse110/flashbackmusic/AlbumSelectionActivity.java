@@ -42,7 +42,7 @@ public class AlbumSelectionActivity extends AppCompatActivity {
             new_button.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View view) {
                     Log.i("AlbumSelectionActivity", "Album " + curr_id + " is being selected");
-                    launchMusicPlay("" + curr_id);
+                    launchMusicPlay(curr_id);
                 }
             });
         }
@@ -57,8 +57,9 @@ public class AlbumSelectionActivity extends AppCompatActivity {
         });
     }
 
-    public void launchMusicPlay (String albumID) {
+    public void launchMusicPlay (int albumID) {
         Intent intent = new Intent(this, MusicPlayActivity.class);
+//        int temp = Integer.parseInt(albumID);
         intent.putExtra("SELECTED_INDEX", albumID);
         intent.putExtra("MODE", "album_selection");
         Log.i("AlbumSelectionActivity", "launched music player with AlbumID " + albumID);
