@@ -235,13 +235,7 @@ public class MainActivity extends AppCompatActivity {
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         googleAccount = GoogleSignIn.getLastSignedInAccount(this);
-        //if (googleAccount == null) {
-        if (true) {
-            launchSignInActivity();
-        } else {
-            Log.i("SIGN IN SKIPPED", "ACCOUNT: " + googleAccount.getEmail());
-            new SetUpPeopleAPITask().execute();
-        }
+        launchSignInActivity();
     }
 
     @Override
