@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity {//implements ActivityCompat
         musicPlayer = new MusicPlayer (this.getResources());
 
         String mode = modeSharedPref.getString("LAST_PLAYED_MODE", "NOT FOUND");
+        mode = "default"; // TODO remove this line
         Log.i("MODE", mode);
         if (mode.equals("flashback")) {
             launchFlashbackMode();

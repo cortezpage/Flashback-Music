@@ -2,6 +2,7 @@ package com.example.cse110.flashbackmusic;
 
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -45,13 +46,14 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
                         // The toggle is enabled
                         musicPlayer.setPlayMode("flashback");
                         MainActivity.updateMode(2);
+                        updateButtonImages();
                     } else {
                         // The toggle is disabled
                         musicPlayer.setPlayMode("song_selection");
                         MainActivity.updateMode(0);
+                        updateButtonImages();
+                        updateUIWithSongInfo();
                     }
-                    updateButtonImages();
-                    updateUIWithSongInfo();
                 }
             }
         });
@@ -181,6 +183,7 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
             @Override
             public void onClick(View view) {
                 Log.i("MusicPlayActivity Next Button", "Next Button is clicked");
+                play_mode = musicPlayer.getPlayMode();
                 if ((play_mode == 1 && musicPlayer.reachedEndOfAlbum()) ||
                         (play_mode == 2 && musicPlayer.reachedEndOfPlaylist())) {
                     musicPlayer.stop();
