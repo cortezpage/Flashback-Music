@@ -19,8 +19,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleBrowserClientRequestUrl;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.people.v1.PeopleService;
+import com.google.api.services.people.v1.model.ListConnectionsResponse;
+import com.google.api.services.people.v1.model.Person;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private final int LOCATION_PERMISSION_REQUEST_CODE = 0; // arbitrary number chosen
 
     private final String CLIENT_AUTH = "787403082568-fgl6qfqr64ed5jsd0uk8a7a4jmoo996m.apps.googleusercontent.com";
+
+    private final String CLIENT_SECRET = "-i7_U5cbS3Eybh0Wuq7IQmmY";
 
     private final int LOGIN_SUCCESS_RESULT_CODE = 178900;
 
@@ -204,63 +221,57 @@ public class MainActivity extends AppCompatActivity {
         if (googleAccount == null) {
             launchSignInActivity();
         } else {
-            Log.i("SIGN IN SKIPPED", "ACCOUNT: " + googleAccount.getDisplayName());
+            Log.i("SIGN IN SKIPPED", "ACCOUNT: " + googleAccount.getEmail());
+            try {
+                SetUpPeopleAPI();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    /*public void SetUpPeopleAPI() throws IOException {
+    public void SetUpPeopleAPI() throws IOException {
+
         HttpTransport httpTransport = new NetHttpTransport();
         JacksonFactory jsonFactory = new JacksonFactory();
+        String code = googleAccount.getServerAuthCode();
+        String redirectUrl = "https://vibemode-2b73b.firebaseapp.com/__/auth/handler";
 
-        // Go to the Google API Console, open your application's
-        // credentials page, and copy the client ID and client secret.
-        // Then paste them into the following code.
-        String clientId = "YOUR_CLIENT_ID";
-        String clientSecret = "YOUR_CLIENT_SECRET";
+        if (code == null) { Log.e("AUTH CODE RETRIEVED", "NULL"); }
+        else {
+            Log.i("AUTH CODE RETRIEVED", "SUCCESS");
 
-        // Or your redirect URL for web based applications.
-        String redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
-        String scope = "https://www.googleapis.com/auth/contacts.readonly";
+            GoogleTokenResponse tokenResponse =
+                    new GoogleAuthorizationCodeTokenRequest(
+                            httpTransport, jsonFactory, CLIENT_AUTH, CLIENT_SECRET, code, redirectUrl)
+                            .execute();
 
-        // Step 1: Authorize -->
-        String authorizationUrl =
-                new GoogleBrowserClientRequestUrl(clientId, redirectUrl, Arrays.asList(scope)).build();
+            GoogleCredential credential = new GoogleCredential.Builder()
+                    .setTransport(httpTransport)
+                    .setJsonFactory(jsonFactory)
+                    .setClientSecrets(CLIENT_AUTH, CLIENT_SECRET)
+                    .build()
+                    .setFromTokenResponse(tokenResponse);
 
-        // Point or redirect your user to the authorizationUrl.
-        System.out.println("Go to the following link in your browser:");
-        System.out.println(authorizationUrl);
+            PeopleService peopleService =
+                    new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
 
-        // Read the authorization code from the standard input stream.
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("What is the authorization code?");
-        String code = in.readLine();
-        // End of Step 1 <--
-
-        // Step 2: Exchange -->
-        GoogleTokenResponse tokenResponse =
-                new GoogleAuthorizationCodeTokenRequest(
-                        httpTransport, jsonFactory, clientId, clientSecret, code, redirectUrl)
+            try {
+                ListConnectionsResponse friends = peopleService.people().
+                        connections()
+                        .list("people/me")
+                        .setPersonFields("names, emailAddresses")
                         .execute();
-        // End of Step 2 <--
-
-        GoogleCredential credential = new GoogleCredential.Builder()
-                .setTransport(httpTransport)
-                .setJsonFactory(jsonFactory)
-                .setClientSecrets(clientId, clientSecret)
-                .build()
-                .setFromTokenResponse(tokenResponse);
-
-        PeopleService peopleService =
-                new PeopleService.Builder(httpTransport, jsonFactory, credential).build();
-    ...
+                List<Person> friendList = friends.getConnections();
+                Log.i("NUM FRIENDS", "" + friendList.size());
+                for (int index = 0; index < friendList.size(); index++) {
+                    Log.e("FRIEND LIST", "" + friendList.get(index).getNames());
+                }
+            } catch (Exception e) {
+                Log.e("PEOPLE ERROR", e.getMessage());
+            }
+        }
     }
-
-    public void GetFriends() {
-        ListConnectionsResponse response = peopleService.people().connections().list("people/me")
-                .setPersonFields("names,emailAddresses")
-                .execute();
-        List<Person> connections = response.getConnections();
-    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -268,6 +279,11 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == LOGIN_SUCCESS_RESULT_CODE) {
             googleAccount = GoogleSignIn.getLastSignedInAccount(this.getApplicationContext());
             Log.i("LOGIN SUCCESSFUL", "USER: " + googleAccount.getDisplayName());
+            try {
+                SetUpPeopleAPI();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
