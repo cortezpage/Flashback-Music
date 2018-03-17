@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -225,6 +226,14 @@ public class MainActivity extends AppCompatActivity {
                 launchAlbumSelection();
             }
         });
+
+        Button toTimeChangeActivity = findViewById(R.id.button_to_change_time);
+        toTimeChangeActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchTimeChangeActivity();
+            }
+        });
     }
 
     public void GoogleAuthentication() {
@@ -284,6 +293,12 @@ public class MainActivity extends AppCompatActivity {
         updateMode(1);
         Log.i("MainAcitivity LaunchAlbumSelection", "Launching Album Selection Mode");
         Intent intent = new Intent(this, AlbumSelectionActivity.class);
+        startActivity(intent);
+    }
+
+    public void launchTimeChangeActivity () {
+        Log.i("MainActivity", "Launching TimeChangeActivity");
+        Intent intent = new Intent(this, DateChangeActivity.class);
         startActivity(intent);
     }
 

@@ -71,7 +71,7 @@ public class MusicPlayer {
 
     public void updateSongInfo() {
         Song curr_song = songs.get(play_index);
-        curr_song.setLastPlayedCalendar(Calendar.getInstance());
+        curr_song.setLastPlayedCalendar(OurCal.getCalendar());
         LatLon newLatLon = MainActivity.getLastLatLon();
         if (newLatLon != null) {
             songs.get(play_index).setLastPlayedLocation(newLatLon);
@@ -87,7 +87,7 @@ public class MusicPlayer {
             User dummyUser = new User("DummyUser");
             //TODO if we wanna manipulate the time we should modify here & grab the User
 
-            Calendar cal = Calendar.getInstance();
+            Calendar cal = OurCal.getCalendar();
             PlayInstance curr_instance = new PlayInstance(dummyUser, newLatLon, cal);
             databaseManager.storePlayInstance(curr_instance, curr_song);
 
@@ -97,7 +97,7 @@ public class MusicPlayer {
 
     public void updatePlaylist(boolean startingFBMode) {
         return;/*
-        Calendar currTime = Calendar.getInstance();
+        Calendar currTime = OurCal.getCalendar();
         LatLon currLoc = MainActivity.getLastLatLon();
         if (flashback_playlist == null) {
             return;

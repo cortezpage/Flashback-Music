@@ -63,7 +63,7 @@ public class Playlist {
             @Override
             public void onComplete(DatabaseEntry databaseEntry) {
                 LatLon latLon = MainActivity.getLastLatLon();
-                Date date = Calendar.getInstance().getTime();
+                Date date = OurCal.getCalendar().getTime();
 
                 Song song = databaseEntry.getSong();
                 ArrayList<PlayInstance> playInstances = databaseEntry.playInstances;
