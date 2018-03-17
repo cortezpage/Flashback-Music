@@ -41,8 +41,6 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
         // get the album we selected
         final ArrayList<Album> albumList = MainActivity.getAlbums();
         curr_album_index = getIntent().getIntExtra("SELECTED_INDEX", 0);
-
-        Log.e("AAAAAAAAAAAAAAAAAAAAAa", "BBBBBBBBBBBBBB " + curr_album_index);
         curr_album = albumList.get(curr_album_index);
 
         String mode = getIntent().getStringExtra("MODE");
@@ -122,7 +120,6 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
         });
 
         curr_album = albumList.get(curr_album_index);
-        Log.e("TESTING", "clbum index is" + curr_album_index);
         songs_toshow = curr_album.getSongs();
 
         Button showTracklist = findViewById(R.id.show_tracklist);
