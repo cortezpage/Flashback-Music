@@ -53,10 +53,6 @@ public class SongSelectionActivity extends AppCompatActivity {
                         break;
                     case "Title":
                         sortByTitle(songs, songs.size());
-                        Log.d("ORDER: BY TITLE", "SUCCESSFUL");
-                        for (int i = 0; i < 10; i++) {
-                            Log.d("SORTED BY TITLE",""+i+" "+song_buttons[i].getText().toString());
-                        }
                         break;
                     case "Artist":
                         Log.e ("select item", "selected artist");
