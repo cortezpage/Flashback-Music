@@ -51,8 +51,8 @@ public class MusicPlayActivity extends AppCompatActivity implements LastPlayedOb
                         // The toggle is disabled
                         musicPlayer.setPlayMode("song_selection");
                         MainActivity.updateMode(0);
-                        updateButtonImages();
-                        updateUIWithSongInfo();
+                        musicPlayer.stop();
+                        finish();
                     }
                 }
             }
