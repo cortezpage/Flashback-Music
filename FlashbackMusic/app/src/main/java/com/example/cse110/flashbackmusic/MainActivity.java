@@ -299,6 +299,14 @@ public class MainActivity extends AppCompatActivity {
         };
         IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         registerReceiver(broadcastReceiver, intentFilter);
+
+        Button toTimeChangeActivity = findViewById(R.id.button_to_change_time);
+        toTimeChangeActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchTimeChangeActivity();
+            }
+        });
     }
 
     // Source (used for info), 3/7/18:
@@ -420,14 +428,6 @@ public class MainActivity extends AppCompatActivity {
         catch (FileNotFoundException e) { e.printStackTrace(); }
         catch (IOException e1){e1.printStackTrace(); }
         Log.d("Unzip", "Finished unzip");
-
-        Button toTimeChangeActivity = findViewById(R.id.button_to_change_time);
-        toTimeChangeActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                launchTimeChangeActivity();
-            }
-        });
     }
 
     public void GoogleAuthentication() {
